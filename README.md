@@ -8,7 +8,7 @@ git checkout -b feature/分支名稱
 ```
 git add .
 git commit -m "檔名"
-git push origin 分支名稱
+git push origin  feature/ 分支名稱
 ```
 - 上傳後可以到 GitHub 上看到這個分支
 
