@@ -12,7 +12,7 @@ git push origin  feature/ 分支名稱
 ```
 - 上傳後可以到 GitHub 上看到這個分支
 
-### 合併分支到主分支（main）
+### 確認沒問題合併分支到主分支（main）
 ```
 # 切換到 main
 git checkout main
