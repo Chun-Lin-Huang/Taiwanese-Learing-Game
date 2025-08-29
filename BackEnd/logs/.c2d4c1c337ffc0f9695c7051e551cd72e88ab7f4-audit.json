@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 30
+    },
+    "auditLog": "/Users/huangchunlin/Taiwanese-learning-robot/BackEnd/logs/.c2d4c1c337ffc0f9695c7051e551cd72e88ab7f4-audit.json",
+    "files": [
+        {
+            "date": 1755916971849,
+            "name": "/Users/huangchunlin/Taiwanese-learning-robot/BackEnd/logs/rejections-2025-08-23.log",
+            "hash": "20967f2e11d2ccb6647ab5bfecfdf0b647e8db94fb3ba33cb39f7fe00e28d3f4"
+        }
+    ],
+    "hashType": "sha256"
+}
