@@ -1,0 +1,52 @@
+/* ===== 使用說明頁專屬樣式 ===== */
+.instructions-container {
+  max-width: 1920px; /* 最大寬度限制，避免超出設計稿寬度 */
+  min-height: 100%; /* 滿版高度 */
+  margin: 0 auto; /* 置中 */
+  overflow: hidden; /* 隱藏超出範圍的內容 */
+}
+
+/* ===== 響應式調整（平板橫向與桌面小螢幕以下） ===== */
+@media (max-width: 1024px) {
+  .game-header {
+    height: 90px; /* 頁首高度縮小 */
+  }
+  .back-button {
+    left: 40px; /* 靠左距離減少 */
+    width: 60px; /* 按鈕寬度縮小 */
+    height: 60px; /* 按鈕高度縮小 */
+  }
+  .header-title {
+    font-size: 36px; /* 標題字體縮小 */
+  }
+}
+
+/* ===== 響應式調整（平板直向與中型手機） ===== */
+@media (max-width: 768px) {
+  .game-header {
+    height: 70px;
+  }
+  .back-button {
+    left: 20px;
+    width: 45px;
+    height: 45px;
+  }
+  .header-title {
+    font-size: 28px;
+  }
+}
+
+/* ===== 響應式調整（小型手機與極小螢幕） ===== */
+@media (max-width: 480px) {
+  .game-header {
+    height: 60px;
+  }
+  .back-button {
+    left: 16px;
+    width: 36px;
+    height: 36px;
+  }
+  .header-title {
+    font-size: 22px;
+  }
+}

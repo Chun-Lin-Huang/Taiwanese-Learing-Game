@@ -1,0 +1,169 @@
+/* GameMain.css */
+
+/* GameQuestion.css - 電腦版適應調整 */
+
+.game-selection-bg {
+  min-height: 100vh;
+  min-width: 100vw;
+  width: 100vw;
+
+  height: auto;
+  /* <--- 確保高度可以自動調整 */
+  position: relative;
+  background: #302727a4;
+  /* 遊戲背景的底色 */
+  overflow-x: hidden;
+  overflow-y: auto;
+
+
+}
+
+
+.main-menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-position: center;
+  background-size: cover;
+
+  background-color: rgba(242, 240, 240, 0.23);
+  /* 可調整透明度 */
+  background-blend-mode: lighten;
+  /* 或用 overlay, multiply, 依需求調整 */
+}
+
+.main-menu-overlay {
+
+  padding: 2rem 3rem;
+  border-radius: 20px;
+  text-align: center;
+  color: white;
+  max-width: 90%;
+}
+
+.main-menu-title {
+  font-size: 8rem;
+  /* 調整標題大小 */
+  margin-bottom: -5rem;
+  /* 減少下方距離，讓按鈕區塊更靠近 */
+  margin-top: 0rem;
+  /* 移除多餘的上邊距，避免影響按鈕位置 */
+  text-shadow: 0 6px 16px rgba(0, 0, 0, 0.9);
+  /* 加陰影 */
+}
+
+/* 調整按鈕區塊往下移動 */
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 20rem;
+  /* 新增，往下移動 */
+
+}
+
+.start-button {
+  padding: 1rem 3rem;
+  font-size: 3rem;
+  border: none;
+  border-radius: 14px;
+  background-color: #FA1717;
+  color: white;
+  cursor: pointer;
+  width: 350px;
+  height: 80px;
+  transition: background-color 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 7px 10px rgba(0, 0, 0, 0.7);
+}
+
+.exit-button {
+  padding: 1rem 3rem;
+  font-size: 3rem;
+  border: none;
+  border-radius: 14px;
+  background-color: #94DA2C;
+  color: white;
+  cursor: pointer;
+  width: 350px;
+  height: 80px;
+  transition: background-color 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 7px 10px rgba(0, 0, 0, 0.7);
+}
+
+
+.start-button:hover,
+.exit-button:hover {
+  background-color: #bfa8f1;
+}
+
+.back-button.top-left {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.back-button img {
+  width: 32px;
+  height: 32px;
+}
+
+/* 確認退出彈窗 */
+.confirm-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.confirm-box {
+  background: white;
+  padding: 3rem; /* 從 2rem 增大到 3rem，增加內邊距 */
+  border-radius: 1.5rem; /* 從 1rem 增大到 1.5rem，圓角也隨之變大 */
+  text-align: center;
+  /* 關鍵調整：增大 max-width，從 300px 改為更大的值 */
+  /* 使用相對單位確保彈性放大，例如 vw，或保持 rem */
+  max-width: 40vw; /* 調整為視窗寬度的 40%，讓它顯著變大 */
+  min-width: 350px; /* 設置最小寬度，避免在小螢幕上過小 */
+}
+
+.confirm-box p {
+  font-size: 1.8rem; /* 從 1.2rem 增大到 1.8rem，文字變大 */
+  margin-bottom: 2rem; /* 從 1.5rem 增大到 2rem，段落下方間距變大 */
+  color: #333;
+}
+
+.confirm-actions button {
+  margin: 0 0.8rem; /* 從 0.5rem 增大到 0.8rem，按鈕間距變大 */
+  padding: 0.8rem 1.6rem; /* 從 0.6rem 1.2rem 增大，按鈕內邊距變大 */
+  font-size: 1.3rem; /* 從 1rem 增大到 1.3rem，按鈕文字變大 */
+  border: none;
+  border-radius: 1rem; /* 從 8px (0.5rem) 增大到 1rem，圓角變大 */
+  cursor: pointer;
+}
+
+.confirm-actions button:first-child {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+.confirm-actions button:last-child {
+  background-color: #94DA2C; /* 根據你的截圖，這裡可能是綠色而不是紅色 */
+  color: white;
+}

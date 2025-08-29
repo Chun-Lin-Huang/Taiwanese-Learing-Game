@@ -1,0 +1,35 @@
+/* LoginFailureSpecific.css */
+
+/* 獨特的紅色輸入欄位樣式 */
+#login-failure-page .form-input-specific { /* 命名一個特定類別 */
+  color: #d86f6f !important;
+}
+
+#login-failure-page .form-input-specific::placeholder {
+  color: #d86f6f;
+}
+
+/* 失敗頁標題的獨特樣式 (如果與 welcome-title 有差異) */
+#login-failure-page .failure-title-specific { /* 命名一個特定類別 */
+  font-size: 5rem; /* 與 welcome-title 相同 */
+  margin-top: 3.75rem; /* 與 welcome-title 相同 */
+  margin-bottom: -9.375rem; /* 這個是 failure-title 獨有的，更貼近小熊 */
+}
+
+/* 針對小尺寸螢幕的 failure-title 調整 */
+@media (max-width: 768px) {
+  #login-failure-page .failure-title-specific {
+    font-size: 3.5rem;
+    margin-top: 1rem;
+    margin-bottom: -3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  #login-failure-page .failure-title-specific {
+    font-size: 2.8rem;
+    margin-bottom: -2.5rem;
+  }
+}
+
+/* 如果有其他任何僅屬於 login-failure-page 的樣式，都放在這裡 */

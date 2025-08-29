@@ -1,0 +1,57 @@
+#login-success-page {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+  font-family: 'Kanit', sans-serif;
+  color: #545050;
+
+  display: flex;
+  flex-direction: column; /* 讓小熊和文字垂直排列 */
+  justify-content: center; /* 水平置中內容 */
+  align-items: center;   /* 垂直置中內容 */
+  text-align: center;
+
+  /* 設定頁面背景 - 現在應該是純色或純棋盤格圖，不包含小熊和 Welcome 文字 */
+  
+   background-image: url('../assets/背景小熊.png'); 
+  /* background-size: cover; */
+  /* background-position: center; */
+  /* background-repeat: no-repeat; */
+
+  cursor: pointer;
+  overflow: hidden; /* 防止動畫元素超出頁面時出現捲軸 */
+
+  /* 這裡不再將動畫直接應用於整個 #login-success-page */
+}
+
+
+
+/* Welcome 文字圖片的樣式與動畫 */
+.welcome-text-image {
+  width: 1400px; /* 根據需要調整文字圖片大小 */
+  max-width: 70%;
+  height: auto;
+  /* 應用往上移的動畫 */
+  animation: slideInUp 1s ease-out forwards;
+  animation-delay: 1s; /* 讓 Welcome 文字在頁面載入後延遲 0.5 秒才開始動畫 */
+}
+
+/* 定義 slideInUp 動畫 */
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%); /* 從原始位置的下方 100% 處開始 */
+    opacity: 0; /* 開始時完全透明 */
+  }
+  to {
+    transform: translateY(); /* 移動到原始位置 */
+    opacity: 1; /* 結束時完全不透明 */
+  }
+}
+
+/* 移除之前可能存在的 .mascot-image 相關樣式，因為我們現在使用 .welcome-bear-image 和 .welcome-text-image */
+/*
+#login-success-page .mascot-image:hover {
+  transform: scale(1.15);
+}
+*/

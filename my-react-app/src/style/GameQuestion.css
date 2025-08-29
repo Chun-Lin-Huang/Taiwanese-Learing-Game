@@ -1,0 +1,494 @@
+/* GameQuestion.css - 電腦版適應調整 */
+
+.game-GameQuestion-bg {
+    /* <--- 將 game-selection-bg 改為 game-GameQuestion-bg */
+    min-height: 100vh;
+    min-width: 100vw;
+    width: 100vw;
+    background: linear-gradient(to bottom right, #fdffbc, #e0f2f7);
+    height: auto;
+    /* <--- 確保高度可以自動調整 */
+    position: relative;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.game-GameQuestion-bg::before {
+    /* <--- 將 game-selection-bg::before 改為 game-GameQuestion-bg::before */
+    content: "";
+    position: absolute;
+    inset: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    /* 確保它在最底層 */
+    /* <--- 你的背景圖片路徑和檔名 */
+    background-size: cover;
+    /* 確保圖片覆蓋整個區域，防止背景空白 */
+    opacity: 0.15;
+    /* 調整透明度，讓內容更突出 */
+    pointer-events: none;
+    /* 讓鼠標事件穿透背景 */
+}
+
+.game-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    /* 增加 header 高度 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffec97;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* 增加陰影，使其更有層次感 */
+}
+
+.back-button {
+    position: absolute;
+    left: 50px;
+    /* 調整左邊距，讓它不會太靠近邊緣 */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 70px;
+    /* 增加點擊區域 */
+    height: 70px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background-color 0.2s ease;
+    /* 添加過渡效果 */
+}
+
+.back-button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    /* 鼠標懸停效果 */
+}
+
+.back-button img {
+    width: 45px;
+    /* 調整返回圖標大小 */
+    height: 45px;
+}
+
+.header-title {
+    width: 100%;
+    text-align: center;
+    margin: 0;
+    font-weight: 600;
+    font-size: 2.5rem;
+    /* 增加標題字體大小 */
+    color: #545050;
+    letter-spacing: 2px;
+    /* 增加字元間距 */
+}
+
+.game-question-main {
+    width: 100%;
+    max-width: 1920px;
+    /* 適度增加最大寬度，讓內容在大螢幕上更寬敞 */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 0 auto;
+    gap: 5px;
+    /* 調整項目之間的間距 */
+    padding: 200px 40px 40px 40px;
+    /* 增加頂部內邊距以避開固定 header，左右也增加 */
+    box-sizing: border-box;
+    /* 確保 padding 不增加總寬度 */
+    position: relative;
+    /* 確保此容器能建立自己的堆疊上下文，如果需要 */
+    z-index: 1;
+    /* 確保內容在背景偽元素之上 */
+}
+
+/* 題號區塊 */
+.question-number-container {
+    background-color: #F9AB5D;
+    color: #ffffff;
+    font-size: 2.5em;
+    /* 增加整體字體大小 */
+    font-weight: bold;
+    padding: 18px 50px;
+    /* 增加內邊距 */
+    border-radius: 9999px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    /* 稍微增強陰影 */
+    display: flex;
+    justify-content: center;
+
+}
+
+.question-number-label {
+    font-size: 1em;
+    /* 相對於父元素 */
+    margin: 0 8px;
+    /* 調整間距 */
+}
+
+.current-question-num {
+    font-size: 1em;
+    /* 數字再大一點點，更突出 */
+    margin: 0 6px;
+}
+
+.total-questions-num {
+    margin-left: 6px;
+}
+
+
+/* 題目區塊 */
+.question-text-container {
+
+    background-color: transparent;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+    display: flex;
+    align-items: center;
+    /* 讓喇叭按鈕和文字包裝器垂直居中對齊 */
+    gap: 60px;
+    /* 喇叭按鈕和文字之間的間距 */
+    width: 100%;
+    max-width: 999px;
+    /* 這裡請設定一個合理的寬度，不要是 100% 或 1980px，因為整個 container 要居中 */
+    min-height: 120px;
+    box-sizing: border-box;
+    margin: 0 auto;
+    /* 讓整個題目區塊在 .game-question-main 內水平居中 */
+
+    /* 關鍵：讓喇叭按鈕靠左，題目文字包裝器在右側佔據剩餘空間 */
+    justify-content: flex-start;
+    /* <--- 確保喇叭按鈕靠左 */
+
+
+}
+
+.speaker-button-container {
+    width: 100%;
+    /* 佔滿可用寬度 */
+    max-width: 800px;
+    /* 讓其與題目區塊的寬度保持一致 */
+    display: flex;
+    /* 啟用 Flexbox */
+    justify-content: flex-start;
+    /* <--- 讓播放鍵靠左 */
+    align-items: center;
+    /* 垂直居中 */
+    padding: 0 0 0 25px;
+    /* 添加左側 padding，讓播放鍵不完全貼邊 */
+    box-sizing: border-box;
+}
+
+.speaker-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    width: 60px;
+    /* 增加按鈕大小 */
+    height: 60px;
+    display: flex;
+    align-items: center;
+    /* 確保圖片在按鈕內居中 */
+    justify-content: center;
+    /* 確保圖片在按鈕內居中 */
+    transition: transform 0.2s ease;
+}
+
+.speaker-button:hover {
+    transform: scale(1.05);
+    /* 懸停放大效果 */
+}
+
+.speaker-button img {
+    width: 50px;
+    /* 調整圖標大小 */
+    height: 50px;
+}
+
+/* 新增：題目文字的包裝器，用於實現文字居中 */
+.question-text-wrapper {
+
+    display: flex;
+    /* 讓其成為一個 flex 容器 */
+    justify-content: center;
+    /* <-- 讓內部文字水平居中 */
+    align-items: center;
+    /* 確保文字在包裝器內垂直居中 */
+    gap: 50px;
+    height: 100%;
+    /* 確保高度撐開 */
+    padding: 120px 40px 40px 40px;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+}
+
+.question-text {
+    font-size: 3.4em;
+    /* 增加題目文字大小 */
+    color: #333;
+    margin: 0;
+    /* 確保沒有額外 margin 干擾居中 */
+    line-height: 1.6;
+    /* 調整行高 */
+    text-align: center;
+    /* <-- 新增：如果一行文字，可以確保其文字內容居中 */
+    word-break: break-word;
+    /* 確保長單詞能斷行 */
+    font-weight: 800;
+}
+
+/* 選項區塊 */
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    width: 100%;
+    max-width: 1000px;
+    /* 比 70% 更穩定，外框感更明顯 */
+    margin: 0 auto;
+    padding: 120px 40px 40px 40px;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+}
+
+/* 單一選項按鈕（外框＋底色＋置中）*/
+.option-button {
+    position: relative;
+    /* 讓勾勾/叉叉可以絕對定位在右側 */
+    background-color: #FFF7B1;
+    border: 6px solid #FFCC6D;
+    /* 外框（回來了！） */
+    border-radius: 20px;
+    padding: 30px 20px;
+    padding-right: 76px;
+    /* 預留右邊空間給勾勾/叉叉 */
+    font-size: 2.4em;
+    color: #4a2f00;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    min-height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Hover/Active 仍保留外框感 */
+.option-button:hover {
+    background-color: #D0F2FF;
+    border-color: #00B4F6;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.option-button:active {
+    transform: translateY(2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 顯示結果：只改顏色，不改邊框粗細/內距 */
+.option-button.correct-answer {
+    background-color: #D0F2FF;
+    border-color: #00B4F6;
+    /* 保持 6px 粗細，避免位移 */
+    color: #161a1e;
+    cursor: default;
+    transform: none;
+}
+
+.option-button.incorrect-answer {
+    background-color: #ffcccc;
+    border-color: #ff0000;
+    /* 保持 6px 粗細，避免位移 */
+    color: #271919;
+    cursor: default;
+    transform: none;
+}
+
+/* ✅ 與 ❌ 圖示固定在按鈕右側中線，不參與排版 */
+.correct-check-icon,
+.incorrect-wrong-icon {
+    position: absolute;
+    right: 16px;
+    /* 想更靠右可加大 */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 38px;
+    /* 桌機尺寸；手機版下方會覆蓋 */
+    height: 38px;
+    pointer-events: none;
+    /* 不阻擋點擊 */
+    z-index: 2;
+}
+
+.next-question-button {
+    background-color: #F9AB5D;
+    /* 按鈕顏色 */
+    color: white;
+    font-size: 1.4em;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+
+    position: absolute;
+    /* 絕對定位 */
+    right: 40px;
+    /* 距離右邊緣 */
+    bottom: 40px;
+    /* 距離底部邊緣 */
+    z-index: 10;
+}
+
+.next-question-button:hover {
+    background-color: #e58a3d;
+    transform: translateY(-3px);
+}
+
+.next-question-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.option-button:hover {
+    background-color: #D0F2FF;
+    border-color: #00B4F6;
+    transform: translateY(-5px);
+    /* 懸停時上移更多 */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.option-button:active {
+    transform: translateY(2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* RWD - 手機版適應 (保持不變或根據需要微調) */
+@media (max-width: 768px) {
+    .game-header {
+        height: 80px;
+        /* 手機版 header 高度 */
+    }
+
+    .header-title {
+        font-size: 1.8em;
+        /* 手機版標題大小 */
+    }
+
+    .back-button {
+        left: 20px;
+        /* 手機版左邊距 */
+        width: 50px;
+        height: 50px;
+    }
+
+    .back-button img {
+        width: 30px;
+        height: 30px;
+    }
+
+    .game-question-main {
+        padding: 100px 20px 20px 20px;
+        /* 手機版內邊距調整 */
+        gap: 30px;
+        /* 手機版項目間距 */
+    }
+
+    .question-number-container {
+        font-size: 1.8em;
+        /* 手機版字體大小 */
+        padding: 12px 30px;
+    }
+
+    .question-number-label {
+        font-size: 0.8em;
+        margin: 0 4px;
+    }
+
+    .current-question-num {
+        font-size: 1.2em;
+        margin: 0 4px;
+    }
+
+    .question-number-separator,
+    .total-questions-num {
+        font-size: 1em;
+    }
+
+    .question-text-container {
+        padding: 20px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        min-height: auto;
+    }
+
+    .speaker-button {
+        width: 45px;
+        height: 45px;
+    }
+
+    .speaker-button img {
+        width: 35px;
+        height: 35px;
+    }
+
+    .question-text {
+        font-size: 1.6em;
+        /* 手機版題目文字大小 */
+    }
+
+    .options-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .option-button {
+        font-size: 1.6em;
+        min-height: 80px;
+        padding: 20px 25px;
+        padding-right: 60px;
+    }
+
+    .correct-check-icon,
+    .incorrect-wrong-icon {
+        right: 12px;
+        width: 34px;
+        height: 34px;
+    }
+
+    .correct-check-icon,
+    .incorrect-wrong-icon {
+        /* 手機版圖標位置和大小 */
+        right: 10px;
+        width: 30px;
+        height: 30px;
+    }
+
+    .next-question-button {
+        font-size: 1.8em;
+        padding: 12px 30px;
+        margin-top: 20px;
+    }
+}

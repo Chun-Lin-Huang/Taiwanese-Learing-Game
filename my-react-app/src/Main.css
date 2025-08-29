@@ -1,0 +1,33 @@
+
+/*跟App.css一樣＊/
+/* 確保全域盒模型 */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 根元素字體大小：用於 rem 單位換算，可以根據需要調整 */
+:root {
+  font-size: 16px;
+  /* 基礎字體大小，1rem = 16px */
+  font-size: 0.8333vw;
+  /* 保持原有變數 */
+  --bg-color: #fffbd3;
+  --header-bg: #ffec97;
+  --text-primary: #545050;
+  --text-secondary: #5e5e64;
+  --bubble-bg-1: #ffd991;
+  --bubble-bg-2: #fff7b1;
+  --input-bg: #ffffff;
+}
+
+/* 假設 body 和其他通用樣式不變 */
+body,
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #ffedcd;
+  /* 可以考慮換成更柔和的淺黃色或淺米色 */
+}
