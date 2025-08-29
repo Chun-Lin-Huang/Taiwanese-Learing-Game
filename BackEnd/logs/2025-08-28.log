@@ -1,4 +1,0 @@
-2025-08-28 21:53:07 info: listening on *:2083
-2025-08-28 21:53:10 info: listening on *:2083
-2025-08-28 21:53:40 error: error: cannt connet to mongoDB MongooseServerSelectionError: connection timed out
-2025-08-28 21:53:40 info: suscess: connet to mongoDB @mongodb://scarlett:yaoyuci04318@100.112.199.48:27017/Taigi
