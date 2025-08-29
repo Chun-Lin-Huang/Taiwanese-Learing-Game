@@ -1,3 +1,0 @@
-info: Aug-23-2025 10:38:03: 	listening on *:undefined
-error: Aug-23-2025 10:38:03: 	error: cannt connet to mongoDB MongoRuntimeError: Unable to parse undefined:undefined with URL
-info: Aug-23-2025 10:38:03: 	suscess: connet to mongoDB @mongodb://undefined:undefined@undefined:undefined/undefined
