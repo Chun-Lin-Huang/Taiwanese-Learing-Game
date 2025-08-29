@@ -1,0 +1,120 @@
+#register-page {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+  font-family: 'Kanit', sans-serif;
+  background-color: #fffbd3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#register-page * { box-sizing: border-box; }
+
+/* 結構（與登入頁一致） */
+#register-page .register-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 90%;
+  max-width: 1920px;
+  scale: 1.6;
+  gap: 0;
+  transform: translateY(40px); /* 整體往下 */
+}
+
+/* 左側小熊與標題 */
+#register-page .welcome-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateX(-200px); /* 與登入頁相同的左移量 */
+}
+
+#register-page .welcome-title {
+  font-size: 110px;
+  font-weight: 800;
+  margin-top: 60px;
+  margin-bottom: -150px; /* 讓標題更貼近小熊 */
+  color: #545050;
+}
+
+#register-page .mascot-image {
+  width: 2000px;      /* 與登入頁相同大小 */
+  max-width: none;
+  height: auto;
+}
+
+/* 右側表單區（與登入頁一致） */
+#register-page .form-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: scale(1.25) translateX(-450px);
+  transform-origin: left center;
+}
+
+#register-page .login-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 100px;
+  margin-bottom: 30px;
+}
+
+#register-page .tab-link {
+  font-size: 48px;
+  font-weight: 800;
+  color: #545050;
+  text-decoration: none;
+}
+#register-page .tab-link.active { color: #f9ab5d; }
+
+#register-page .login-form {
+  background-color: #fff7ab;
+  border: 5px solid #ffc081;
+  border-radius: 40px;
+  padding: 80px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  width: 1000px;      /* 與登入頁一致 */
+}
+
+/* 輸入欄位（四個欄位一致規格） */
+#register-page .form-input {
+  height: 104px;
+  padding: 0 48px;
+  font-size: 38px;
+  border: none;
+  border-radius: 30px;
+  box-shadow: 0px 4px 4px rgba(0,0,0,0.25);
+  color: #545050 !important;
+}
+#register-page .form-input::placeholder { color: #545050; }
+
+/* 確定按鈕（與登入頁一致） */
+#register-page .submit-button {
+  background-color: #f9ab5d;
+  color: white;
+  font-size: 58px;
+  font-weight: 900;
+  padding: 38px 0;
+  width: 100%;
+  border: none;
+  border-radius: 60px;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0px 12px 18px rgba(0,0,0,0.35);
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+#register-page .submit-button:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0px 16px 24px rgba(0, 0, 0, 0.4);
+}

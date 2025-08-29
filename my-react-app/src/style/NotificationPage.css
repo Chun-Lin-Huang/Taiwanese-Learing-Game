@@ -1,0 +1,125 @@
+/* ===== NotificationPage 專屬樣式 ===== */
+
+/* 色票 */
+:root {
+	--bg-page: #fffbd3;
+	--bg-header: #ffec97;
+	--bg-notification: #fff9c0;
+	--text-primary: #545050;
+	--text-danger: #ff0000;
+	--border-color: #fcb023;
+}
+
+/* 本頁不要共用背景圖 */
+.notification-page::before { display: none !important; }
+
+/* 列表容器 */
+.notifications-list-container {
+	margin-top: var(--header-height, 80px); /* 頂部貼近橫幅 */
+	height: calc(100vh - var(--header-height, 80px));
+	overflow-y: auto;
+	padding: clamp(12px, 3vw, 20px);
+	padding-bottom: clamp(20px, 5vh, 60px); /* 底部留白 */
+	box-sizing: border-box;
+}
+
+/* 列表垂直間距 */
+.notifications-list {
+	display: flex;
+	flex-direction: column;
+	gap: clamp(12px, 2.5vw, 24px);
+}
+
+/* 通知項目 */
+.notification-item {
+	width: 100%;
+	max-width: 1000px;
+	min-height: clamp(70px, 12vw, 100px);
+	display: flex;
+	align-items: center;
+	background-color: var(--bg-notification);
+	border: 4px solid var(--border-color);
+	border-radius: clamp(12px, 3vw, 20px);
+	padding: 0 clamp(12px, 3vw, 24px);
+	padding-right: clamp(50px, 8vw, 100px); /* 留右側空間放時間 */
+	box-shadow: 0px 8px 4px rgba(0, 0, 0, 0.25);
+	margin: 0 auto;
+	position: relative;
+	box-sizing: border-box;
+}
+
+/* icon */
+.icon-wrapper {
+	width: clamp(28px, 5vw, 55px);
+	height: clamp(28px, 5vw, 55px);
+	position: relative;
+	flex-shrink: 0;
+}
+.icon-wrapper .bell-icon {
+	width: clamp(24px, 4vw, 50px);
+	height: clamp(22px, 4vw, 46px);
+	display: block;
+}
+.icon-wrapper .unread-dot {
+	width: clamp(5px, 1.5vw, 12px);
+	height: clamp(5px, 1.5vw, 12px);
+	position: absolute;
+	top: 0; right: 0;
+}
+
+/* 文字與時間 */
+.notification-text {
+	margin-left: clamp(10px, 3vw, 24px);
+	font-size: clamp(14px, 2.5vw, 22px);
+	flex: 1;
+	word-break: break-word;
+}
+.notification-time {
+	font-size: clamp(12px, 2vw, 18px);
+	position: absolute;
+	right: clamp(12px, 3vw, 24px);
+	bottom: clamp(6px, 2vw, 10px);
+	white-space: nowrap;
+}
+
+/* 清除按鈕 */
+.clear-button {
+	position: absolute;
+	right: clamp(16px, 5vw, 50px); /* 桌機最大 50px */
+	top: 50%;
+	transform: translateY(-50%);
+	background: transparent;
+	border: none;
+	font-size: clamp(18px, 3vw, 28px); /* 桌機最大 28px */
+	font-weight: 400;
+	color: var(--text-danger);
+	cursor: pointer;
+}
+
+/* RWD：小於 768px */
+@media (max-width: 768px) {
+	.notifications-list-container { padding: clamp(12px, 4vw, 20px); }
+	.notifications-list { gap: clamp(10px, 3vw, 20px); }
+	.notification-item {
+		padding: clamp(8px, 3vw, 20px);
+		min-height: clamp(60px, 10vw, 80px);
+		border-radius: clamp(10px, 3vw, 20px);
+		padding-right: clamp(40px, 8vw, 80px);
+	}
+	.icon-wrapper { width: clamp(24px, 8vw, 45px); height: clamp(24px, 8vw, 45px); }
+	.icon-wrapper .bell-icon { width: clamp(20px, 6vw, 40px); height: clamp(18px, 6vw, 38px); }
+	.icon-wrapper .unread-dot { width: clamp(4px, 2vw, 10px); height: clamp(4px, 2vw, 10px); top: 0; right: 0; }
+	.notification-text { font-size: clamp(12px, 3vw, 16px); margin-left: clamp(8px, 3vw, 20px); }
+	.notification-time { font-size: clamp(10px, 2.5vw, 14px); padding-left: clamp(6px, 2vw, 10px); }
+	.clear-button { right: clamp(12px, 5vw, 20px); font-size: clamp(16px, 3.5vw, 20px); }
+}
+
+/* RWD：小於 1024px */
+@media (max-width: 1024px) {
+	.notification-item { width: 90vw; }
+}
+
+
+
+
+

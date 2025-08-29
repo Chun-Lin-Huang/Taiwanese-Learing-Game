@@ -1,0 +1,112 @@
+/* 根元素字體大小：用於 rem 單位換算，可以根據需要調整 */
+:root {
+  font-size: 16px; /* 基礎字體大小，1rem = 16px。這是一個很好的起點。 */
+ font-size: 0.8333vw;
+  /* 保持原有變數，方便統一管理顏色 */
+  --bg-color: #fffbd3;
+  --header-bg: #ffec97;
+  --text-primary: #545050;
+  --text-secondary: #5e5e64;
+  --bubble-bg-1: #ffd991;
+  --bubble-bg-2: #fff7b1;
+  --input-bg: #ffffff;
+  --card-focus-border: #f6f3f0; /* 這個變數放在這裡很合理 */
+  --bg-max-width: 1920px;
+  --bg-max-height: 1080px;
+}
+
+/* 假設 body 和其他通用樣式不變 */
+body, html {
+  height: 100%; /* 確保 html 和 body 佔滿整個視口高度 */
+  margin: 0;
+  padding: 0;
+  background: #ffedcd; /* 可以考慮換成更柔和的淺黃色或淺米色 */
+  overflow-x: hidden; /* 防止水平滾動條，因為您在 .selection-bg 中已經處理了 */
+}
+
+/* 確保全域盒模型 */
+* {
+  box-sizing: border-box; /* 這是響應式設計的基石，非常正確 */
+  margin: 0;
+  padding: 0;
+}
+
+.selection-bg {
+  min-height: 100vh;
+  min-width: 100vw;
+  width: 100vw;
+  height: 100vh; /* 使用 vh 確保高度佔滿視窗 */
+  position: relative;
+  /*background: linear-gradient(to bottom right, #fdffbc, #e0f2f7);*/
+  overflow-x: hidden; /* 防止因背景圖或內容溢出導致的水平滾動條 */
+  overflow-y: auto; /* 允許垂直滾動，以防內容超出視口高度 */
+  z-index: 0;
+}
+
+
+
+.selection-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0; /* top, right, bottom, left 都為 0，很好的簡寫 */
+  z-index: 0; /* 確保它在背景層 */
+  background: url('./assets/背景.png') center no-repeat;
+  /* 調整 background-size：使用 'cover' 讓圖片填滿整個螢幕 */
+  background-size: cover; /* <<-- 將這裡從 60vmin auto 改為 cover */
+                                
+  opacity: 0.5; /* 如果您需要透明度，請確保這一行沒有被移除 */
+  pointer-events: none;  /* 不影響點擊，非常正確 */
+}
+
+.back-button {
+  position: absolute;
+  left: 5vw; /* 從 70px 改為視窗寬度的 5% */
+  top: 50%;
+  transform: translateY(-50%); /* 垂直居中，很棒 */
+  width: 5vw; /* 從 80px 改為視窗寬度的 5% */
+  height: 5vw; /* 保持正方形比例 */
+  min-width: 40px; /* 設置按鈕的最小尺寸 */
+  min-height: 40px;
+  max-width: 80px; /* 設置按鈕的最大尺寸 */
+  max-height: 80px; /* min/max 限制很到位 */
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background-color 0.3s;
+}
+.back-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.back-button img {
+  width: 60%; /* 圖片寬度佔按鈕的 60% */
+  height: 60%; /* 圖片高度佔按鈕的 60% */
+  object-fit: contain; /* 確保圖片縮放時不會被裁切 */
+}
+
+.header-title {
+  width: 100%;
+  text-align: center;
+  margin: 0;
+  font-weight: 700;
+  font-size: 4vw; /* 從 2.2rem 改為視窗寬度的 4%，更具彈性 */
+  min-font-size: 1.5rem; /* 設置最小字體大小，確保可讀性 */
+  max-font-size: 2.5rem; /* 設置最大字體大小，避免過大。字體大小的 min/max 設定是響應式設計的黃金準則！ */
+  color: #3f3e3e;
+  text-shadow: 0.0625rem 0.0625rem 0.125rem rgba(255, 255, 255, 0.5); /* 陰影使用 rem */
+}
+
+
+.game-selection-main {
+  padding-top: 100px; /* 原本140px，這裡應該動態調整，因為 header 是變動的。 */
+                     /* 更好的做法是 `padding-top: calc(10vh + 20px);` (加上額外間距)
+                     /* 或者讓 .game-selection-main 成為 flex-grow: 1; 的元素，
+                     /* 讓它填充 header 下方的所有空間。 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

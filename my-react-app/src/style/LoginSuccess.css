@@ -1,0 +1,51 @@
+#login-success-page {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+  font-family: 'Kanit', sans-serif;
+  background-color: #fffbd3;
+  color: #545050;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  text-align: center;
+}
+
+#login-success-page * {
+  box-sizing: border-box;
+}
+
+#login-success-page .success-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;                         /* ✅ 調小 gap，讓文字更貼近小熊 */
+  transform: scale(2.4) translateY(-30px);
+}
+
+/* 成功訊息 */
+#login-success-page .success-message {
+  font-size: 84px;
+  font-weight: 800;
+  color: #545050;
+  margin: 0;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* 小熊圖片 */
+#login-success-page .mascot-image {
+  width: 1000px;
+  max-width: 100%;
+  height: auto;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+#login-success-page .mascot-image:hover {
+  transform: scale(1.15);
+}

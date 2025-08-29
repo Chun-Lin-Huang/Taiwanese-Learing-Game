@@ -1,0 +1,236 @@
+:root {
+  --text-color: #545050;
+  --bg-main: #fffbd3;
+  --bg-header: #ffec97;
+  --font-title-desktop: 48px;
+  --font-body-desktop: 40px;
+  --font-title-tablet: 36px;
+  --font-body-tablet: 32px;
+  --font-title-mobile: 24px;
+  --font-body-mobile: 18px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* CSS from section:header */
+/*.story-header {
+  background: #ffec97;
+  border-radius: 24px 24px 0 0;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 1000px;
+  margin: 0 auto;
+}*/
+.story-header {
+    border-radius: 0;
+    padding: 0 16px;
+    height: 80px;
+  }
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+.back-button {
+  position: absolute;
+  left: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.back-button img {
+  width: 85px;
+  height: 90px;
+  display: block;
+}
+
+.story-title {
+  flex: 1;
+  text-align: center;
+  color: #545050;
+  font-weight: 800;
+  font-size: 40px;
+  margin: 0;
+}
+
+@media (max-width: 1200px) {
+  .header-container {
+    height: 100px;
+    padding: 0 40px;
+  }
+  .back-button {
+    left: 40px;
+  }
+  .back-button img {
+    width: 60px;
+    height: auto;
+  }
+  .story-title {
+    font-size: var(--font-title-tablet);
+  }
+}
+
+@media (max-width: 768px) {
+  .header-container {
+    height: 80px;
+    padding: 0 20px;
+  }
+  .back-button {
+    left: 20px;
+  }
+  .back-button img {
+    width: 40px;
+  }
+  .story-title {
+    font-size: var(--font-title-mobile);
+  }
+}
+
+/* CSS from section:story */
+.story-detail-bg {
+  background: #fffbd3;
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+.story-content-wrapper {
+  /* Based on Figma: container y=1567, image y=1589 -> top padding: 22px */
+  /* Based on Figma: root width=1920, content frame width=1858 -> horizontal padding: (1920-1858)/2 = 31px */
+  max-width: 1000px;
+  margin: 40px auto 0 auto;
+  padding: 22px 31px 60px;
+}
+
+.story-image-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.story-image {
+  display: block;
+  /* Based on Figma: width=943.5px */
+  width: 943.5px;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.story-body {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.audio-button {
+  background: none;
+  border: none;
+  margin-bottom: 24px;
+  cursor: pointer;
+  flex-shrink: 0;
+  /* Align button with the first line of text */
+  margin-top: 10px; 
+}
+
+.audio-button img {
+  /* Based on Figma: width=72.47, height=73.33 */
+  width: 73px;
+  height: auto;
+  display: block;
+}
+
+.story-paragraph {
+  font-weight: 800;
+  font-size: var(--font-body-desktop);
+  /* Based on Figma: line-height=48.4px for font-size=40px -> ~1.21 */
+  line-height: 1.8; /* Increased for better readability */
+  margin: 0 0 32px 0;
+  white-space: pre-wrap; /* Preserves newlines and spaces from Figma */
+  text-align: center;
+  max-width: 800px;
+}
+
+@media (max-width: 1600px) {
+  .story-body {
+    max-width: 95%;
+  }
+}
+
+@media (max-width: 1200px) {
+  .story-content-wrapper {
+    padding: 20px 40px 40px;
+  }
+  .story-body {
+    margin-top: 40px;
+    gap: 20px;
+  }
+  .audio-button img {
+    width: 60px;
+  }
+  .story-paragraph {
+    font-size: var(--font-body-tablet);
+  }
+}
+
+@media (max-width: 768px) {
+  .story-content-wrapper {
+    padding: 20px 20px 30px;
+  }
+  .story-body {
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+  }
+  .audio-button {
+    margin-top: 0;
+  }
+  .audio-button img {
+    width: 50px;
+  }
+  .story-paragraph {
+    font-size: var(--font-body-mobile);
+  }
+}
+
+main {
+  width: 100vw;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+}

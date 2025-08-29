@@ -1,0 +1,382 @@
+/* 通用樣式 */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Kanit', sans-serif;
+  /* 確保字體已導入，或替換為系統通用字體 */
+  background-color: #fffbd3;
+  color: #545050;
+}
+
+/* 整個頁面容器樣式 (使用你提供的 #theme-selection 代替 .page-container) */
+#theme-selection {
+  max-width: 1400px;
+  /* 根據你的設計調整最大寬度 */
+  min-height: 800px;
+  /* 根據你的設計調整最小高度 */
+  margin: 40px auto;
+  /* 居中顯示 */
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  background-color: #fffbd3;
+  /* 確保背景色與 App.css 中一致 */
+}
+
+.background-image {
+  position: absolute;
+  z-index: 0;
+  width: 100%;
+  /* 確保圖片填充容器 */
+  height: 100%;
+  /* 確保圖片填充容器 */
+  object-fit: cover;
+  opacity: 0.5;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+}
+
+/* 頁面頂部 Header 樣式 */
+.page-header {
+  background-color: #ffec97;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  /* 垂直居中對齊 */
+  justify-content: space-between;
+  /* 將左右兩側內容推開 */
+  padding: 0 24px;
+  /* 左右內邊距 */
+  position: relative;
+  /* 確保 z-index 工作 */
+  flex-shrink: 0;
+  border-radius: 16px 16px 0 0;
+  z-index: 100;
+  /* 確保 header 在背景之上 */
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  /* 返回按鈕和標題之間的間距 */
+  z-index: 10;
+  /* 確保在 header-title 之上 */
+}
+
+.back-icon-btn {
+  width: 60px;
+  height: 60px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: transform 0.2s ease;
+}
+
+.back-icon-btn:hover {
+  transform: scale(1.1);
+}
+
+.back-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.header-title {
+ width: 100%;
+  text-align: center;
+  margin: 0;
+  font-weight: 700;
+  font-size: 4vw; /* 從 2.2rem 改為視窗寬度的 4%，更具彈性 */
+  min-font-size: 1.5rem; /* 設置最小字體大小，確保可讀性 */
+  max-font-size: 2.5rem; /* 設置最大字體大小，避免過大 */
+  color: #3f3e3e;
+  text-shadow: 0.0625rem 0.0625rem 0.125rem rgba(255, 255, 255, 0.5); /* 陰影使用 rem */
+
+}
+
+/* 收藏集按鈕樣式 */
+.favorite-collection-btn {
+  display: flex;
+  position: fixed;
+  top: 10px;
+  right: 50px;
+  gap: 24px;
+  /* 圖標與文字間距 */
+  padding: 10px 10px;
+  /* 按鈕內邊距 */
+  background-color: #ffffff;
+  border: none;
+  border-radius: 50px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 10;
+
+  /* 確保在 header-title 之上 */
+
+}
+
+.favorite-collection-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+
+}
+
+.favorite-icon {
+  width: 40px;
+  /* 圖標尺寸 */
+  height: 40px;
+  
+}
+
+.favorite-text {
+  font-size: 25px;
+  /* 文字尺寸 */
+  font-weight: 700;
+  color: #545050;
+
+
+}
+
+/* 主要內容區塊 */
+.theme-card-scroll {
+  /* 保持你提供的名稱 */
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 32px 16px;
+  /* 上下左右內邊距 */
+  min-height: 40vh;
+  /* 確保有足夠高度 */
+  margin-top: 80px;
+  /* 為 header 留出空間 */
+  overflow-y: auto;
+  /* 允許內容垂直滾動 */
+}
+
+.main-title {
+  /* 保持你提供的名稱 */
+  font-size: 64px;
+  font-weight: 700;
+  color: #545050;
+  margin: 0 0 48px 0;
+  text-align: center;
+}
+
+.theme-card-list {
+  /* 保持你提供的名稱 */
+  list-style: none;
+  /* 移除列表點 */
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  /* 允許換行 */
+  justify-content: center;
+  /* 水平居中 */
+  gap: 32px;
+  /* 卡片間距 */
+}
+
+/* 主題卡片樣式 */
+.theme-card {
+  /* 保持你提供的名稱 */
+  min-width: 320px;
+  height: 320px;
+  border-radius: 32px;
+  font-size: 2.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  border: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  color: #333;
+  /* 確保文字顏色清晰 */
+}
+
+.theme-card:active,
+.theme-card:hover {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.16);
+}
+
+.card-yellow {
+  background-color: #ffe680;
+}
+
+.card-orange {
+  background-color: #f89c3f;
+}
+
+/* 響應式樣式 */
+@media (max-width: 1200px) {
+  #theme-selection {
+    max-width: 95%;
+    /* 調整容器最大寬度 */
+  }
+
+  .main-title {
+    font-size: 56px;
+  }
+
+  .theme-card {
+    min-width: 280px;
+    height: 280px;
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  #theme-selection {
+    min-height: 100vh;
+    max-width: 100vw;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .background-image {
+    width: 100%;
+    height: 100%;
+  }
+
+  .page-header {
+    height: 80px;
+    padding: 0 16px;
+    /* 縮小左右內邊距 */
+  }
+
+  .header-left {
+    gap: 10px;
+  }
+
+  .back-icon-btn {
+    width: 48px;
+    height: 48px;
+  }
+
+  .back-icon {
+    width: 80%;
+    height: 80%;
+  }
+
+  .header-title {
+    font-size: 24px;
+    text-align: center;
+    /* 在小螢幕上可以考慮標題居中 */
+  }
+
+  .favorite-collection-btn {
+    padding: 10px 20px;
+    gap: 15px;
+  }
+
+  .favorite-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .favorite-text {
+    font-size: 24px;
+  }
+
+  .theme-card-scroll {
+    padding: 24px 8px;
+    margin-top: 80px;
+    /* 根據 header 高度調整 */
+  }
+
+  .main-title {
+    font-size: 38px;
+    margin-bottom: 32px;
+  }
+
+  .theme-card-list {
+    gap: 24px;
+  }
+
+  .theme-card {
+    min-width: 250px;
+    height: 250px;
+    border-radius: 24px;
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header {
+    height: 60px;
+    padding: 0 10px;
+  }
+
+  .header-left {
+    gap: 8px;
+  }
+
+  .back-icon-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .back-icon {
+    width: 70%;
+    height: 70%;
+  }
+
+  .header-title {
+    font-size: 20px;
+  }
+
+  .favorite-collection-btn {
+    padding: 8px 16px;
+    gap: 10px;
+  }
+
+  .favorite-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .favorite-text {
+    font-size: 20px;
+  }
+
+  .theme-card-scroll {
+    padding: 16px 4px;
+    margin-top: 60px;
+    /* 根據 header 高度調整 */
+  }
+
+  .main-title {
+    font-size: 28px;
+    margin-bottom: 24px;
+  }
+
+  .theme-card-list {
+    gap: 16px;
+  }
+
+  .theme-card {
+    min-width: 200px;
+    height: 200px;
+    border-radius: 20px;
+    font-size: 1.8rem;
+  }
+}

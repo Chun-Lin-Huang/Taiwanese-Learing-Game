@@ -1,0 +1,164 @@
+/* 全局設定 */ 
+body, html, #root { 
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  font-family: 'Kanit', sans-serif;
+  background-color: #fffbd3;
+  color: #545050;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* 主畫面區塊 */
+#hero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  min-height: 100vh;
+  min-width: 100vw;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+  z-index: 0;
+
+  text-align: center;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+/* 中央容器 */
+.hero-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  max-width: 1600px;
+  padding: 40px;
+  gap: 10px;
+  transform: scale(1.4); 
+  transform-origin: center;
+}
+
+/* 標題與段落 */
+.hero-title {
+  font-size: 80px;
+  font-weight: 800;
+  margin: 120px 0 0 0;
+}
+
+.hero-subtitle {
+  font-size: 40px;
+  font-weight: 600;
+  margin: -20px 0 0 0;
+}
+
+.hero-description {
+  font-size: 30px;
+  margin: -10px 0 30px 0;
+}
+
+.subtitle-small {
+  font-size: 48px;
+  margin-top: 10px;
+}
+
+/* 小熊圖片 */
+.hero-bear-image {
+  width: 50%;
+  max-width: 500px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+/* ✅ 開始按鈕：加長寬度，超過上方文字 */
+.start-button {
+  width: 300px;
+  height: 80px;
+  /* 移除 line-height，改用 Flexbox 實現垂直置中 */
+  /* line-height: 150px; */ /* <-- 刪除或註解此行 */
+  border-radius: 75px;
+
+  background-color: #f9ab5d;
+  color: white;
+  font-size: 30px;
+  font-weight: 900;
+  text-align: center; /* 雖然有 Flexbox，但保留 text-align 確保文字在 flex 項目內也置中 */
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  
+  /* 使用 Flexbox 進行內容置中 */
+  display: flex; /* <-- 將 display 改為 flex */
+  justify-content: center; /* <-- 水平置中 */
+  align-items: center; /* <-- 垂直置中 */
+
+  box-shadow: 0px 12px 18px rgba(17, 17, 17, 0.35);
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.start-button:hover {
+  transform: scale(1.05); /* 稍微縮小放大的幅度，避免過於劇烈 */
+  box-shadow: 0px 8px 12px rgba(0, 0, 0, 0); /* 調整陰影效果 */
+  background-color: #ff8400;
+  color: #ffffff;
+}
+
+
+
+/* 📱 RWD - 平板 */
+@media (max-width: 1024px) {
+  .hero-container {
+    transform: scale(1.1);
+    max-width: 1000px;
+    gap: 15px;
+  }
+
+  .hero-title { font-size: 80px; margin: 30px 0 0 0; }
+  .hero-bear-image { max-width: 1000px; margin-bottom: 8px; }
+  .hero-subtitle { font-size: 54px; margin: -20px 0 0 0; }
+  .hero-description { font-size: 42px; margin: -5px 0 25px 0; }
+
+  .start-button {
+    width: 700px;
+    height: 130px;
+    font-size: 56px;
+    line-height: 130px;
+    border-radius: 65px;
+  }
+}
+
+/* 📱 RWD - 手機 */
+@media (max-width: 768px) {
+  .hero-container {
+    transform: scale(1);
+    width: 95%;
+    max-width: 100%;
+    gap: 10px;
+  }
+
+  .hero-title { font-size: 48px; margin: 20px 0 0 0; }
+  .hero-bear-image { max-width: 320px; margin-bottom: 5px; }
+  .hero-subtitle { font-size: 32px; margin: -15px 0 0 0; }
+  .hero-description { font-size: 24px; margin: -5px 0 20px 0; }
+
+  .start-button {
+    width: 100%;
+    max-width: 320px;
+    height: 100px;
+    font-size: 42px;
+    line-height: 100px;
+    border-radius: 50px;
+  }
+}

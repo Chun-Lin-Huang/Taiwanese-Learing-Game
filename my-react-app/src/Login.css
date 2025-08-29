@@ -1,0 +1,309 @@
+/* Login.css */
+
+/* 確保全域盒模型 */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.login-page {
+  margin: 0;
+  padding: 0;
+  height: 100vh; /* 確保佔滿視窗高度 */
+  width: 100vw; /* 確保佔滿視窗寬度 */
+  font-family: 'Kanit', sans-serif;
+  color: #545050;
+  display: flex; /* Flexbox 容器 */
+  justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
+  text-align: center;
+  z-index: 1;
+  position: relative;
+ 
+}
+
+/* 登入頁面內容容器 (包含小熊和表單) */
+.login-page .login-container {
+  display: flex;
+  flex-direction: row;
+  /* 保持 justify-content 為 center，讓整個小熊+表單的組合居中 */
+  justify-content: center; /* 保持中心對齊，然後通過子元素的 transform 精確調整 */
+  align-items: center; /* 垂直居中 */
+  width: 90%;
+  max-width: 120rem; /* 約 1920px */
+  gap: 3rem; /* 保持小熊和表單之間的間距 */
+  transform: translateY(1.5rem); /* 微調垂直位置，約 24px */
+
+}
+
+/* 左側小熊與標題區塊 */
+.login-page .welcome-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* 關鍵調整：將小熊面板整體向左移動，使其更靠近左邊 */
+  transform: translateX(-10rem); /* **將其從 0 調整為負值，例如 -15rem (約 -240px)，具體數值請根據視覺效果調整** */
+}
+
+.login-page .welcome-title {
+  font-size: 5rem; /* 約 80px */
+  font-weight: 800;
+  margin-top: 3.75rem; /* 約 60px */
+  margin-bottom: -1.25rem; /* 約 -20px */
+  color: #545050;
+  white-space: nowrap;
+}
+
+.login-page .mascot-image {
+  width: 50vw; /* 根據圖片視覺調整 */
+  max-width: 50rem; /* 設置一個最大值，避免過大 */
+  height: auto;
+}
+
+/* 登入表單面板 */
+.login-page .form-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* 表單面板保持不動或根據需要微調，確保其相對於 login-container 保持在右側並居中 */
+  /* 如果小熊往左移，且 login-container 保持 justify-content: center，
+     表單會相對往右移一點，所以這裡可能不需要額外的 translateX 或可微調為正值 */
+  transform: translateX(-0); /* 保持沒有額外位移，讓 Flexbox 處理 */
+
+  transform: translateX(-5rem);
+}
+
+.login-page .login-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 3.125rem; /* 約 50px */
+  margin-bottom: 1.875rem; /* 約 30px */
+}
+
+.login-page .tab-link {
+  font-size: 2.25rem; /* 約 36px */
+  font-weight: 800;
+  color: #545050;
+  text-decoration: none;
+}
+
+.login-page .tab-link.active {
+  color: #f9ab5d;
+}
+
+/* 登入表單容器 */
+.login-page .login-form {
+  background-color: #fff7ab;
+  border: 0.3125rem solid #ffc081; /* 保持 5px */
+  border-radius: 2.5rem; /* 保持 40px */
+  padding: 4.5rem 3.75rem; /* 增加上下 padding，約 72px 上下，60px 左右 */
+  display: flex;
+  flex-direction: column;
+  gap: 1.875rem; /* 約 30px */
+  width: 38rem; /* 保持寬度 (約 608px) */
+  max-width: 90vw; /* 確保在小螢幕下不會溢出 */
+}
+
+/* 輸入欄位樣式 */
+.login-page .form-input {
+  height: 3.8rem; /* 稍微增加輸入框高度，約 60.8px */
+  padding: 0 1.5rem; /* 保持左右內邊距 */
+  font-size: 1.5rem; /* 稍微增加字體大小，約 24px */
+  border: none;
+  border-radius: 1.875rem;
+  box-shadow: 0 0.25rem 0.25rem rgba(0,0,0,0.25);
+  color: #545050 !important;
+}
+
+.login-page .form-input::placeholder {
+  color: #545050;
+}
+
+/* 登入按鈕樣式 */
+.login-page .submit-button {
+  background-color: #f9ab5d;
+  color: white;
+  font-size: 2rem; /* 稍微增加字體大小，約 32px */
+  font-weight: 900;
+  padding: 1.2rem 0; /* 增加按鈕上下 padding，約 19.2px */
+  width: 100%;
+  border: none;
+  border-radius: 2.5rem;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 0.5rem 0.75rem rgba(0, 0, 0, 0.35);
+  text-shadow: 0.125rem 0.125rem 0.375rem rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-page .submit-button:hover {
+  transform: translateY(-0.1rem) scale(1.01);
+  box-shadow: 0 0.75rem 1rem rgba(0, 0, 0, 0.4);
+}
+
+/* 錯誤輸入時不變紅的樣式 */
+.login-page input:invalid {
+  color: #545050 !important;
+  box-shadow: none;
+}
+
+/* --- 媒體查詢 (Media Queries) --- */
+
+/* 針對平板和較小的桌面螢幕 (例如寬度小於 1440px) */
+@media (max-width: 1440px) {
+  .login-page .login-container {
+    transform: translateY(1rem);
+    gap: 2.5rem;
+  }
+
+  .login-page .welcome-panel {
+    /* 在這個斷點也調整小熊的位移 */
+    transform: translateX(-10rem); /* 根據螢幕大小調整，例如 -10rem */
+  }
+
+  .login-page .form-panel {
+    transform: translateX(0);
+  }
+
+  .login-page .mascot-image {
+    width: 45vw;
+    max-width: 38rem;
+  }
+
+  .login-page .login-form {
+    width: 35rem;
+    padding: 3.5rem 3rem;
+  }
+
+  .login-page .form-input {
+    height: 3.5rem;
+    font-size: 1.3rem;
+  }
+
+  .login-page .submit-button {
+    font-size: 1.8rem;
+    padding: 1rem 0;
+  }
+}
+
+/* 針對手機 (例如寬度小於 768px) */
+@media (max-width: 768px) {
+  :root {
+    font-size: 14px;
+  }
+
+  .login-page {
+    display: block;
+    padding-top: 5rem;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .login-page .login-container {
+    flex-direction: column; /* 垂直堆疊 */
+    width: 95%;
+    max-width: 100%;
+    transform: translateY(0);
+    gap: 1.5rem;
+    margin: 0 auto;
+    /* 手機上通常不會讓小熊往左邊靠太多，而是讓他和表單一起居中 */
+    justify-content: center; /* 讓內容居中 */
+  }
+
+  .login-page .welcome-panel {
+    transform: translateX(0); /* 手機上移除位移 */
+    margin-bottom: 0;
+  }
+
+  .login-page .welcome-title {
+    font-size: 3.5rem;
+    margin-top: 1rem;
+    margin-bottom: -3rem;
+  }
+
+  .login-page .mascot-image {
+    width: 55vw;
+    max-width: 20rem;
+  }
+
+  .login-page .form-panel {
+    transform: scale(1) translateX(0);
+    width: 100%;
+  }
+
+  .login-page .login-tabs {
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .login-page .tab-link {
+    font-size: 1.5rem;
+  }
+
+  .login-page .login-form {
+    width: 100%;
+    padding: 2rem 1.5rem;
+    gap: 1rem;
+    border-radius: 1.5rem;
+  }
+
+  .login-page .form-input {
+    height: 3rem;
+    font-size: 1rem;
+    padding: 0 1rem;
+    border-radius: 1.5rem;
+  }
+
+  .login-page .submit-button {
+    font-size: 1.5rem;
+    padding: 0.8rem 0;
+    border-radius: 2rem;
+  }
+}
+
+/* 針對極小螢幕手機 (例如寬度小於 480px) */
+@media (max-width: 480px) {
+  :root {
+    font-size: 12px;
+  }
+
+  .login-page {
+    padding-top: 4rem;
+  }
+
+  .login-page .welcome-title {
+    font-size: 2.8rem;
+    margin-bottom: -2.5rem;
+  }
+
+  .login-page .mascot-image {
+    width: 60vw;
+  }
+
+  .login-page .login-form {
+    padding: 1.5rem 1rem;
+    gap: 0.8rem;
+  }
+
+  .login-page .form-input {
+    height: 2.5rem;
+    font-size: 0.9rem;
+  }
+
+  .login-page .submit-button {
+    font-size: 1.3rem;
+    padding: 0.6rem 0;
+  }
+}
+
+/* 頂部「登入頁」文字的樣式 */
+.top-left-text {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  font-size: 1.5rem;
+  color: #545050;
+  font-weight: 500;
+  z-index: 2;
+}
