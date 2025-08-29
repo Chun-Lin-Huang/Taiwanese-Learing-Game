@@ -4,3 +4,5 @@ node_modules
 logs
 undefinded
 uploads
+.DS_Store
+undefinded
