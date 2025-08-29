@@ -2,3 +2,5 @@ build
 node_modules
 .env
 logs
+undefinded
+upload
