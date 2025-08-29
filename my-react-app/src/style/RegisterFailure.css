@@ -1,0 +1,95 @@
+/* 註冊失敗頁（與登入/註冊/登入失敗一致） */
+#register-failure-page {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: #fffbd3;
+  font-family: 'Kanit', sans-serif;
+  color: #545050;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  text-align: center;
+}
+
+#register-failure-page * { box-sizing: border-box; }
+
+#register-failure-page .register-failure-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 90%;
+  max-width: 1920px;
+  scale: 1.6;
+  gap: 0;
+  transform: translateY(40px);          /* 整體往下，與其他頁一致 */
+}
+
+/* 左側：標題 + 小熊 */
+#register-failure-page .welcome-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateX(-200px);        /* 與其他頁一致的左移量 */
+}
+
+#register-failure-page .welcome-title {
+  font-size: 110px;
+  font-weight: 800;
+  margin-top: 60px;
+  margin-bottom: -150px;                 /* 讓標題更貼近小熊 */
+  color: #545050;
+}
+
+#register-failure-page .mascot-image {
+  width: 2000px;                         /* 小熊大小一致 */
+  max-width: none;
+  height: auto;
+}
+
+/* 右側：訊息卡片 */
+#register-failure-page .message-card {
+  background-color: #fff7ab;
+  border: 5px solid #ffc081;
+  border-radius: 40px;
+  padding: 80px 60px;
+  width: 1000px;                         /* 與表單寬度一致 */
+  text-align: center;
+  box-shadow: 0px 12px 18px rgba(0,0,0,0.15);
+  transform: scale(1.25) translateX(-450px);
+  transform-origin: left center;
+}
+
+#register-failure-page .message-text {
+  font-size: 38px;                       /* 與輸入字級一致 */
+  color: #d86f6f;                        /* 失敗頁以紅系提示 */
+  margin-bottom: 40px;
+  line-height: 1.4;
+}
+
+/* 按鈕（與登入/註冊一致） */
+#register-failure-page .submit-button {
+  background-color: #f9ab5d;
+  color: #fff;
+  font-size: 58px;
+  font-weight: 900;
+  padding: 38px 0;
+  width: 100%;
+  border: none;
+  border-radius: 60px;
+  cursor: pointer;
+  box-shadow: 0px 12px 18px rgba(0, 0, 0, 0.35);
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+#register-failure-page .submit-button:hover {
+  background-color: #f59a3e;
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0px 16px 24px rgba(0,0,0,0.4);
+}

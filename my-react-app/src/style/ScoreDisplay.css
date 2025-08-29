@@ -1,0 +1,105 @@
+/* ScoreDisplay.css */
+
+.score-display-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* 讓分數畫面佔滿整個視窗高度 */
+    background: #fff6c7; /* 與遊戲背景色保持一致 */
+    position: fixed; /* 固定在最上層 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 2000; /* 確保它在所有遊戲內容之上 */
+}
+
+.score-card {
+    background-color: #ffec97; /* 卡片的背景色 */
+    border: 5px solid #ffcc00; /* 卡片的邊框 */
+    border-radius: 25px;
+    padding: 50px 80px;
+    text-align: center;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    animation: fadeInScale 0.5s ease-out forwards; /* 添加動畫效果 */
+}
+
+.score-title {
+    font-size: 3.5rem;
+    color: #545050;
+    margin-bottom: 25px;
+    font-weight: 700;
+}
+
+.final-score {
+    font-size: 2.8rem;
+    color: #4a2f00;
+    margin-bottom: 40px;
+    font-weight: 600;
+}
+
+.final-score span {
+    font-size: 3.5rem; /* 分數數字更大更突出 */
+    color: #F9AB5D; /* 分數數字的顏色 */
+    font-weight: bold;
+}
+
+.restart-button {
+    background-color: #F9AB5D; /* 按鈕背景色 */
+    color: #ffffff;
+    font-size: 2.2rem;
+    padding: 15px 40px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+}
+
+.restart-button:hover {
+    background-color: #e58a3d;
+    transform: translateY(-3px);
+}
+
+.restart-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 動畫效果 */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* RWD - 手機版適應 */
+@media (max-width: 768px) {
+    .score-card {
+        padding: 30px 40px;
+        border-radius: 20px;
+    }
+
+    .score-title {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+    }
+
+    .final-score {
+        font-size: 2rem;
+        margin-bottom: 30px;
+    }
+
+    .final-score span {
+        font-size: 2.5rem;
+    }
+
+    .restart-button {
+        font-size: 1.8rem;
+        padding: 12px 30px;
+    }
+}

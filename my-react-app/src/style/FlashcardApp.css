@@ -1,0 +1,387 @@
+:root {
+  --page-max-width: 1920px;
+  --header-height: 124px;
+  --card-width: 1281px;
+  --card-height: 748px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #fffbd3;
+  color: #545050;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.page-container {
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.background-pattern {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Header */
+.site-header {
+  background-color: #ffec97;
+  height: var(--header-height);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  max-width: var(--page-max-width);
+  padding: 0 71px;
+}
+
+.back-button {
+  position: absolute;
+  left: 71px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.back-button img {
+  width: 80px;
+  height: 80px;
+  display: block;
+}
+
+.header-title {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0;
+  color: #545050;
+}
+
+@media (max-width: 768px) {
+  .site-header {
+    height: 80px;
+  }
+  .header-content {
+    padding: 0 20px;
+  }
+  .back-button {
+    left: 20px;
+  }
+  .back-button img {
+    width: 40px;
+    height: 40px;
+  }
+  .header-title {
+    font-size: 24px;
+  }
+}
+
+/* Flashcard Section */
+.flashcard-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 100px;
+  min-height: calc(100vh - 124px);
+  position: relative;
+  z-index: 1;
+}
+
+.flashcard-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+}
+
+.flashcard-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+}
+
+.flashcard {
+  width: 2500px;
+  height: 1300px;
+  border-radius: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 30px;
+  perspective: 1500px;
+  cursor: pointer;
+}
+
+.flashcard-inner {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s ease;
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+.flashcard.flipped .flashcard-inner {
+  transform: rotateY(180deg);
+}
+
+.flashcard-front,
+.flashcard-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 40px;
+  backface-visibility: hidden;
+  background-color: #f9ab5d;
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.15);
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.flashcard-back {
+  background-color: #ffd78a;
+  transform: rotateY(180deg);
+}
+
+/* Flashcard Text Content */
+.flashcard-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+}
+
+.flashcard-text-line {
+  margin: 0;
+  padding: 5px 0;
+  line-height: 1.2;
+  font-size: 100px;
+  font-weight: 800; /* 用於拼音 */
+}
+
+.flashcard-text-chinese {
+  font-size: 80px;
+  font-weight: 400; /* 不加粗中文 */
+}
+
+/* Responsive Text Size for Chinese */
+@media (max-width: 1400px) {
+  .flashcard-text-chinese {
+    font-size: 6vw;
+    font-weight: 400;
+  }
+}
+
+@media (max-width: 768px) {
+  .flashcard-text-chinese {
+    font-size: 8vw;
+    font-weight: 400;
+  }
+}
+
+/* Image */
+.flashcard-side-image {
+  width: 1500px;
+  height: 1150px;
+  object-fit: cover;
+  border-radius: 80px;
+  background: #fffbd3;
+  overflow: hidden;
+  display: block;
+}
+
+@media (max-width: 1400px) {
+  .flashcard {
+    width: 70vw;
+    height: 40vw;
+  }
+
+  .flashcard-text-line {
+    font-size: 10vw;
+  }
+
+  .card-icons {
+    top: 30px;
+    right: 30px;
+    gap: 15px;
+  }
+
+  .icon-button img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .flashcard-side-image {
+    width: 70vw;
+    height: 40vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .flashcard {
+    width: 90vw;
+    height: 50vw;
+    max-width: 100%;
+    max-height: 60vh;
+  }
+
+  .flashcard-area {
+    gap: 20px;
+  }
+
+  .flashcard-wrapper {
+    height: 40vw;
+    max-height: 60vh;
+  }
+
+  .flashcard-text-line {
+    font-size: 15vw;
+  }
+
+  .card-icons {
+    top: 20px;
+    right: 20px;
+    gap: 10px;
+  }
+
+  .icon-button img {
+    width: 44px;
+    height: 44px;
+  }
+
+  .card-navigation {
+    gap: 24px;
+  }
+
+  .nav-arrow img {
+    width: 18px;
+    height: 24px;
+  }
+
+  .flashcard-side-image {
+    width: 90vw;
+    height: 50vw;
+    max-width: 100%;
+    max-height: 60vh;
+  }
+}
+
+/* Icons */
+.card-icons {
+  position: absolute;
+  top: 60px;
+  right: 63px;
+  display: flex;
+  gap: 29px;
+}
+
+.icon-button img {
+  width: 88px;
+  height: 88px;
+  display: block;
+}
+
+/* Star icon */
+.star-icon {
+  width: 88px;
+  height: 88px;
+  fill: #ccc;
+  transition: fill 0.3s ease;
+}
+
+.star-icon.favorited {
+  filter: invert(28%) sepia(98%) saturate(7492%) hue-rotate(357deg) brightness(97%) contrast(112%);
+}
+
+@media (max-width: 1400px) {
+  .star-icon {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+@media (max-width: 768px) {
+  .star-icon {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* Navigation */
+.card-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 54px;
+}
+
+.nav-arrow {
+  display: flex;
+  align-items: center;
+}
+
+.nav-arrow img {
+  width: 100px;
+  height: 100px;
+}
+
+.left-arrow img {
+  transform: rotate(180deg);
+}
+
+.page-counter {
+  font-size: 55px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #545050;
+}

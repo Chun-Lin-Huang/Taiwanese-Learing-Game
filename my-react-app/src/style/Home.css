@@ -1,0 +1,268 @@
+.site-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 20vh; /* 從 400px 改為視窗高度的 20%，或你可以設定一個 min-height */
+  min-height: 100px; /* 最小高度，避免過小 */
+  background-color: var(--header-bg);
+  display: flex;
+  align-items: center;
+  /* 調整為 space-around 或 space-between 以適應不同寬度 */
+  justify-content: space-around; /* 或 space-between */
+  padding: 0 5%; /* 保持左右間距彈性 */
+  z-index: 1000;
+  white-space: nowrap; /* 保持標題和導航不換行 */
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0; 
+}
+
+.greeting-title {
+  margin: 0;
+  font-weight: 700; /* 字體可以再粗一點 */
+  font-size: 10px; /* 稍微放大 */
+  color: #3f3e3e; /* 更深的顏色，增加對比 */
+  writing-mode: horizontal-tb; 
+}
+
+.main-navigation {
+  display: flex;
+  gap: 5vw; /* 從 100px 改為視窗寬度的 5% */
+  align-items: center;
+}
+
+.nav-button {
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 1.5vw; /* 從 28px 改為視窗寬度 */
+  cursor: pointer;
+  padding: 1.5vw 2.5vw; /* 調整 padding 為相對單位 */
+  font-size: 3vw; /* 從 120px 改為視窗寬度的 3% */
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: background 0.2s ease;
+  min-font-size: 16px; /* 確保最小可讀字體 */
+}
+
+.nav-icon { 
+  width: 20vw; /* 從 120px 改為視窗寬度的 7% */
+  height: 7vw; /* 保持比例 */
+  object-fit: contain; 
+  min-width: 80px; /* 最小尺寸 */
+  min-height: 80px;
+}
+.nav-label { 
+  
+  font-weight: 600; 
+ font-weight: 700; /* 字體可以再粗一點 */
+  font-size: 2rem; /* 稍微放大 */
+  color: #3f3e3e; /* 更深的顏色，增加對比 */
+}
+.chevron-icon { 
+  width: 2vw; /* 從 42px 改為視窗寬度的 2% */
+  height: 2vw; 
+  object-fit: contain; 
+  margin-left: 0.5vw; 
+  min-width: 16px; /* 最小尺寸 */
+  min-height: 16px;
+}
+
+.main-content {
+  width: 100%;
+  height: 100%; /* 或 min-height: calc(100vh - 20vh); */
+  position: relative;
+  padding-top: 20vh; /* 從 400px 改為 header 的高度 */
+}
+
+.reset-button {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-top: 10px; /* 增加與上方文字的距離 */
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+}
+
+.reset-button:hover {
+    background-color: #e0e0e0;
+}
+
+.character-area {
+  position: absolute;
+  left: -6%; /* 保持百分比 */
+  top: 30%; /* 保持百分比 */
+  width: 60%; /* 保持百分比 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+   
+}
+
+.character-image { 
+  width: 100%; 
+  height: auto; 
+}
+
+.character-button {
+  background: none; /* 移除背景 */
+  border: none; /* 移除邊框 */
+  padding: 0; /* 移除內邊距 */
+  cursor: pointer; /* 讓鼠標懸停時顯示為可點擊手勢 */
+  display: flex; /* 使用 Flexbox 進行佈局 */
+  flex-direction: column; /* 讓子元素垂直排列 */
+  align-items: center; /* 讓子元素在水平方向上居中 */
+    margin: 0 auto; 
+     
+}
+
+.character-caption {
+  font-weight: 700;
+  font-size: 30px; /* 從 72px 改為視窗寬度 */
+  color: var(--text-secondary);
+  margin-top: vw;
+  text-align: center;
+  min-font-size: 20px;
+}
+
+/* Chat Area */
+.chat-area {
+  position: absolute;
+  left: 40%; /* 保持百分比 */
+  top: 22%; /* 保持百分比 */
+  width: 52%; /* 保持百分比 */
+  height: 65%; /* 保持百分比 */
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-log {
+  flex-grow: 1;
+  position: relative;
+}
+
+.message-group {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+}
+
+.message-group.incoming { align-items: flex-start; left: 0; }
+.message-group.outgoing { align-items: flex-end; right: 5%; }
+
+.message-group:nth-child(1) { top: 0; }
+.message-group:nth-child(2) { top: 18%; }
+.message-group:nth-child(3) { top: 38%; }
+
+.sender-name {
+  font-weight: 800;
+  font-size: 2.5vw; /* 從 48px 改為視窗寬度 */
+  color: var(--text-primary);
+  margin-bottom: 0.5vw; /* 調整為相對單位 */
+  min-font-size: 18px;
+}
+
+.message-bubble {
+  border-radius: 1.5vw; /* 從 30px 改為視窗寬度 */
+  min-height: 5vw; /* 從 100px 改為視窗寬度 */
+  padding: 1vw 1.5vw; /* 調整 padding 為相對單位 */
+  font-size: 2vw; /* 從 40px 改為視窗寬度 */
+  line-height: 1.4;
+  min-font-size: 14px;
+  min-height: 30px; /* 最小高度 */
+}
+
+
+/* Home.css 或新的 .css 檔案 */
+
+/* 選單容器 */
+.topic-selection-container {
+  /* 根據圖片，這個容器有一個圓角邊框和陰影，並且可能在 chat-area 中間 */
+  background-color: #f6f3f0; /* 或其他淺色背景 */
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%; /* 填滿父容器的寬度 */
+  max-width: 400px; /* 或者根據需要設定最大寬度 */
+  padding: 20px;
+  
+  /* 將它放在 chat-area 的中間 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 選單標題 */
+.topic-selection-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #3f3e3e;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* 主題列表 */
+.topic-list {
+  list-style: none; /* 移除項目符號 */
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* 項目之間的間距 */
+}
+
+/* 單個主題項目 */
+.topic-item {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 15px 20px;
+  font-size: 20px;
+  font-weight: 500;
+  color: #545050;
+  text-align: center;
+  border: 1px solid #ccc; /* 輕微的邊框 */
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+/* 鼠標懸停效果 */
+.topic-item:hover {
+  background-color: #f0f0f0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 調整 chat-area 的佈局 */
+.chat-area {
+  position: absolute;
+  left: 40%;
+  top: 22%;
+  width: 52%;
+  height: 65%;
+  /* 讓 chat-area 能夠容納聊天記錄和選單 */
+  display: flex;
+  flex-direction: column; /* 或 row，根據您希望聊天記錄和選單如何排列 */
+  justify-content: center; /* 垂直置中 */
+  align-items: center; /* 水平置中 */
+}
+
+/* 讓 .chat-log 和 .topic-selection-container 並排 */
+.chat-area {
+  display: flex;
+  flex-direction: row; /* 讓子元素水平排列 */
+  justify-content: center;
+  align-items: center;
+  gap: 20px; /* 聊天記錄和選單之間的間距 */
+}
+
+/* 如果您不希望聊天記錄和選單並排，而是讓選單在聊天記錄下方，則維持 flex-direction: column */
+/* ... 根據您的設計調整 ... */
+
+.bubble-style-1 { background-color: var(--bubble-bg-1); width: 30vw; /* 從 520px 改為視窗寬度 */ }
+.bubble-style-1.large { width: 40vw; min-height: 15vw; /* 從 700px/300px 改為視窗寬度 */ }
+.bubble-style-2 { background-color: var(--bubble-bg-2); width: 28vw; min-height: 5vw; /* 從 480px/100px 改為視窗寬度 */ }

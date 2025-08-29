@@ -1,0 +1,315 @@
+
+/* 根元素字體大小：用於 rem 單位換算，可以根據需要調整 */
+:root {
+  font-size: 16px; /* 基礎字體大小，1rem = 16px。這是一個很好的起點。 */
+ font-size: 0.8333vw;
+  /* 保持原有變數，方便統一管理顏色 */
+  --bg-color: #fffbd3;
+  --header-bg: #ffec97;
+  --text-primary: #545050;
+  --text-secondary: #5e5e64;
+  --bubble-bg-1: #ffd991;
+  --bubble-bg-2: #fff7b1;
+  --input-bg: #ffffff;
+  --card-focus-border: #f6f3f0; /* 這個變數放在這裡很合理 */
+}
+
+/* 假設 body 和其他通用樣式不變 */
+body, html {
+  height: 100%; /* 確保 html 和 body 佔滿整個視口高度 */
+  margin: 0;
+  padding: 0;
+  background: #ffedcd; /* 可以考慮換成更柔和的淺黃色或淺米色 */
+  overflow-x: hidden; /* 防止水平滾動條，因為您在 .selection-bg 中已經處理了 */
+}
+
+/* 確保全域盒模型 */
+* {
+  box-sizing: border-box; /* 這是響應式設計的基石，非常正確 */
+  margin: 0;
+  padding: 0;
+}
+
+
+
+.story-selection-bg {
+  min-height: 100vh;
+  min-width: 100vw;
+  width: 100vw;
+  height: 100vh; /* 使用 vh 確保高度佔滿視窗 */
+  position: relative;
+  /*background: linear-gradient(to bottom right, #fdffbc, #e0f2f7);*/
+  overflow-x: hidden; /* 防止因背景圖或內容溢出導致的水平滾動條 */
+  overflow-y: auto; /* 允許垂直滾動，以防內容超出視口高度 */
+  z-index: 0;
+}
+
+
+
+.story-selection-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0; /* top, right, bottom, left 都為 0，很好的簡寫 */
+  z-index: 0; /* 確保它在背景層 */
+  background: url('./assets/背景.png') center no-repeat;
+  /* 調整 background-size：使用 'cover' 讓圖片填滿整個螢幕 */
+  background-size: cover; /* <<-- 將這裡從 60vmin auto 改為 cover */
+                                
+  opacity: 0.5; /* 如果您需要透明度，請確保這一行沒有被移除 */
+  pointer-events: none;  /* 不影響點擊，非常正確 */
+}
+/* ===== Layout Containers ===== */
+.page-container {
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 0 40px; /* 放大 padding */
+  box-sizing: border-box;
+}
+
+.main-card {
+  max-width: 1200px; /* 原 900 → 放大 */
+  margin: 80px auto;
+  background: #fffbd3;
+  border-radius: 32px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  padding-bottom: 60px;
+}
+
+.page-container.stories-section {
+  width: 100%;
+  max-width: 1600px;
+  margin: 60px auto;
+  background: #fffbd3;
+  border-radius: 32px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  padding-bottom: 60px;
+}
+
+/* ===== Header ===== */
+.story-header {
+  background: var(--color-header-bg);
+  border-radius: 32px 32px 0 0;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  padding: 0 64px;
+}
+
+.header-container {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+
+.back-button {
+  justify-self: start;
+  width: 72px; /* 放大返回鍵 */
+  height: 72px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-button img {
+  width: 72px;
+  height: 72px;
+}
+
+.header-title, .story-title {
+  font-family: var(--font-secondary);
+  font-size: 64px; /* 原 48 → 放大 */
+  font-weight: 900;
+  text-align: center;
+  color: var(--color-text-secondary);
+  margin: 0;
+  justify-self: center;
+}
+
+.header-actions {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+
+
+/* ===== Search / Hero / Filters ===== */
+.stories-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+  padding-top: 60px;
+  padding-bottom: 120px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background-color: #ffffff;
+  border-radius: 48px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+  padding: 20px 36px;
+  width: 100%;
+  height: 40px; /* 放大高度 */
+  max-width: 1000px; /* 放寬 */
+
+  margin: -10px auto;
+}
+
+.search-icon {
+  width: 20px;
+  height: 20px;
+   
+}
+
+.search-input {
+  color: var(--color-text-secondary);
+  background: #ffffff00;
+  font-size: 20px; /* 放大字體 */
+  border: none;
+  outline: none;
+  padding: 20px 28px;
+  border-radius: 24px;
+  width: 100%;
+}
+
+.search-input::placeholder {
+  font-size: 20px;
+  align-items: center;
+}
+
+/* ===== Hero Image ===== */
+.hero-image-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 64px 0;
+}
+
+.hero-image {
+  width: 70%;
+  max-width: px; /* 放大 hero */
+  max-height: 500px; /* 放大高度 */
+  border-radius: 32px;
+}
+
+/* ===== Filters ===== */
+.filters {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 80px;
+  margin: 48px 0;
+}
+
+.filter-button {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  font-family: var(--font-primary);
+  font-weight: 900;
+  font-size: 44px;
+  color: var(--color-text-primary);
+  padding-bottom: 14px;
+  border-bottom: 3px solid transparent;
+}
+
+.filter-button.active {
+  border-bottom-color: var(--color-text-secondary);
+}
+
+.icon-wrapper {
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+
+/* ===== Story Grid & Cards ===== */
+.story-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(700px, 1fr));
+  gap: 48px;
+  max-width: 2000px;
+  margin: 48px auto 0;
+  max-height: 700px;
+  overflow-y: auto;
+  padding-right: 12px;
+}
+
+.story-card {
+  background: #fff2a7;              /* 更柔和的底色 */
+  border-radius: 32px;              /* 圓角加大 */
+  padding: 32px 48px;               /* 上下縮小、左右加大 */
+  display: flex;
+ align-items: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10); /* 陰影更柔和 */
+  gap: 32px;                        /* 卡片內元素間距加大 */
+  font-size: 28px;                  /* 字體略小 */
+  width: 100%;
+  transition: box-shadow 0.2s;      /* 滑鼠懸停時有動畫 */
+}
+
+.story-card:hover {
+  box-shadow: 0 16px 48px rgba(0,0,0,0.16); /* 懸停時陰影加深 */
+  background: #fff07a;                      /* 懸停時底色變亮 */
+}
+
+.story-thumbnail {
+   width: 30%;
+  aspect-ratio: 16 / 9; /* 強制長方形比例 (16:9) */
+  object-fit: cover;    /* 保持比例，裁切多餘部分 */
+  border-radius: 12px;
+}
+
+.card-divider {
+  width: 3px;
+  height: 140px;
+  background-color: var(--color-divider);
+  flex-shrink: 0;
+}
+
+.story-title {
+  color: var(--color-text-secondary);
+  font-weight: 900;
+  font-size: 40px;
+  line-height: 1.2;
+  text-align: center;
+  margin: 0;
+  flex: 1;
+}
+
+.favorite-button {
+  width: 72px;
+  height: 72px;
+  margin-left: 24px;
+}
+
+.favorite-button img {
+  width: 56px;
+  height: 56px;
+  filter: grayscale(100%);
+  transition: filter 0.2s ease, transform 0.15s ease;
+}
+
+.favorite-button.active img {
+  filter: none;
+}
+
+.favorite-button:active img {
+  transform: scale(0.9);
+}
+
+/* ===== Empty Message ===== */
+.empty-message {
+  text-align: center;
+  font-size: 32px;
+  color: #888;
+  margin: 80px auto;
+  font-weight: 600;
+}

@@ -1,0 +1,98 @@
+/* ===== 全站共用樣式 ===== */
+
+:root {
+  /* 背景圖原始最大尺寸，請依實際圖片調整 */
+  --bg-max-width: 1920px;
+  --bg-max-height: 1080px;
+  /* 頁面頂部橫幅高度 */
+  --header-height: 80px;
+}
+
+/* 設定 HTML 與 body 的高度與背景 */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #fff6c7; /* 淡黃色背景 */
+}
+
+/* 全站共用背景容器（可在頁面加 class 使用） */
+.page-bg {
+  min-height: 100vh;
+  min-width: 100vw;
+  width: 100vw;
+  height: auto;
+  margin: 0 auto;
+  position: relative;
+  background: #fff6c7;
+  overflow-x: hidden;
+  overflow-y: auto;
+  z-index: 0;
+}
+
+.page-bg::before {
+  content: "";
+  position: fixed; /* 背景固定於視窗，不隨內容移動/縮放 */
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: -1;  /* 放在內容下方且不影響層級 */
+  background: url('../src/assets/22600173.png') center center no-repeat;
+  background-size: cover; /* 覆蓋整個視窗，維持比例 */
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+/* 頁面頂部橫幅 */
+.game-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-height, 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffec97;
+  z-index: 1000;
+}
+
+/* 返回按鈕 */
+.back-button {
+  position: absolute;
+  left: 70px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 80px;
+  height: 80px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  outline: none; /* 移除點擊時的藍色外框 */
+}
+
+.back-button:focus,
+.back-button:active {
+  outline: none; /* 再次確保在聚焦和激活狀態下也沒有外框 */
+}
+
+.back-button img {
+  width: 50px;
+  height: 50px;
+}
+
+/* 標題文字 */
+.header-title {
+  width: 100%;
+  text-align: center;
+  margin: 0;
+  font-weight: 600;
+  font-size: 2rem;
+  color: #545050;
+}
+
+/* 讓內容避開固定 header 的高度 */
+.page-bg .profile-content {
+  margin-top: var(--header-height, 80px);
+}
