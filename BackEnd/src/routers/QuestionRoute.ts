@@ -14,15 +14,6 @@ export class QuestionRoute extends Route {
     }
 
     protected setRoutes(): void {
-
-        this.router.get(`${this.url}findAllQuestion`, (req, res) => {
-            this.Contorller.findAll(req, res);
-        })
-
-        this.router.get(`${this.url}listByUserName`, (req, res) => {
-            this.Contorller.list(req, res);
-        });
-
         /**
          * 紀錄問題
          * request body {

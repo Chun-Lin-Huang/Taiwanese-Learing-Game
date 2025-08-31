@@ -64,44 +64,39 @@
 
 }
 
+/* 共用按鈕樣式 */
+.menu-buttons button {
+  padding: 1rem 3rem;
+  font-size: 3rem;
+  border: none;
+  border-radius: 14px;
+  color: white;
+  cursor: pointer;
+  width: 350px;
+  height: 80px;
+  transition: background-color 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 7px 10px rgba(0, 0, 0, 0.7);
+}
+
+/* 開始遊戲專用 */
 .start-button {
-  padding: 1rem 3rem;
-  font-size: 3rem;
-  border: none;
-  border-radius: 14px;
   background-color: #FA1717;
-  color: white;
-  cursor: pointer;
-  width: 350px;
-  height: 80px;
-  transition: background-color 0.3s ease;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 7px 10px rgba(0, 0, 0, 0.7);
 }
 
+.start-button:hover {
+  background-color: #d31414; /* 深一點的紅 */
+}
+
+/* 退出遊戲專用 */
 .exit-button {
-  padding: 1rem 3rem;
-  font-size: 3rem;
-  border: none;
-  border-radius: 14px;
   background-color: #94DA2C;
-  color: white;
-  cursor: pointer;
-  width: 350px;
-  height: 80px;
-  transition: background-color 0.3s ease;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 7px 10px rgba(0, 0, 0, 0.7);
 }
 
-
-.start-button:hover,
 .exit-button:hover {
-  background-color: #bfa8f1;
+  background-color: #6aa91f; /* 深一點的綠 */
 }
 
 .back-button.top-left {

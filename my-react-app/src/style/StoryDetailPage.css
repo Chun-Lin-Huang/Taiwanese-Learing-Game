@@ -10,8 +10,12 @@
   --font-body-mobile: 18px;
 }
 
-* {
-  box-sizing: border-box;
+* { box-sizing: border-box; }
+
+html, body, #root {
+  min-height: 100%;
+  height: auto;
+  overflow-y: auto;            /* 總是允許垂直捲動 */
 }
 
 body {
@@ -23,26 +27,28 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* CSS from section:header */
-/*.story-header {
-  background: #ffec97;
-  border-radius: 24px 24px 0 0;
-  height: 110px;
+/* 讓這個頁面本身成為「可捲動容器」 */
+.story-detail-page {
+  min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  max-width: 1000px;
-  margin: 0 auto;
-}*/
+  flex-direction: column;
+  background: var(--bg-main);
+}
+
+/* ===== Header ===== */
 .story-header {
-    border-radius: 0;
-    padding: 0 16px;
-    height: 80px;
-  }
+  background: var(--bg-header);
+  padding: 0 16px;
+  height: 80px;
+  position: sticky;      /* 滾動時固定在頂端 */
+  top: 0;
+  z-index: 10;
+}
 
 .header-container {
   max-width: 1200px;
   margin: 0 auto;
+  height: 80px;
   display: flex;
   align-items: center;
   position: relative;
@@ -51,7 +57,7 @@ body {
 
 .back-button {
   position: absolute;
-  left: 32px;
+  left: 16px;
   top: 50%;
   transform: translateY(-50%);
   width: 48px;
@@ -63,88 +69,48 @@ body {
   border: none;
   cursor: pointer;
 }
-
-.back-button img {
-  width: 85px;
-  height: 90px;
-  display: block;
-}
+.back-button img { width: 40px; height: 40px; display: block; }
 
 .story-title {
   flex: 1;
   text-align: center;
-  color: #545050;
+  color: var(--text-color);
   font-weight: 800;
-  font-size: 40px;
+  font-size: var(--font-title-desktop);
   margin: 0;
 }
 
-@media (max-width: 1200px) {
-  .header-container {
-    height: 100px;
-    padding: 0 40px;
-  }
-  .back-button {
-    left: 40px;
-  }
-  .back-button img {
-    width: 60px;
-    height: auto;
-  }
-  .story-title {
-    font-size: var(--font-title-tablet);
-  }
+/* ===== Main ===== */
+.story-main {
+  width: 100%;
+  max-width: 1100px;        /* 文字區寬度 */
+  margin: 0 auto;
+  padding: 24px 24px 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-@media (max-width: 768px) {
-  .header-container {
-    height: 80px;
-    padding: 0 20px;
-  }
-  .back-button {
-    left: 20px;
-  }
-  .back-button img {
-    width: 40px;
-  }
-  .story-title {
-    font-size: var(--font-title-mobile);
-  }
-}
-
-/* CSS from section:story */
-.story-detail-bg {
-  background: #fffbd3;
-  min-height: 100vh;
-  padding-bottom: 40px;
-}
-
-.story-content-wrapper {
-  /* Based on Figma: container y=1567, image y=1589 -> top padding: 22px */
-  /* Based on Figma: root width=1920, content frame width=1858 -> horizontal padding: (1920-1858)/2 = 31px */
-  max-width: 1000px;
-  margin: 40px auto 0 auto;
-  padding: 22px 31px 60px;
-}
-
+/* 影像區 — 讓按鈕可疊在其上 */
 .story-image-container {
+  position: relative;       /* 供絕對定位參考 */
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-bottom: 32px;
+  margin: 16px 0 32px;
 }
 
 .story-image {
   display: block;
-  /* Based on Figma: width=943.5px */
-  width: 943.5px;
+  width: min(900px, 92vw);  /* 大圖，但仍保留邊距 */
   max-width: 100%;
   height: auto;
-  margin: 0 auto;
   border-radius: 16px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.08);
 }
 
+
+/* ===== 文字內容（基底） ===== */
 .story-body {
   width: 100%;
   display: flex;
@@ -152,85 +118,68 @@ body {
   align-items: center;
 }
 
-.audio-button {
-  background: none;
-  border: none;
-  margin-bottom: 24px;
-  cursor: pointer;
-  flex-shrink: 0;
-  /* Align button with the first line of text */
-  margin-top: 10px; 
-}
-
-.audio-button img {
-  /* Based on Figma: width=72.47, height=73.33 */
-  width: 73px;
-  height: auto;
-  display: block;
-}
-
 .story-paragraph {
   font-weight: 800;
-  font-size: var(--font-body-desktop);
-  /* Based on Figma: line-height=48.4px for font-size=40px -> ~1.21 */
-  line-height: 1.8; /* Increased for better readability */
-  margin: 0 0 32px 0;
-  white-space: pre-wrap; /* Preserves newlines and spaces from Figma */
+  font-size: var(--font-body-desktop);  /* 基底較大（舊樣式相容） */
+  line-height: 1.8;
+  margin: 0 0 24px 0;
+  white-space: pre-wrap;
   text-align: center;
-  max-width: 800px;
+  max-width: 900px;         /* 文字寬度（可與圖片不同） */
 }
 
-@media (max-width: 1600px) {
-  .story-body {
-    max-width: 95%;
-  }
-}
-
+/* ===== RWD（基底） ===== */
 @media (max-width: 1200px) {
-  .story-content-wrapper {
-    padding: 20px 40px 40px;
-  }
-  .story-body {
-    margin-top: 40px;
-    gap: 20px;
-  }
-  .audio-button img {
-    width: 60px;
-  }
-  .story-paragraph {
-    font-size: var(--font-body-tablet);
-  }
+  .story-title { font-size: var(--font-title-tablet); }
+  .audio-fab { width: 56px; height: 56px; left: 14px; bottom: 14px; }  /* ← 用 left */
+  .audio-fab img { width: 24px; height: 24px; }
+  .story-paragraph { font-size: var(--font-body-tablet); }
 }
 
 @media (max-width: 768px) {
-  .story-content-wrapper {
-    padding: 20px 20px 30px;
-  }
-  .story-body {
-    flex-direction: column;
-    align-items: center;
-    gap: 30px;
-  }
-  .audio-button {
-    margin-top: 0;
-  }
-  .audio-button img {
-    width: 50px;
-  }
-  .story-paragraph {
-    font-size: var(--font-body-mobile);
-  }
+  .header-container { height: 72px; }
+  .story-header { height: 72px; }
+  .back-button { left: 12px; }
+  .back-button img { width: 32px; height: 32px; }
+  .story-title { font-size: var(--font-title-mobile); }
+  .story-main { padding: 16px 16px 64px; }
+  .audio-fab { width: 52px; height: 52px; left: 12px; bottom: 12px; }  /* ← 用 left */
+  .audio-fab img { width: 22px; height: 22px; }
+  .story-paragraph { font-size: var(--font-body-mobile); }
 }
 
-main {
-  width: 100vw;
-  max-width: 1400px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: none;
-  box-shadow: none;
-  border-radius: 0;
-  padding: 0;
+/* =========================================================
+   覆蓋：台羅/漢字與中文的實際字級（放在檔案最後，權重較高）
+   ========================================================= */
+.story-paragraph.han-text {
+  font-size: 28px;     /* 台羅/漢字（較小） */
+  font-weight: 700;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.story-paragraph.chinese-text {
+  font-size: 22px;     /* 中文（再小一點） */
+  font-weight: 400;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+/* 讓 <audio> 看起來整齊 */
+.story-audio {
+  width: min(900px, 92vw);
+  max-width: 100%;
+  margin: 8px 0 24px;
+  display: block;
+}
+
+@media (max-width: 1200px) {
+  .story-paragraph.han-text { font-size: 24px; }
+  .story-paragraph.chinese-text { font-size: 18px; }
+}
+
+@media (max-width: 768px) {
+  .story-paragraph.han-text { font-size: 20px; }
+  .story-paragraph.chinese-text { font-size: 16px; }
 }

@@ -1,66 +1,100 @@
-//故事收藏
- 
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import backIcon from '../assets/Back.svg';
-import '../style/FavoriteCollectionPage.css';
-import '../style/GameSelection.css';
-import '../App.css';
+import backIcon from "../assets/back.svg";
+import favoriteActive from "../assets/red.svg";
+import storyFallback from "../assets/story.png";
 
-import { stories } from '../data/stories';
-import type { Story } from '../data/stories';
-import favoriteIcon from '../assets/收藏.png';
-import favoriteActive from '../assets/red.svg';
-import storyThumbnail from '../assets/moon.png';
+import "../style/FavoriteCollectionPage.css";
+import "../style/GameSelection.css";
+import "../App.css";
 
-type FavoritesMap = { [id: number]: boolean };
+import { api } from "../enum/api";
+import { asyncGet } from "../utils/fetch";
+import { toast } from "react-toastify";
 
-const LOVESTORY_FAV_KEY = 'lovestory_favorites';
+/** 內嵌 deleteCompat，避免 DELETE 的相容性問題 */
+async function deleteCompat(url: string, body?: any) {
+  const resp = await fetch(url, {
+    method: "DELETE",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+    mode: "cors",
+  });
+  const ct = resp.headers.get("content-type") || "";
+  if (resp.status === 204 || !ct.includes("application/json")) return { ok: resp.ok };
+  return resp.json();
+}
+
+type StoryCard = {
+  _id: string; // storyNameId
+  name: string;
+  imageUrl?: string;
+  imageFilename?: string;
+};
+
+function getUserId(): string | null {
+  return (
+    localStorage.getItem("userId") ||
+    localStorage.getItem("userid") ||
+    localStorage.getItem("uid") ||
+    null
+  );
+}
 
 const LoveStoryPage: React.FC = () => {
   const navigate = useNavigate();
-  const [favs, setFavs] = useState<FavoritesMap>({});
+  const userId = useMemo(() => getUserId(), []);
+  const [loading, setLoading] = useState(false);
+  const [list, setList] = useState<StoryCard[]>([]);
 
-  const readFavs = () => {
+  const buildCoverSrc = (id: string) => `${api.storyCover}/${id}?cb=${id}`;
+
+  const loadCollection = async () => {
+    if (!userId) return;
+    setLoading(true);
     try {
-      const raw = localStorage.getItem(LOVESTORY_FAV_KEY);
-      setFavs(raw ? JSON.parse(raw) : {});
-    } catch {
-      setFavs({});
+      // GET /api/v1/story-collection/:userId
+      const res = await asyncGet(`${api.storyCollectionList}/${encodeURIComponent(userId)}`);
+      const body = res?.body ?? res ?? [];
+      const normalized: StoryCard[] = (body as any[]).map((it) => ({
+        _id: it._id || it.storyNameId,
+        name: it.name,
+        imageUrl: it.imageUrl,
+        imageFilename: it.imageFilename,
+      })).filter((x) => !!x._id);
+      setList(normalized);
+    } catch (e) {
+      console.error(e);
+      toast.error("無法讀取收藏清單");
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => { readFavs(); }, []);
-
   useEffect(() => {
-    const onVisible = () => {
-      if (document.visibilityState === 'visible') readFavs();
-    };
-    document.addEventListener('visibilitychange', onVisible);
-    return () => document.removeEventListener('visibilitychange', onVisible);
-  }, []);
+    loadCollection();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
-  useEffect(() => {
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === LOVESTORY_FAV_KEY) readFavs();
-    };
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
-  }, []);
+  const handleUnfavorite = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (!userId) {
+      toast.info("請先登入");
+      return;
+    }
 
-  const favoriteStories: Story[] = useMemo(
-    () => stories.filter(s => !!favs[s.id]),
-    [favs]
-  );
-
-  const toggleFavorite = (e: React.MouseEvent, id: number) => {
-    e.stopPropagation(); // ← 避免點愛心也觸發導頁
-    setFavs(prev => {
-      const next = { ...prev, [id]: !prev[id] };
-      localStorage.setItem(LOVESTORY_FAV_KEY, JSON.stringify(next));
-      return next;
-    });
+    const old = list;
+    setList((prev) => prev.filter((x) => x._id !== id)); // 樂觀更新
+    try {
+      // DELETE /api/v1/story-collection/remove  { userId, storyNameId }
+      await deleteCompat(api.storyCollectionRemove, { userId, storyNameId: id });
+    } catch (err) {
+      console.error(err);
+      setList(old); // 失敗回滾
+      toast.error("移除收藏失敗");
+    }
   };
 
   return (
@@ -74,42 +108,62 @@ const LoveStoryPage: React.FC = () => {
         >
           <img src={backIcon} alt="返回" />
         </button>
-        <h1 className="header-title">故事收藏集</h1>
+        <h1 className="header-title">我的收藏集</h1>
       </header>
 
       <main className="game-selection-main">
-        {favoriteStories.length === 0 ? (
-          <p>尚未收藏任何故事，回到故事集點愛心即可加入喔！</p>
-        ) : (
-          <div className="story-grid">
-            {favoriteStories.map(story => (
-              <article
-                key={story.id}
-                className="story-card"
-                onClick={() => navigate(`/story/${story.id}`)}  // ← 點卡片導到故事內文
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') navigate(`/story/${story.id}`);
-                }}
-              >
-                <img src={storyThumbnail} alt="Story thumbnail" className="story-thumbnail" />
-                <div className="card-divider" />
-                <h2 className="story-title">《{story.title}》</h2>
+        {!userId && (
+          <p style={{ textAlign: "center", marginTop: 24 }}>
+            找不到使用者資訊，請先登入。
+          </p>
+        )}
 
-                <button
-                  className={`favorite-button ${favs[story.id] ? 'active' : ''}`}
-                  onClick={(e) => toggleFavorite(e, story.id)}
-                  aria-label={favs[story.id] ? '移除收藏' : '加入收藏'}
-                  title={favs[story.id] ? '再次點擊移除收藏' : '點擊加入收藏'}
+        {userId && loading && <p style={{ textAlign: "center" }}>載入中…</p>}
+
+        {userId && !loading && list.length === 0 && (
+          <p style={{ textAlign: "center", opacity: 0.7 }}>
+            這裡將顯示你收藏的故事卡。
+          </p>
+        )}
+
+        {userId && !loading && list.length > 0 && (
+          <div className="story-grid">
+            {list.map((s) => {
+              const cover = s.imageUrl || buildCoverSrc(s._id);
+              return (
+                <article
+                  key={s._id}
+                  className="story-card"
+                  onClick={() => navigate(`/story/${s._id}`, { state: { title: s.name } })}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ")
+                      navigate(`/story/${s._id}`, { state: { title: s.name } });
+                  }}
                 >
                   <img
-                    src={favs[story.id] ? favoriteActive : favoriteIcon}
-                    alt={favs[story.id] ? 'Favorited' : 'Add to favorites'}
+                    src={cover}
+                    alt="Story cover"
+                    className="story-thumbnail"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = storyFallback;
+                    }}
                   />
-                </button>
-              </article>
-            ))}
+                  <div className="card-divider" />
+                  <h2 className="story-title">《{s.name}》</h2>
+
+                  <button
+                    className="favorite-button active"
+                    onClick={(e) => handleUnfavorite(e, s._id)}
+                    aria-label="移除收藏"
+                    title="點擊移除收藏"
+                  >
+                    <img src={favoriteActive} alt="Favorited" />
+                  </button>
+                </article>
+              );
+            })}
           </div>
         )}
       </main>
