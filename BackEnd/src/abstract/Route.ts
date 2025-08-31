@@ -5,7 +5,7 @@ export abstract class Route{
 
     protected abstract url:string
 
-    protected abstract Contorller:Contorller
+    protected abstract Contorller:any
 
     protected router = Router()
 

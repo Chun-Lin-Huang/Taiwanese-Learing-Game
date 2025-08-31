@@ -7,4 +7,13 @@ export enum api {
     latestGameByCategory = "http://127.0.0.1:2083/api/v1/game/by-category",
     gameQuestionsByGame = "http://127.0.0.1:2083/api/v1/game-questions/by-game",
     audioByQuestion = "http://127.0.0.1:2083/api/v1/audio/by-question",
+    storyNameList = "http://127.0.0.1:2083/api/v1/story-name/list",
+    storyCover = "http://127.0.0.1:2083/api/v1/story-name/stream",
+    storySearch = "http://127.0.0.1:2083/api/v1/story-name/search",
+    storyDetails = "http://127.0.0.1:2083/api/v1/story",
+    storyAudioByStoryName = "http://127.0.0.1:2083/api/v1/story-audio/by-story-name",
+    storyAudioStream = "http://127.0.0.1:2083/api/v1/story-audio/stream",
+    storyCollectionList = "http://127.0.0.1:2083/api/v1/story-collection",     
+    storyCollectionAdd = "http://127.0.0.1:2083/api/v1/story-collection/add",   
+    storyCollectionRemove = "http://127.0.0.1:2083/api/v1/story-collection/remove", 
 }

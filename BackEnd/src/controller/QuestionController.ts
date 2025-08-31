@@ -23,42 +23,5 @@ export class QuestionController extends Contorller {
         const resp = await this.service.create(Request.body)
         Response.status(resp.code).send(resp)
     }
-
-    /**
-     * 取得問題清單（可依 userName 過濾）
-     * @param Request 
-     * @param Response 
-     */
-    public async list(Request: Request, Response: Response) {
-        const { userName } = Request.query || {};
-        const resp = await this.service.list(userName as string | undefined)
-        Response.status(resp.code).send(resp)
-    }
-
-    /**
-     * 取得所有問題
-     * @param Request 
-     * @param Response 
-     */
-        public async findAll(Request: Request, Response: Response) {
-    
-            const res: resp<Array<DBResp<Question>> | undefined> = {
-                code: 200,
-                message: "",
-                body: undefined
-            }
-    
-            const dbResp = await this.service.getAllQuestions();
-            if (dbResp) {
-                res.body = dbResp;
-                res.message = "find sucess";
-                Response.send(res);
-            } else {
-                res.code = 500;
-                res.message = "server error";
-                Response.status(500).send(res);
-            }
-    
-        }
 }
     

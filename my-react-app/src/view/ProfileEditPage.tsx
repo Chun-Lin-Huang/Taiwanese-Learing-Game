@@ -1,11 +1,12 @@
+// src/view/ProfileEditPage.tsx
 import React, { useState, useEffect, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import "../style/ProfileEditPage.css"; 
+import "../style/ProfileEditPage.css";
 import BackIcon from "../assets/Back.svg";
-import  avartBg from"../assets/avatar_bg.png";
-import avatar from"../assets/avatar.png";
+import avartBg from "../assets/avatar_bg.png";
+import avatar from "../assets/avatar.png";
 import { api } from "../enum/api";
 import { asyncPut } from "../utils/fetch";
 
@@ -26,14 +27,13 @@ const ProfileEditPage: React.FC = () => {
   const [displayName, setDisplayName] = useState("");
   const [displayUsername, setDisplayUsername] = useState("");
 
-  // 編輯用輸入框（預設空字串 → 只顯示 placeholder）
+  // 編輯用輸入框
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
 
   const [avatarPreview, setAvatarPreview] = useState(defaultAvatar);
   const [submitting, setSubmitting] = useState(false);
 
-  // 初始化：從 localStorage 帶入顯示用資訊
   useEffect(() => {
     try {
       const raw = localStorage.getItem("userInfo");
@@ -41,11 +41,8 @@ const ProfileEditPage: React.FC = () => {
         const info = JSON.parse(raw) as UserInfo;
         setDisplayName(info.name || "");
         setDisplayUsername(info.userName || "");
-        // 注意：不把 input 的 value 設成這些值，讓 input 只顯示 placeholder
       }
-    } catch {
-      /* ignore */
-    }
+    } catch {}
   }, []);
 
   const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -71,7 +68,7 @@ const ProfileEditPage: React.FC = () => {
     const payload: Record<string, any> = { _id: userId };
     if (fullName.trim()) payload.name = fullName.trim();
     if (username.trim()) payload.userName = username.trim();
-    // 若兩個都沒填，就不送
+
     if (!payload.name && !payload.userName) {
       toast.info("請至少編輯一項資料再送出", { position: "top-center" });
       return;
@@ -81,34 +78,45 @@ const ProfileEditPage: React.FC = () => {
     try {
       const resp = await asyncPut(api.update, payload);
 
-      // 非 2xx 會在 asyncPut 丟錯；所以這裡視為成功或 resp?.code === 200 都可以
-      if (!resp || resp?.code === 200) {
-        // 同步更新顯示文字與 localStorage
-        const nextName = payload.name ?? displayName;
-        const nextUserName = payload.userName ?? displayUsername;
+      // 依照後端的錯誤格式判斷
+      const code = resp?.code ?? resp?.status;
 
-        setDisplayName(nextName);
-        setDisplayUsername(nextUserName);
-
-        const old = JSON.parse(localStorage.getItem("userInfo") || "{}");
-        localStorage.setItem(
-          "userInfo",
-          JSON.stringify({
-            ...old,
-            _id: userId,
-            name: nextName,
-            userName: nextUserName,
-          })
-        );
-
-        // 清空輸入框，回到只顯示 placeholder 的狀態
-        setFullName("");
-        setUsername("");
-
-        toast.success("資料更新成功！", { position: "top-center", autoClose: 2000 });
-      } else {
-        toast.error(resp?.message || "更新失敗，請稍後再試", { position: "top-center" });
+      if (code && code !== 200) {
+        if (code === 409) {
+          toast.error(resp?.message || "使用者名稱已有人使用", { position: "top-center" });
+        } else {
+          toast.error(resp?.message || "更新失敗，請稍後再試", { position: "top-center" });
+        }
+        return; // 結束，不進入成功流程
       }
+
+      if (resp && resp.success === false) {
+        toast.error(resp?.message || "更新失敗，請稍後再試", { position: "top-center" });
+        return;
+      }
+
+      // 成功：同步畫面與 localStorage
+      const nextName = payload.name ?? displayName;
+      const nextUserName = payload.userName ?? displayUsername;
+
+      setDisplayName(nextName);
+      setDisplayUsername(nextUserName);
+
+      const old = JSON.parse(localStorage.getItem("userInfo") || "{}");
+      localStorage.setItem(
+        "userInfo",
+        JSON.stringify({
+          ...old,
+          _id: userId,
+          name: nextName,
+          userName: nextUserName,
+        })
+      );
+
+      setFullName("");
+      setUsername("");
+
+      toast.success("資料更新成功！", { position: "top-center", autoClose: 2000 });
     } catch (err) {
       console.error(err);
       const msg = err instanceof Error ? err.message : "無法連線到伺服器";
@@ -124,9 +132,8 @@ const ProfileEditPage: React.FC = () => {
 
   return (
     <section id="profile-change" className="page-bg">
-      {/* 頁面頂部橫幅 */}
       <header className="game-header">
-         <button
+        <button
           type="button"
           className="back-button"
           aria-label="返回"
@@ -137,26 +144,14 @@ const ProfileEditPage: React.FC = () => {
         <h1 className="header-title">個人資料變更</h1>
       </header>
 
-      {/* 表單內容 */}
       <main className="profile-content">
         <form className="profile-form" onSubmit={handleSubmit}>
-
-          {/* 頭像區 */}
           <div className="avatar-section">
             <div className="avatar-wrapper">
-              <img
-                src={avartBg}
-                className="avatar-bg"
-                alt="Avatar background"
-              />
-              <img
-                src={avatarPreview}
-                className="avatar-icon"
-                alt="User avatar"
-              />
+              <img src={avartBg} className="avatar-bg" alt="Avatar background" />
+              <img src={avatarPreview} className="avatar-icon" alt="User avatar" />
             </div>
 
-            {/* 顯示目前使用者姓名 + 使用者名稱 */}
             <p className="avatar-change-label">
               {displayName || "使用者"} {displayUsername ? `(${displayUsername})` : ""}
             </p>
@@ -171,7 +166,6 @@ const ProfileEditPage: React.FC = () => {
             />
           </div>
 
-          {/* 輸入欄位 */}
           <div className="form-fields">
             <div className="form-group">
               <label htmlFor="full-name" className="form-label">編輯姓名</label>
@@ -197,7 +191,6 @@ const ProfileEditPage: React.FC = () => {
             </div>
           </div>
 
-          {/* 按鈕 */}
           <div className="form-actions">
             <button type="submit" className="btn btn-confirm" disabled={submitting}>
               {submitting ? "送出中…" : "確定"}
@@ -207,7 +200,6 @@ const ProfileEditPage: React.FC = () => {
         </form>
       </main>
 
-      {/* Toast提示 */}
       <ToastContainer />
     </section>
   );

@@ -1,9 +1,13 @@
-import { StoryName } from "./StoryName";
-
+// src/interfaces/StoryCollection.ts
 export interface StoryCollection {
-    _id?: string,             // 唯一識別碼
-    userName: string,         // 使用者名稱
-    storyNames: StoryName[],  // 收藏的故事名稱陣列
-    createdAt?: Date,
-    updatedAt?: Date
+  _id?: string;
+  user_id: string;  // ✅ 用 user_id 而不是 userName
+  storyNames: Array<{
+    _id: string; // StoryName 的 ObjectId
+    name: string;
+    imageFilename?: string;
+    imageUrl?: string;
+    imageSize?: number;
+  }>;
+  addTime?: Date;
 }

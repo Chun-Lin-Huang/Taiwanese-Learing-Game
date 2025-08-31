@@ -1,49 +1,179 @@
-import React from 'react';
-import '../style/StoryDetailPage.css';
-import backIcon from '../assets/back.svg';
-import storyImage from '../assets/detail.png';
-import volumeIcon from '../assets/volume.png';
+// src/view/StoryDetailPage.tsx
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import "../style/StoryDetailPage.css";
 
-const StoryDetailPage: React.FC<{ story: any, onBack: () => void }> = ({ story, onBack }) => {
+import backIcon from "../assets/back.svg";
+
+import { api } from "../enum/api";
+import { asyncGet } from "../utils/fetch";
+
+type StoryDetail = {
+  _id: string;
+  storyNameId: string;
+  chinese?: string;
+  han?: string;
+  imageUrl?: string;
+};
+
+type LocationState = { title?: string } | null;
+
+const StoryDetailPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { storyNameId } = useParams<{ storyNameId: string }>();
+  const location = useLocation();
+  const state = (location.state as LocationState) || null;
+
+  const [loading, setLoading] = useState(true);
+  const [errMsg, setErrMsg] = useState<string | null>(null);
+  const [story, setStory] = useState<StoryDetail | null>(null);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+
+  const pageTitle = useMemo(() => state?.title ?? "故事", [state]);
+
+  useEffect(() => {
+    if (!storyNameId) {
+      setErrMsg("缺少故事 ID");
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        setLoading(true);
+        setErrMsg(null);
+
+        // 1) 故事內容
+        const res = await asyncGet(`${api.storyDetails}/${encodeURIComponent(storyNameId)}`);
+        const body: StoryDetail | undefined = res?.body ?? res;
+        if (!body || !body._id) throw new Error("找不到故事內容");
+        if (!cancelled) setStory(body);
+
+        // 2) 音檔 URL
+        try {
+          const metaRes = await asyncGet(
+            `${api.storyAudioByStoryName}/${encodeURIComponent(storyNameId)}`
+          );
+          const url: string | undefined = metaRes?.body?.url ?? metaRes?.url;
+          if (url && !cancelled) setAudioUrl(url);
+        } catch {
+          if (!cancelled) setAudioUrl(null);
+        }
+      } catch (e: any) {
+        if (!cancelled) {
+          setErrMsg(e?.message || "載入故事失敗");
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+        audioRef.current = null;
+      }
+    };
+  }, [storyNameId]);
+
+  const Header = (
+    <header className="story-header">
+      <div className="header-container">
+        <button className="back-button" aria-label="Go back" onClick={() => navigate(-1)}>
+          <img src={backIcon} alt="Back" />
+        </button>
+        <h1 className="story-title">{loading ? "載入中…" : `《${pageTitle}》`}</h1>
+      </div>
+    </header>
+  );
+
+  if (loading) {
+    return (
+      <div className="story-detail-page">
+        {Header}
+        <main className="story-main">
+          <div className="story-image-container" />
+          <div className="story-body">
+            <p className="story-paragraph">故事內容載入中，請稍候。</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (errMsg || !story) {
+    return (
+      <div className="story-detail-page">
+        {Header}
+        <main className="story-main">
+          <div className="story-image-container" />
+          <div className="story-body">
+            <p className="story-paragraph" style={{ color: "#b00" }}>
+              {errMsg || "無法取得故事內容"}
+            </p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  const coverSrc = story.imageUrl;
+
   return (
-    <>
-      <header className="story-header">
-        <div className="header-container">
-          <a href="#" className="back-button" aria-label="Go back" onClick={onBack}>
-            <img src={backIcon} alt="Back arrow icon" />
-          </a>
-          <h1 className="story-title">《月娘花開的暗暝》</h1>
-        </div>
-      </header>
-      <main>
+    <div className="story-detail-page">
+      {Header}
+
+      <main className="story-main">
         <div className="story-image-container">
           <img
             className="story-image"
-            src={storyImage}
-            alt="Illustration of a smiling moon and flowers at night"
+            src={coverSrc}
+            alt="Story cover"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).style.display = "none";
+            }}
           />
         </div>
+
+        {/* 直接顯示 <audio controls /> */}
+        {audioUrl && (
+          <audio
+            ref={audioRef}
+            className="story-audio"
+            src={audioUrl}
+            controls
+            preload="metadata"
+          />
+        )}
+
         <div className="story-body">
-          <button className="audio-button" aria-label="Play story audio">
-            <img
-              src={volumeIcon}
-              alt="Volume up icon"
-            />
-          </button>
-          <p className="story-paragraph">
-            很久很久以前，有一個小村莊，村莊邊有一間柴房，裡面住著一位老人家，人稱阿月嬤。阿月嬤每天坐在窗邊，望著天頂的月娘，嘴內念念有詞，村仔內的人攏講，她是在等一個已經無可能返來的人。
-            <br /><br />
-            五十年前，阿月嬤是村內有名的水某仔，名叫月娘。月娘彼時青春水噹噹，唱歌好聽、心地又善良。她愛上了一個種田的青年阿添，兩人相知相惜，在月光下定下終身。毋過，戰爭來了，阿添被徵調去當兵，講是三個月就會返來，月娘信著，就每天坐在窗前等，等啊等，等過春天、夏天、秋天、冬天，一年又一年，阮村的屋頂換新了、稻田收割再種，但阿添一直無影。鄰居勸她放下，她只是笑笑講：「我知影伊會返來，咱月娘花會開的暗暝，就會是伊返來的時陣。」
-            <br /><br />
-            她種了一排月娘花，白色細細的花朵，每年攏照時開，像是她的希望攏不曾變。終於，有一工，暗暝天特別光，月娘花開甲滿滿，風吹過有一陣陣香。
-            <br /><br />
-            有人講，看著一個穿舊軍裝的男子，腳步輕輕行入村口。阿月嬤彼工猶坐在窗邊，忽然，笑甲流目屎。「添哥，你返來啦⋯⋯」無人知影那人真有無來，也有人講阿月嬤是老到迷惘去。但村裡的人攏知影，月娘嬤守著一段情，守著月娘花開的暗暝，也守著自己心內那份真心。
-            <br /><br />
-            從此以後，村內若有細漢問：「月娘花為什麼每年攏會開？」老人會笑笑講：「因為有一個人，一直等，一直相信，有情人會再見面。」
-          </p>
+          {(() => {
+            const hanLines = story.han ? story.han.split(/\n+/) : [];
+            const zhLines = story.chinese ? story.chinese.split(/\n+/) : [];
+            const maxLen = Math.max(hanLines.length, zhLines.length);
+
+            return Array.from({ length: maxLen }).map((_, i) => (
+              <React.Fragment key={i}>
+                {hanLines[i] && <p className="story-paragraph han-text">{hanLines[i]}</p>}
+                {zhLines[i] && (
+                  <p className="story-paragraph chinese-text">（{zhLines[i]}）</p>
+                )}
+              </React.Fragment>
+            ));
+          })()}
+
+          {!story.han && !story.chinese && (
+            <p className="story-paragraph">（此故事目前沒有內文）</p>
+          )}
         </div>
       </main>
-    </>
+    </div>
   );
 };
 
