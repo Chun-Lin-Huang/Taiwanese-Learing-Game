@@ -1,230 +1,316 @@
+/* ---- 全頁禁止捲動，完全隱藏 scrollbar ---- */
+html, body {
+  height: 100%;
+  overflow: hidden;   /* 不允許水平/垂直捲動 */
+}
+
+/* 內層真正可滾的容器（保留你原本的設定） */
+.page-bg {
+  min-height: 100svh;      /* 更穩定的視窗高度單位 */
+  overflow-x: hidden;
+  overflow-y: auto;        /* 🔑 只在這裡顯示垂直滾輪 */
+}
+
 /* =========================
    頁面主要內容容器
    ========================= */
-   .page-container {
-    max-width: 1920px;        /* 限制最大寬度 */
-    margin: 0 auto;           /* 置中對齊 */
-    position: relative;       
-    min-height: 100vh;        /* 內容至少佔滿一個螢幕高度 */
-    padding-top: 80px;        /* 預留固定 header 的高度 */
-    overflow-x: hidden;       /* 隱藏水平滾動條 */
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-  
-  /* =========================
+/* 這裡避免 100vh + padding-top 造成超高而多出滾輪 */
+.page-container {
+  /* 其餘維持你的設定 */
+  max-width: 1920px;
+  margin: 0 auto;
+  position: relative;
+  padding-top: 80px;       /* 與固定 header 高度一致 */
+  overflow-x: hidden;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+/* 保險：徹底關掉水平滾輪的可能來源 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+img, svg, video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* =========================
      使用者資料區塊（外層容器）
      ========================= */
-  .profile-content {
-    padding-top: clamp(30px, 7vw, 60px);     /* 上方內距，隨螢幕比例變化 */
-    padding-bottom: clamp(5px, 1.5vw, 20px); /* 下方內距，隨螢幕比例變化 */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: clamp(25px, 5vw, 40px);              /* 元素間距，隨螢幕比例變化 */
-    margin-bottom: 0;
-  }
-  
-  /* =========================
+.profile-content {
+  padding-top: clamp(30px, 7vw, 60px);
+  /* 上方內距，隨螢幕比例變化 */
+  padding-bottom: clamp(5px, 1.5vw, 20px);
+  /* 下方內距，隨螢幕比例變化 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(25px, 5vw, 40px);
+  /* 元素間距，隨螢幕比例變化 */
+  margin-bottom: 0;
+}
+
+/* =========================
      使用者資訊（頭像 + 名稱）
      ========================= */
-  .user-info {
-    display: flex;
-    align-items: center;
-    gap: 20px;                    /* 頭像與名稱的間距 */
-    width: 100%;
-    max-width: 1479px;
-    padding: 0 15vw;              /* 左右內距，隨視窗寬度比例調整 */
-    box-sizing: border-box;
-    margin-bottom: 0;
-  }
-  
-  /* --- 頭像容器 --- */
-  .avatar {
-    position: relative;
-    width: 6vmin;        /* 隨視窗縮放的寬度 */
-    height: 6vmin;       /* 隨視窗縮放的高度 */
-    min-width: 90px;     /* 避免太小 */
-    min-height: 90px;    /* 避免太小 */
-    flex-shrink: 0;      /* 不隨 flex 壓縮 */
-  }
-  
-  /* 頭像背景 & 頭像圖示共用樣式 */
-  .avatar .avatar-background,
-  .avatar .avatar-icon {
-    position: absolute;              
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* 置中對齊 */
-    max-width: 100%;
-    max-height: 100%;
-  }
-  
-  /* 頭像背景圖 */
-  .avatar .avatar-background {
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* 保持比例，不裁切 */
-  }
-  
-  /* 頭像前景圖 */
-  .avatar .avatar-icon {
-    width: 80%; /* 佔背景 80% 的大小 */
-    height: 80%;
-  }
-  
-  /* --- 使用者名稱 --- */
-  .username {
-    font-size: 2.5rem;
-    font-weight: 400;
-    margin: 0;
-  }
-  
-  /* =========================
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  /* 頭像與名稱的間距 */
+  width: 100%;
+  max-width: 1479px;
+  padding: 0 15vw;
+  /* 左右內距，隨視窗寬度比例調整 */
+  box-sizing: border-box;
+  margin-bottom: 0;
+}
+
+/* --- 頭像容器 --- */
+.avatar {
+  position: relative;
+  width: 6vmin;
+  /* 隨視窗縮放的寬度 */
+  height: 6vmin;
+  /* 隨視窗縮放的高度 */
+  min-width: 90px;
+  /* 避免太小 */
+  min-height: 90px;
+  /* 避免太小 */
+  flex-shrink: 0;
+  /* 不隨 flex 壓縮 */
+}
+
+/* 頭像背景 & 頭像圖示共用樣式 */
+.avatar .avatar-background,
+.avatar .avatar-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* 置中對齊 */
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* 頭像背景圖 */
+.avatar .avatar-background {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* 保持比例，不裁切 */
+}
+
+/* 頭像前景圖 */
+.avatar .avatar-icon {
+  width: 80%;
+  /* 佔背景 80% 的大小 */
+  height: 80%;
+}
+
+/* --- 使用者名稱 --- */
+.username {
+  font-size: 2.5rem;
+  font-weight: 400;
+  margin: 0;
+}
+
+/* =========================
      設定功能選單
      ========================= */
-  .settings-menu {
-    width: 100%;
-    max-width: 1479px;
-    padding: 0 15vw; /* 左右內距，隨視窗寬度比例調整 */
-    box-sizing: border-box;
-  }
-  
-  .settings-menu ul {
-    list-style: none;   /* 移除預設項目符號 */
-    padding-left: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;          /* 選單項目間距 */
-  }
-  
-  /* --- 單一功能選項 --- */
-  .menu-item {
-    background-color: #ffec97;
-    border-radius: 30px;
-    min-height: 70px; /* 約 85px 高度 */
-    width: 2000px;
-    display: flex;
-    align-items: center;
-    padding: 0 2.1875rem;  /* 左右內距 */
-    box-sizing: border-box;
-    gap: 1rem;             /* 圖示與文字間距 */
-    cursor: pointer;       /* 滑鼠變手形 */
-    max-width: 100%;
-  }
-  
-  /* 功能選單的圖示容器 */
-  .menu-icon-container {
-    width: 3.125rem;  /* 約 50px */
-    height: 3.125rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  
-  .menu-icon-container img {
-    max-width: 100%;
-    max-height: 100%;
-  }
-  
-  /* 功能文字 */
-  .menu-text {
-    font-size: clamp(1.2rem, 2.5vw, 2rem); /* 隨視窗比例調整 */
-    font-weight: 800;
-    flex-grow: 1; /* 讓文字佔滿中間空間 */
-  }
-  
-  /* 功能箭頭圖示 */
-  .menu-arrow {
-    width: 3.75rem;  /* 約 60px */
-    height: 3.75rem;
-    flex-shrink: 0;
-  }
-  
-  /* =========================
+.settings-menu {
+  width: 100%;
+  max-width: 1479px;
+  padding: 0 15vw;
+  /* 左右內距，隨視窗寬度比例調整 */
+  box-sizing: border-box;
+}
+
+.settings-menu ul {
+  list-style: none;
+  /* 移除預設項目符號 */
+  padding-left: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  /* 選單項目間距 */
+}
+
+.menu-item {
+  background-color: #ffec97;
+  border-radius: 30px;
+  min-height: 70px;
+  width: 100%;
+  /* ✅ 跟隨容器寬度 */
+  display: flex;
+  align-items: center;
+  padding: 0 2.1875rem;
+  box-sizing: border-box;
+  gap: 1rem;
+  cursor: pointer;
+}
+
+/* 功能選單的圖示容器 */
+.menu-icon-container {
+  width: 3.125rem;
+  /* 約 50px */
+  height: 3.125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.menu-icon-container img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* 功能文字 */
+.menu-text {
+  font-size: clamp(1.2rem, 2.5vw, 2rem);
+  /* 隨視窗比例調整 */
+  font-weight: 800;
+  flex-grow: 1;
+  /* 讓文字佔滿中間空間 */
+}
+
+/* 功能箭頭圖示 */
+.menu-arrow {
+  width: 3.75rem;
+  /* 約 60px */
+  height: 3.75rem;
+  flex-shrink: 0;
+}
+
+/* =========================
      響應式調整（平板尺寸以下）
      ========================= */
-  @media (max-width: 1200px) {
-    .page-container {
-      padding-top: 80px;
-    }
-    .user-info,
-    .settings-menu {
-      max-width: 100%;
-      padding: 0 5%;
-    }
-    .settings-menu ul {
-      gap: 1.5rem; /* 約 24px */
-    }
-    .menu-item {
-      min-height: clamp(3.125rem, 5vw, 3.75rem); 
-      border-radius: 25px;
-      padding: 0 clamp(2.5rem, 5vw, 4rem) 0 clamp(2rem, 4vw, 3.5rem);
-      gap: clamp(0.6rem, 1.2vw, 0.9rem);
-    }
-    .menu-icon-container,
-    .menu-arrow {
-      width: clamp(2.25rem, 3.5vw, 3rem);
-      height: clamp(2.25rem, 3.5vw, 3rem);
-    }
-    .menu-text {
-      font-size: clamp(1.2rem, 2vw, 1.6rem);
-    }
-    .username {
-      font-size: clamp(1.5rem, 3vw, 1.8rem);
-    }
-    .avatar {
-      width: clamp(5vmin, 8vw, 6vmin);
-      height: clamp(5vmin, 8vw, 6vmin);
-      min-width: 80px;
-      min-height: 80px;
-    }
-  }
-  
-  /* =========================
-     響應式調整（手機尺寸以下）
-     ========================= */
-  @media (max-width: 768px) {
-    .page-container {
-      padding-top: 70px;
-    }
-    .user-info {
-      flex-direction: column; /* 改成直排 */
-      align-items: center;
-      gap: clamp(1rem, 2vw, 1.25rem);
-      padding: 0 5vw;
-    }
-    .settings-menu {
-      padding: 0 5vw;
-    }
-    .settings-menu ul {
-      gap: 1rem;
-    }
-    .menu-item {
-      min-height: clamp(2.5rem, 4vw, 3.125rem);
-      border-radius: 20px;
-      padding: 0 clamp(1.5rem, 3.5vw, 3rem) 0 clamp(1.25rem, 2.5vw, 2.5rem);
-      gap: clamp(0.5rem, 1vw, 0.75rem);
-    }
-    .menu-icon-container,
-    .menu-arrow {
-      width: clamp(1.75rem, 3vw, 2.25rem);
-      height: clamp(1.75rem, 3vw, 2.25rem);
-    }
-    .menu-text {
-      font-size: clamp(0.9rem, 1.5vw, 1.2rem);
-    }
-    .username {
-      font-size: clamp(1rem, 2vw, 1.2rem);
-    }
-    .avatar {
-      width: clamp(4vmin, 6vw, 5vmin);
-      height: clamp(4vmin, 6vw, 5vmin);
-      min-width: 70px;
-      min-height: 70px;
-    }
+@media (max-width: 1200px) {
+  .page-container {
+    padding-top: 80px;
   }
 
-  
+  .user-info,
+  .settings-menu {
+    max-width: 100%;
+    padding: 0 5%;
+  }
+
+  .settings-menu ul {
+    gap: 1.5rem;
+    /* 約 24px */
+  }
+
+  .menu-item {
+    min-height: clamp(3.125rem, 5vw, 3.75rem);
+    border-radius: 25px;
+    padding: 0 clamp(2.5rem, 5vw, 4rem) 0 clamp(2rem, 4vw, 3.5rem);
+    gap: clamp(0.6rem, 1.2vw, 0.9rem);
+  }
+
+  .menu-icon-container,
+  .menu-arrow {
+    width: clamp(2.25rem, 3.5vw, 3rem);
+    height: clamp(2.25rem, 3.5vw, 3rem);
+  }
+
+  .menu-text {
+    font-size: clamp(1.2rem, 2vw, 1.6rem);
+  }
+
+  .username {
+    font-size: clamp(1.5rem, 3vw, 1.8rem);
+  }
+
+  .avatar {
+    width: clamp(5vmin, 8vw, 6vmin);
+    height: clamp(5vmin, 8vw, 6vmin);
+    min-width: 80px;
+    min-height: 80px;
+  }
+}
+
+/* =========================
+     響應式調整（手機尺寸以下）
+     ========================= */
+@media (max-width: 768px) {
+  .page-container {
+    padding-top: 70px;
+  }
+
+  .user-info {
+    flex-direction: column;
+    /* 改成直排 */
+    align-items: center;
+    gap: clamp(1rem, 2vw, 1.25rem);
+    padding: 0 5vw;
+  }
+
+  .settings-menu {
+    padding: 0 5vw;
+  }
+
+  .settings-menu ul {
+    gap: 1rem;
+  }
+
+  .menu-item {
+    min-height: clamp(2.5rem, 4vw, 3.125rem);
+    border-radius: 20px;
+    padding: 0 clamp(1.5rem, 3.5vw, 3rem) 0 clamp(1.25rem, 2.5vw, 2.5rem);
+    gap: clamp(0.5rem, 1vw, 0.75rem);
+  }
+
+  .menu-icon-container,
+  .menu-arrow {
+    width: clamp(1.75rem, 3vw, 2.25rem);
+    height: clamp(1.75rem, 3vw, 2.25rem);
+  }
+
+  .menu-text {
+    font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+  }
+
+  .username {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+  }
+
+  .avatar {
+    width: clamp(4vmin, 6vw, 5vmin);
+    height: clamp(4vmin, 6vw, 5vmin);
+    min-width: 70px;
+    min-height: 70px;
+  }
+}
+
+/* =========================
+   額外插入：關掉水平滾輪
+   ========================= */
+body {
+  overflow-x: hidden;
+}
+
+/* ---- 全頁禁止捲動，完全隱藏 scrollbar ---- */
+html, body, #root, .page-bg, .page-container {
+  height: 100%;
+  overflow: hidden !important;   /* 水平 + 垂直滾動都關掉 */
+  width: 100%;
+  max-width: 100%;
+}
+
+/* 最常見元兇：用 100vw 的 header。強制用 100% 不會超出視窗寬 */
+.game-header {
+  width: 100% !important;
+}
+
+/* 3) 保險：任何固定寬度背景/條狀區塊都不要超出視窗 */
+.page-bg, .page-container {
+  max-width: 100%;
+}

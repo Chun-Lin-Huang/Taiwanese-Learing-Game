@@ -16,4 +16,15 @@ export class VocabularyCardController {
       res.status(500).send({ code: 500, message: "server error", body: [] });
     }
   }
+
+  /** GET /api/v1/vocab-cards/:cardId */
+  public async getById(req: Request, res: Response) {
+    try {
+      const { cardId } = req.params as { cardId: string };
+      const out = await this.service.getById(cardId);
+      res.status(out.code).send(out);
+    } catch {
+      res.status(500).send({ code: 500, message: "server error", body: null });
+    }
+  }
 }

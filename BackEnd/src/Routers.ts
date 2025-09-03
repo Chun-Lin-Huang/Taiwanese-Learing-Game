@@ -15,6 +15,7 @@ import { VocabularyCardRoute } from "./routers/VocabilaryCardRoute";
 import { VocabularyAudioRoute } from "./routers/VocabularyAudioRoute";
 import { SentenceRoute } from "./routers/SentenceRoute";
 import { SentenceAudioRoute } from "./routers/SentenceAudioRoute";
+import { VocabularyCollectionRoute } from "./routers/VocabularyCollectionRoute";
 
 export const router: Array<Route> = [
     new PageRoute(),new UserRoute()
@@ -32,4 +33,5 @@ export const router: Array<Route> = [
     ,new VocabularyAudioRoute()
     ,new SentenceRoute()
     ,new SentenceAudioRoute()
+    ,new VocabularyCollectionRoute()
 ];

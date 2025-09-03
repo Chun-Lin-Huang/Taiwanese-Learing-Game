@@ -17,5 +17,9 @@ export class VocabularyCardRoute extends Route {
     this.router.get(`${this.url}by-category/:categoryId`, (req, res) =>
       this.Contorller.getByCategory(req, res)
     );
+
+    this.router.get(`${this.url}:cardId`, (req, res) =>
+      this.Contorller.getById(req, res)
+    );
   }
 }

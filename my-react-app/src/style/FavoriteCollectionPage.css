@@ -1,9 +1,236 @@
-
-
 .favorite-content {
   flex-grow: 1;
   padding: 20px;
   text-align: center;
   font-size: 18px;
   color: #333;
+}
+
+.favorite-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 固定三欄 */
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
+  max-width: 1400px; /* 最大寬度，避免太擠 */
+  margin: 0 auto;   /* 置中 */
+}
+
+.favorite-flashcard {
+  width: 100%;      /* 改成由 grid 控制 */
+  aspect-ratio: 4 / 3; /* 保持比例（可調整 3/2, 16/9 都行） */
+  border-radius: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 20px;
+  perspective: 1500px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.favorite-flashcard-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+/* 翻面效果 */
+.favorite-flashcard.flipped .favorite-flashcard-inner {
+  transform: rotateY(180deg);
+}
+
+.favorite-flashcard-front,
+.favorite-flashcard-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  background-color: #f9ab5d;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.favorite-flashcard-front {
+  background-color:#f9ab5d;
+  color: #333;
+}
+
+.favorite-flashcard-back {
+  background-color:#ffd78a;
+  color: #333;
+  transform: rotateY(180deg);
+}
+
+/* 卡片內容樣式，字體隨卡片縮小 */
+.favorite-flashcard-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+    word-wrap: break-word;  /* 允許長字串換行 */
+}
+
+
+.favorite-word-stack,
+.favorite-sentence-stack {
+  margin: 0;
+  padding: 5px 0;
+  line-height: 1.2;
+  font-size: 100px;
+  font-weight: 800; /* 用於拼音 */
+ margin-top: -30px;
+}
+
+.favorite-word-stack p,
+.favorite-sentence-stack p {
+  margin-top: 100px;
+  line-height: -2;          /* 調整行距 */
+  font-size: clamp(0.8rem, 2vw, 1rem); /* 字體自適應縮放 */
+
+}
+
+.favorite-word-stack .favorite-word-tl,
+.favorite-sentence-stack .favorite-sent-tl {
+  font-size: 1rem; /* 相對字體大小 */
+  color: #666;
+  font-style: italic;
+}
+
+.favorite-word-stack .favorite-word-zh,
+.favorite-sentence-stack .favorite-sent-zh {
+  font-size: 1rem; /* 相對字體大小 */
+  color: #999;
+}
+
+.thin-text {
+  font-size: 1em; /* 相對字體大小 */
+  opacity: 0.8;
+   
+}
+
+/* 卡片圖示樣式 */
+.favorite-card-icons {
+  position: absolute;
+  top: 15px;   /* 稍微下移 */
+  right: 15px;
+  display: flex;
+  gap: 10px;   /* 圖標之間距離拉大一點 */
+  z-index: 10;
+}
+
+.favorite-icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.favorite-icon-button img {
+  width: 36px;   /* 原本 24px → 放大 */
+  height: 36px;
+}
+
+.star-icon.favorited {
+  filter: drop-shadow(0 0 5px #ffc107) saturate(1.5) brightness(1.2);
+}
+
+/* 刪除按鈕樣式 */
+.delete-button {
+  position: absolute;
+  bottom: 15px;   /* 往下 */
+  right: 15px;    /* 往右 */
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 48px;    /* 原本 30px → 放大 */
+  height: 48px;
+  font-size: 14px;  /* 原本 10px → 放大 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  font-weight: bold;
+  padding-top: 2px;
+}
+
+.delete-button:hover {
+  background-color: #c0392b;
+  transform: scale(1.1);
+}
+
+/* 沒有收藏卡片時的提示文字 */
+.game-selection-main p {
+  margin-top: 50px;
+  font-size: 1.2rem;
+  color: #777;
+}
+
+/* ===== 收藏網格：RWD 三段斷點 ===== */
+.favorite-cards-grid {
+  display: grid;
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;                   /* 置中 */
+  grid-template-columns: 1fr;       /* 手機：1 欄 */
+}
+
+/* 平板（≥ 640px）：2 欄 */
+@media (min-width: 640px) {
+  .favorite-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 桌機（≥ 1024px）：3 欄 */
+@media (min-width: 1024px) {
+  .favorite-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* 卡片尺寸交給格線，維持比例即可 */
+.favorite-flashcard {
+  width: 100%;
+  aspect-ratio: 4 / 3;              /* 想更寬就 16/9，想更方就 1/1 */
+  border-radius: 40px;
+  position: relative;
+  padding: 20px;
+  perspective: 1500px;
+  box-shadow: 0 4px 10px rgba(0,0,0,.1);
+}
+
+/* 內容排版在小螢幕稍微縮小一點字 */
+.favorite-word-han { font-size: clamp(18px, 2.2vw, 28px); font-weight: 800; }
+.favorite-word-tl  { font-size: clamp(14px, 1.8vw, 20px); font-weight: 700;  }
+.favorite-word-zh  { font-size: clamp(12px, 1.6vw, 18px); opacity: .9;       }
+
+/* 圖示/刪除按鈕：跟著尺寸 RWD */
+.favorite-card-icons { top: 10px; right: 10px; gap: 8px; }
+.favorite-icon-button img { width: clamp(18px, 2.2vw, 24px); height: clamp(18px, 2.2vw, 24px); }
+
+.delete-button {
+  width: clamp(34px, 3.2vw, 40px);
+  height: clamp(34px, 3.2vw, 40px);
+  font-size: clamp(10px, 1.4vw, 12px);
+  bottom: 10px; right: 10px;
 }
