@@ -111,29 +111,6 @@ const SettingsPage: React.FC = () => {
           </nav>
         </section>
       </main>
-
-      {/* 開發用快捷按鈕（非 production 顯示） */}
-      {import.meta.env.MODE !== "production" && (
-        <button
-          type="button"
-          onClick={() => navigate("/notifications")}
-          aria-label="前往通知頁（開發用）"
-          style={{
-            position: "fixed",
-            right: 20,
-            bottom: 100,
-            zIndex: 2000,
-            padding: "8px 12px",
-            background: "#333",
-            color: "#fff",
-            border: "none",
-            borderRadius: 6,
-            opacity: 0.7,
-          }}
-        >
-          通知頁（開發）
-        </button>
-      )}
     </div>
   );
 };

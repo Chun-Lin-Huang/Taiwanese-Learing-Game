@@ -55,4 +55,57 @@ export class VocabularyCardService {
 
     return { code: 200, message: "find success", body };
   }
+
+  /** 根據 cardId 取得單字卡詳細內容（含音檔資訊） */
+  async getById(cardId: string): Promise<resp<any>> {
+    if (!Types.ObjectId.isValid(cardId)) {
+      return { code: 400, message: "cardId invalid", body: null };
+    }
+
+    // 1) 單字卡
+    const card = await VocabularyCardModel.findById(cardId)
+      .select("_id han tl ch category_id audio_file_id audio_filename")
+      .lean();
+
+    if (!card) return { code: 404, message: "not found", body: null };
+
+    // 2) 音檔：相容三種情況
+    //   - 新資料：vocId=ObjectId(cardId)
+    //   - 新資料（有些存字串）：vocId=cardId(string)
+    //   - 舊資料：audioFileId = card.audio_file_id
+    const vocIdObj = new Types.ObjectId(cardId);
+    const audio = await VocabularyAudioModel.findOne({
+      isActive: { $ne: false },
+      $or: [
+        { vocId: vocIdObj },
+        { vocId: cardId },
+        ...(card.audio_file_id ? [{ audioFileId: String(card.audio_file_id) }] : []),
+      ],
+    })
+      .select("_id")
+      .lean();
+
+    const audioDocId = audio ? String(audio._id) : null;
+
+    // 3) 組回傳：若找不到 audioDocId，就提供以 cardId 串流的備援路徑
+    const audioUrl = audioDocId
+      ? this.streamByDocId(audioDocId)
+      : this.streamByCardId(String(card._id));
+
+    return {
+      code: 200,
+      message: "find success",
+      body: {
+        _id: String(card._id),
+        han: card.han,
+        tl: card.tl,
+        ch: card.ch,
+        categoryId: String(card.category_id),
+        audioFileId: card.audio_file_id ? String(card.audio_file_id) : null,
+        audioId: audioDocId,
+        audioFilename: card.audio_filename || null,
+        audioUrl,
+      },
+    };
+  }
 }
