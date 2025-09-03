@@ -10,6 +10,11 @@ import { StoryNameRoute } from "./routers/StoryNameRoute";
 import { StoryRoute } from "./routers/StoryRoute";
 import { StoryAudioRoute } from "./routers/StoryAudioRoute";
 import { StoryCollectionRoute } from "./routers/StroyCollectionRoute";
+import { VocabularyCategoryRoute } from "./routers/VocabularyCategoryRoute";
+import { VocabularyCardRoute } from "./routers/VocabilaryCardRoute";
+import { VocabularyAudioRoute } from "./routers/VocabularyAudioRoute";
+import { SentenceRoute } from "./routers/SentenceRoute";
+import { SentenceAudioRoute } from "./routers/SentenceAudioRoute";
 
 export const router: Array<Route> = [
     new PageRoute(),new UserRoute()
@@ -22,4 +27,9 @@ export const router: Array<Route> = [
     ,new StoryRoute()
     ,new StoryAudioRoute()
     ,new StoryCollectionRoute()
+    ,new VocabularyCategoryRoute()
+    ,new VocabularyCardRoute()
+    ,new VocabularyAudioRoute()
+    ,new SentenceRoute()
+    ,new SentenceAudioRoute()
 ];

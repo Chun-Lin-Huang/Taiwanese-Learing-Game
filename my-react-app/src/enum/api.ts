@@ -16,4 +16,10 @@ export enum api {
     storyCollectionList = "http://127.0.0.1:2083/api/v1/story-collection",     
     storyCollectionAdd = "http://127.0.0.1:2083/api/v1/story-collection/add",   
     storyCollectionRemove = "http://127.0.0.1:2083/api/v1/story-collection/remove", 
+    vocabCategoriesList = "http://127.0.0.1:2083/api/v1/vocab-categories/list",
+    vocabCategoryImage = "http://127.0.0.1:2083/api/v1/vocab-categories/stream",
+    vocabCardsByCategory = "http://127.0.0.1:2083/api/v1/vocab-cards/by-category",
+    vocabAudioStream = "http://127.0.0.1:2083/api/v1/vocab-audio/stream",
+    sentenceByCard = "http://127.0.0.1:2083/api/v1/sentences/by-card",
+    sentenceAudioStream = "http://127.0.0.1:2083/api/v1/sentence-audio/stream",
 }
