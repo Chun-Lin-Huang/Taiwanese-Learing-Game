@@ -99,8 +99,6 @@ body {
   margin: 0;
   font-weight: 700;
   font-size: 4vw; /* 從 2.2rem 改為視窗寬度的 4%，更具彈性 */
-  min-font-size: 1.5rem; /* 設置最小字體大小，確保可讀性 */
-  max-font-size: 2.5rem; /* 設置最大字體大小，避免過大 */
   color: #3f3e3e;
   text-shadow: 0.0625rem 0.0625rem 0.125rem rgba(255, 255, 255, 0.5); /* 陰影使用 rem */
 
@@ -217,12 +215,62 @@ body {
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.16);
 }
 
-.card-yellow {
-  background-color: #ffe680;
+/* 不要再放大整顆卡片 */
+.game-card {
+  position: relative;
+  overflow: hidden;
+  transform: none;            /* 關掉舊的縮放 */
+  transition: none;
 }
 
-.card-orange {
-  background-color: #f89c3f;
+/* 圖片與遮罩用來做放大效果，文字不受影響 */
+.active-card-image,
+.game-card::after {
+  transition: transform .25s ease, opacity .25s ease;
+}
+
+/* hover / 聚焦時只放大圖片與遮罩 */
+.game-card:hover .active-card-image,
+.game-card.focused .active-card-image {
+  transform: scale(1.06);     /* ✅ 放大圖片 */
+}
+
+.game-card:hover::after,
+.game-card.focused::after {
+  transform: scale(1.06);     /* ✅ 遮罩也一起放大，邊緣不露白 */
+}
+
+/* 置中的白字，固定大小不跟著縮放 */
+.active-card-title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);  /* 只做位移，不做縮放 */
+  z-index: 2;
+  width: 86%;
+  text-align: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 34px;            /* ✅ 固定大小，想多大就改這裡 */
+  line-height: 1.25;
+  letter-spacing: .02em;
+  text-shadow: 0 2px 6px rgba(0,0,0,.35);
+  white-space: pre-line;      /* 讓 \n 生效換行（如果你把 <br/> 移掉） */
+}
+
+/* 稍微變淺的漸層遮罩（不搶畫面，但確保字可讀） */
+.game-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,.22) 28%,
+    rgba(0,0,0,.08) 60%,
+    transparent 100%
+  );
+  z-index: 1;
+  pointer-events: none;
 }
 
 /* 響應式樣式 */

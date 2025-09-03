@@ -1,387 +1,270 @@
 :root {
   --page-max-width: 1920px;
-  --header-height: 124px;
-  --card-width: 1281px;
-  --card-height: 748px;
-}
 
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: #fffbd3;
-  color: #545050;
+  --card-radius: 40px;
+  --card-padding: 30px;
+
+  --brand-bg: #fffbd3;
+  --header-bg: #ffec97;
+  --card-front: #f9ab5d;
+  --card-back: #ffd78a;
+  --text: #545050;
+
+  /* 置中用 */
+  --nav-height: 44px;
+  --group-gap: 16px;
 }
 
 *,
 *::before,
-*::after {
-  box-sizing: border-box;
+*::after { box-sizing: border-box; }
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: var(--brand-bg);
+  color: var(--text);
 }
 
-button {
-  padding: 0;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-}
+button { border: none; background: transparent; cursor: pointer; padding: 0; }
 
-.page-container {
-  max-width: var(--page-max-width);
-  margin: 0 auto;
-  position: relative;
-  overflow: hidden;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
+/* 背景底圖 */
 .background-pattern {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
+  width: 100svw;
+  height: 100svh;
   object-fit: cover;
   z-index: -1;
   pointer-events: none;
 }
 
-/* Header */
-.site-header {
-  background-color: #ffec97;
-  height: var(--header-height);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-
-.header-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  width: 100%;
-  max-width: var(--page-max-width);
-  padding: 0 71px;
-}
-
-.back-button {
-  position: absolute;
-  left: 71px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 80px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  cursor: pointer;
-  z-index: 10;
-}
-
-.back-button img {
-  width: 80px;
-  height: 80px;
-  display: block;
-}
-
-.header-title {
-  font-size: 48px;
-  font-weight: 800;
-  line-height: 1.2;
-  margin: 0;
-  color: #545050;
-}
-
-@media (max-width: 768px) {
-  .site-header {
-    height: 80px;
-  }
-  .header-content {
-    padding: 0 20px;
-  }
-  .back-button {
-    left: 20px;
-  }
-  .back-button img {
-    width: 40px;
-    height: 40px;
-  }
-  .header-title {
-    font-size: 24px;
-  }
-}
-
-/* Flashcard Section */
+/* ===== 主體（用彈簧把卡片＋導覽夾在正中央） ===== */
 .flashcard-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding-top: 100px;
-  min-height: calc(100vh - 124px);
+  min-height: calc(100svh - var(--header-height));
+  padding: 0;
   position: relative;
   z-index: 1;
 }
 
 .flashcard-area {
+  min-height: calc(100svh - var(--header-height));
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: var(--group-gap);
   position: relative;
 }
 
-.flashcard-wrapper {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 32px;
+/* 上下彈簧：確保中間內容在正中央 */
+.flashcard-area::before,
+.flashcard-area::after {
+  content: "";
+  display: block;
+  flex: 1 1 0;
+  width: 1px;
 }
 
+/* ===== 卡片 ===== */
 .flashcard {
-  width: 2500px;
-  height: 1300px;
-  border-radius: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  padding: 30px;
+  width: clamp(320px, 88vw, 1200px);
+  aspect-ratio: 5 / 3;
+  max-height: calc(100svh - var(--header-height) - var(--nav-height) - var(--group-gap));
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
   perspective: 1500px;
   cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto; /* 水平置中 */
 }
 
 .flashcard-inner {
   width: 100%;
   height: 100%;
-  transition: transform 0.8s ease;
-  transform-style: preserve-3d;
   position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.8s ease;
 }
-
-.flashcard.flipped .flashcard-inner {
-  transform: rotateY(180deg);
-}
+.flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
 
 .flashcard-front,
 .flashcard-back {
   position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 40px;
+  inset: 0;
+  border-radius: var(--card-radius);
   backface-visibility: hidden;
-  background-color: #f9ab5d;
-  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.15);
-  padding: 30px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.15);
+  padding: var(--card-padding);
+
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
+.flashcard-front { background: var(--card-front); }
+.flashcard-back  { background: var(--card-back); transform: rotateY(180deg); }
 
-.flashcard-back {
-  background-color: #ffd78a;
-  transform: rotateY(180deg);
-}
-
-/* Flashcard Text Content */
+/* ===== 卡片文字 ===== */
 .flashcard-content {
+  width: 100%;
+  height: 100%;
+  text-align: center;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  height: 100%;
-  width: 100%;
-  text-align: center;
+  justify-content: center;
 }
 
 .flashcard-text-line {
   margin: 0;
-  padding: 5px 0;
-  line-height: 1.2;
-  font-size: 100px;
-  font-weight: 800; /* 用於拼音 */
+  padding: 6px 0;
+  line-height: 1.15;
+  font-weight: 800;
+  font-size: clamp(32px, 6vw, 120px);
 }
-
 .flashcard-text-chinese {
-  font-size: 80px;
-  font-weight: 400; /* 不加粗中文 */
+  font-size: clamp(20px, 3.2vw, 64px);
+  font-weight: 400;
 }
 
-/* Responsive Text Size for Chinese */
-@media (max-width: 1400px) {
-  .flashcard-text-chinese {
-    font-size: 6vw;
-    font-weight: 400;
-  }
-}
-
-@media (max-width: 768px) {
-  .flashcard-text-chinese {
-    font-size: 8vw;
-    font-weight: 400;
-  }
-}
-
-/* Image */
+/* 側圖（若有） */
 .flashcard-side-image {
-  width: 1500px;
-  height: 1150px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border-radius: 80px;
-  background: #fffbd3;
+  border-radius: calc(var(--card-radius) * 2);
+  background: var(--brand-bg);
   overflow: hidden;
   display: block;
 }
 
-@media (max-width: 1400px) {
-  .flashcard {
-    width: 70vw;
-    height: 40vw;
-  }
-
-  .flashcard-text-line {
-    font-size: 10vw;
-  }
-
-  .card-icons {
-    top: 30px;
-    right: 30px;
-    gap: 15px;
-  }
-
-  .icon-button img {
-    width: 60px;
-    height: 60px;
-  }
-
-  .flashcard-side-image {
-    width: 70vw;
-    height: 40vw;
-  }
-}
-
-@media (max-width: 768px) {
-  .flashcard {
-    width: 90vw;
-    height: 50vw;
-    max-width: 100%;
-    max-height: 60vh;
-  }
-
-  .flashcard-area {
-    gap: 20px;
-  }
-
-  .flashcard-wrapper {
-    height: 40vw;
-    max-height: 60vh;
-  }
-
-  .flashcard-text-line {
-    font-size: 15vw;
-  }
-
-  .card-icons {
-    top: 20px;
-    right: 20px;
-    gap: 10px;
-  }
-
-  .icon-button img {
-    width: 44px;
-    height: 44px;
-  }
-
-  .card-navigation {
-    gap: 24px;
-  }
-
-  .nav-arrow img {
-    width: 18px;
-    height: 24px;
-  }
-
-  .flashcard-side-image {
-    width: 90vw;
-    height: 50vw;
-    max-width: 100%;
-    max-height: 60vh;
-  }
-}
-
-/* Icons */
+/* ===== 右上角圖示 ===== */
 .card-icons {
   position: absolute;
-  top: 60px;
-  right: 63px;
+  top: clamp(10px, 3.2vw, 24px);
+  right: clamp(10px, 3.2vw, 24px);
   display: flex;
-  gap: 29px;
+  gap: clamp(8px, 2vw, 16px);
 }
-
-.icon-button img {
-  width: 88px;
-  height: 88px;
+.icon-button img,
+.star-icon {
+  width: clamp(22px, 4.2vw, 40px);
+  height: clamp(22px, 4.2vw, 40px);
   display: block;
 }
-
-/* Star icon */
-.star-icon {
-  width: 88px;
-  height: 88px;
-  fill: #ccc;
-  transition: fill 0.3s ease;
-}
-
 .star-icon.favorited {
   filter: invert(28%) sepia(98%) saturate(7492%) hue-rotate(357deg) brightness(97%) contrast(112%);
 }
 
-@media (max-width: 1400px) {
-  .star-icon {
-    width: 60px;
-    height: 60px;
-  }
-}
-
-@media (max-width: 768px) {
-  .star-icon {
-    width: 44px;
-    height: 44px;
-  }
-}
-
-/* Navigation */
+/* ===== 下方導覽 ===== */
 .card-navigation {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 54px;
+  gap: clamp(16px, 4vw, 48px);
+  margin-top: var(--group-gap);
 }
-
-.nav-arrow {
-  display: flex;
-  align-items: center;
-}
-
+.nav-arrow { display: flex; align-items: center; }
 .nav-arrow img {
-  width: 100px;
-  height: 100px;
+  width: clamp(20px, 3.5vw, 32px);
+  height: clamp(24px, 4vw, 40px);
 }
-
-.left-arrow img {
-  transform: rotate(180deg);
-}
-
+.left-arrow img { transform: rotate(180deg); }
 .page-counter {
-  font-size: 55px;
+  font-size: clamp(16px, 2.6vw, 28px);
   font-weight: 700;
   line-height: 1.2;
-  color: #545050;
+  color: var(--text);
+}
+
+/* 手機：如果想更細可再降到 56px */
+@media (max-width: 768px) {
+  :root { --header-height: 56px; }
+}
+
+/* --- 強制把內容往下推、跟 Header 保持明顯距離 --- */
+:root {
+  /* 你可以再調大或調小，這個一定看得出來 */
+  --safe-top: clamp(56px, 8vh, 120px);
+}
+
+/* 有別的樣式在搶？那就用高優先度壓過去 */
+#flashcard-app .flashcard-area {
+  padding-top: var(--safe-top) !important;
+  min-height: calc(100svh - var(--header-height) - var(--safe-top)) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* 卡片的最大高度也一起扣掉 safe-top，避免撐太高貼到上緣 */
+#flashcard-app .flashcard {
+  max-height: calc(
+    100svh - var(--header-height) - var(--safe-top) - var(--nav-height) - var(--group-gap)
+  ) !important;
+}
+
+/* === 強制把 Header 壓到細條 === */
+header.site-header,
+#header.site-header {
+  height: 70px !important;   /* 想要更細就改 40px、45px */
+  min-height: 70px !important;
+  max-height: 70px !important;
+  background: var(--header-bg);
+}
+
+/* 裡面文字跟按鈕也要縮小一點 */
+header.site-header .header-title,
+#header.site-header .header-title {
+  font-size: 32px !important;  /* 調整標題字體大小 */
+  line-height: 1 !important;
+}
+
+header.site-header .back-button img,
+#header.site-header .back-button img {
+  width: 50px !important;
+  height: 50px !important;
+}
+
+/* === 只調整「背面」的文字大小與排版 === */
+.flashcard-back .flashcard-content {
+  padding: clamp(12px, 2vw, 24px) clamp(16px, 3vw, 32px);
+  gap: clamp(4px, 1.2vw, 10px);
+}
+
+/* 背面一般行（例如羅馬字或句子） */
+.flashcard-back .flashcard-text-line {
+  font-size: clamp(18px, 3.6vw, 56px);  /* 比正面的小一階 */
+  line-height: 1.3;
+  font-weight: 700;                     /* 比正面 800 再柔和一點 */
+}
+
+/* 背面的中文解釋（你程式 index === 2 的那行會加上這個 class） */
+.flashcard-back .flashcard-text-chinese {
+  font-size: clamp(16px, 2.8vw, 40px);  /* 再小一階，適合長句 */
+  font-weight: 400;
+}
+
+/* 內容太多時可滾動，不會把卡片撐破 */
+.flashcard-back .flashcard-content {
+  overflow: auto;
+}
+
+/* 背面例句專用：整體縮小 */
+.flashcard-back .example-line {
+  font-size: clamp(18px, 3.6vw, 40px); /* 小一階 */
+  line-height: 1.3;
+  font-weight: 600; /* 比正面柔和 */
+}
+
+/* 中文再小一點 */
+.flashcard-back .example-line.flashcard-text-chinese {
+  font-size: clamp(16px, 3vw, 32px);
+  font-weight: 400;
+  color: #444;
 }
