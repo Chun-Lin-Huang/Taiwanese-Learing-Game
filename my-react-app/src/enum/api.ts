@@ -29,4 +29,5 @@ export enum api {
     chatChooseById = "http://127.0.0.1:2083/api/v1/chat-choose",
     scenarioStart = "http://127.0.0.1:2083/api/v1/scenario/start",
     scenarioTurnText = "http://127.0.0.1:2083/api/v1/scenario/turn_text",
+    scenarioVoiceTurn = "http://127.0.0.1:2083/api/v1/scenario/voice_turn",
 }
