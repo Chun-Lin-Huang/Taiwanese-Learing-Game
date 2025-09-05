@@ -13,7 +13,6 @@ import { api } from "../enum/api";
 import { asyncPost } from "../utils/fetch";
 
 type ChatMsg = { type: "incoming" | "outgoing"; sender: string; content: React.ReactNode };
-
 const Home: React.FC = () => {
   const navigate = useNavigate();
 
@@ -21,8 +20,12 @@ const Home: React.FC = () => {
   const [chatLog, setChatLog] = useState<ChatMsg[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [topic, setTopic] = useState<TopicItem | null>(null);
-  const [input, setInput] = useState("");
-  const [sending, setSending] = useState(false);
+  
+  // 語音狀態
+  const [isRecording, setIsRecording] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
 
   // 是否顯示主題選單
   const [showTopicMenu, setShowTopicMenu] = useState(true);
@@ -80,28 +83,100 @@ const Home: React.FC = () => {
     }
   }, []);
 
-  /** 每回合送出（POST /scenario/turn_text） */
-  const handleSend = useCallback(async () => {
-    if (!input.trim() || !sessionId) return;
-    const userText = input.trim();
-    setInput("");
-
-    // 先把使用者話丟進對話
-    setChatLog(prev => [...prev, { type: "outgoing", sender: "你", content: <span>{userText}</span> }]);
-
-    setSending(true);
+  /** 開始語音錄音 */
+  const startRecording = useCallback(async () => {
+    if (!sessionId) return;
+    
     try {
-      const turnRes = await asyncPost(api.scenarioTurnText, {
-        session_id: sessionId,
-        text: userText,
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks: Blob[] = [];
+      
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunks.push(event.data);
+        }
+      };
+      
+      recorder.onstop = async () => {
+        const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+        await processVoiceInput(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+      
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+    } catch (error) {
+      console.error('錄音失敗:', error);
+      setChatLog(prev => [
+        ...prev,
+        {
+          type: "incoming",
+          sender: "小熊",
+          content: <span style={{ color: "#b00" }}>錄音失敗，請檢查麥克風權限</span>,
+        },
+      ]);
+    }
+  }, [sessionId]);
+
+  /** 停止語音錄音 */
+  const stopRecording = useCallback(() => {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
+      setIsRecording(false);
+    }
+  }, [mediaRecorder, isRecording]);
+
+  /** 處理語音輸入 */
+  const processVoiceInput = useCallback(async (audioBlob: Blob) => {
+    if (!sessionId) return;
+    
+    setIsProcessing(true);
+    
+    try {
+      // 建立 FormData 上傳音頻檔案
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.webm');
+      formData.append('session_id', sessionId);
+      formData.append('topic_prompt', topic?.name || '');
+      
+      // 調用語音處理 API
+      const response = await fetch(api.scenarioVoiceTurn, {
+        method: 'POST',
+        body: formData,
       });
-      const body = turnRes?.body ?? turnRes ?? {};
-      const reply: string = body.reply_text || body.replyText || "……";
-      const finished: boolean = !!body.finished;
-
-      // 小熊回覆
-      setChatLog(prev => [...prev, { type: "incoming", sender: "小熊", content: <span>{reply}</span> }]);
-
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const result = await response.json();
+      const { transcript, reply_text, reply_audio, finished } = result.body || result;
+      
+      // 顯示用戶語音識別結果
+      if (transcript) {
+        setChatLog(prev => [...prev, { 
+          type: "outgoing", 
+          sender: "你", 
+          content: <span>{transcript}</span> 
+        }]);
+      }
+      
+      // 顯示小熊回覆
+      if (reply_text) {
+        setChatLog(prev => [...prev, { 
+          type: "incoming", 
+          sender: "小熊", 
+          content: <span>{reply_text}</span> 
+        }]);
+      }
+      
+      // 播放音頻回覆
+      if (reply_audio) {
+        await playAudio(reply_audio);
+      }
+      
       if (finished) {
         // 對話結束，回到主題選單
         setSessionId(null);
@@ -112,25 +187,61 @@ const Home: React.FC = () => {
           { type: "incoming", sender: "小熊", content: <span>本回合結束囉！再選一個主題吧～</span> },
         ]);
       }
-    } catch (e: any) {
+    } catch (error: any) {
+      console.error('語音處理失敗:', error);
       setChatLog(prev => [
         ...prev,
         {
           type: "incoming",
           sender: "小熊",
-          content: <span style={{ color: "#b00" }}>送出失敗：{e?.message || "未知錯誤"}</span>,
+          content: <span style={{ color: "#b00" }}>語音處理失敗：{error?.message || "未知錯誤"}</span>,
         },
       ]);
     } finally {
-      setSending(false);
+      setIsProcessing(false);
     }
-  }, [input, sessionId]);
+  }, [sessionId, topic]);
+
+  /** 播放音頻 */
+  const playAudio = useCallback(async (audioUrl: string) => {
+    try {
+      setIsPlaying(true);
+      const audio = new Audio(audioUrl);
+      
+      audio.onended = () => {
+        setIsPlaying(false);
+      };
+      
+      audio.onerror = () => {
+        setIsPlaying(false);
+        console.error('音頻播放失敗');
+      };
+      
+      await audio.play();
+    } catch (error) {
+      console.error('音頻播放失敗:', error);
+      setIsPlaying(false);
+    }
+  }, []);
+
+  /** 語音按鈕點擊處理 */
+  const handleVoiceClick = useCallback(() => {
+    if (!sessionId) return;
+    
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  }, [sessionId, isRecording, startRecording, stopRecording]);
 
   /** 回主題選單（清空 session） */
   const resetChat = useCallback(() => {
     setSessionId(null);
     setTopic(null);
-    setInput("");
+    setIsRecording(false);
+    setIsProcessing(false);
+    setIsPlaying(false);
     setShowTopicMenu(true);
     setChatLog([
       { type: "incoming", sender: "小熊", content: <span>請選擇想聊的主題～</span> },
@@ -184,23 +295,17 @@ const Home: React.FC = () => {
             <div ref={chatEndRef} />
           </div>
 
-          {/* 輸入列（沒 session 就禁止輸入） */}
-          <div className="input-bar">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder={sessionId ? "輸入想說的話…" : "請先選擇主題開始對話"}
-              disabled={!sessionId || sending}
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            />
+          {/* 語音控制區域 */}
+          <div className="voice-control-area">
             <button
-              onClick={handleSend}
-              disabled={!sessionId || sending || !input.trim()}
-              className="reset-button"
+              onClick={handleVoiceClick}
+              disabled={!sessionId || isProcessing}
+              className="voice-button"
             >
-              送出
+              {isRecording ? '停止錄音' : '開始語音對話'}
             </button>
+            {isProcessing && <span className="processing-text">處理中...</span>}
+            {isPlaying && <span className="playing-text">播放中...</span>}
           </div>
         </div>
       </main>
