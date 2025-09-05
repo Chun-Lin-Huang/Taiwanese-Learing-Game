@@ -16,6 +16,8 @@ import { VocabularyAudioRoute } from "./routers/VocabularyAudioRoute";
 import { SentenceRoute } from "./routers/SentenceRoute";
 import { SentenceAudioRoute } from "./routers/SentenceAudioRoute";
 import { VocabularyCollectionRoute } from "./routers/VocabularyCollectionRoute";
+import { ChatChooseRoute } from "./routers/ChatChooseRoute";
+import { ScenarioRoute } from "./routers/ScenarioRoute";
 
 export const router: Array<Route> = [
     new PageRoute(),new UserRoute()
@@ -34,4 +36,6 @@ export const router: Array<Route> = [
     ,new SentenceRoute()
     ,new SentenceAudioRoute()
     ,new VocabularyCollectionRoute()
+    ,new ChatChooseRoute()
+    ,new ScenarioRoute()
 ];
