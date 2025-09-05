@@ -289,28 +289,3 @@ img, svg, video {
     min-height: 70px;
   }
 }
-
-/* =========================
-   額外插入：關掉水平滾輪
-   ========================= */
-body {
-  overflow-x: hidden;
-}
-
-/* ---- 全頁禁止捲動，完全隱藏 scrollbar ---- */
-html, body, #root, .page-bg, .page-container {
-  height: 100%;
-  overflow: hidden !important;   /* 水平 + 垂直滾動都關掉 */
-  width: 100%;
-  max-width: 100%;
-}
-
-/* 最常見元兇：用 100vw 的 header。強制用 100% 不會超出視窗寬 */
-.game-header {
-  width: 100% !important;
-}
-
-/* 3) 保險：任何固定寬度背景/條狀區塊都不要超出視窗 */
-.page-bg, .page-container {
-  max-width: 100%;
-}

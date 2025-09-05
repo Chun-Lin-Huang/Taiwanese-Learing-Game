@@ -22,7 +22,11 @@ export enum api {
     vocabAudioStream = "http://127.0.0.1:2083/api/v1/vocab-audio/stream",
     sentenceByCard = "http://127.0.0.1:2083/api/v1/sentences/by-card",
     sentenceAudioStream = "http://127.0.0.1:2083/api/v1/sentence-audio/stream",
-    vocabCollectionList = "http://127.0.0.1:2083/api/v1/vocab-collection",        
-    vocabCollectionToggle = "http://127.0.0.1:2083/api/v1/vocab-collection/toggle", 
+    vocabCollectionList = "http://127.0.0.1:2083/api/v1/vocab-collection",
+    vocabCollectionToggle = "http://127.0.0.1:2083/api/v1/vocab-collection/toggle",
     vocabCardById = "http://127.0.0.1:2083/api/v1/vocab-cards",
+    chatChooseList = "http://127.0.0.1:2083/api/v1/chat-choose/list",
+    chatChooseById = "http://127.0.0.1:2083/api/v1/chat-choose",
+    scenarioStart = "http://127.0.0.1:2083/api/v1/scenario/start",
+    scenarioTurnText = "http://127.0.0.1:2083/api/v1/scenario/turn_text",
 }

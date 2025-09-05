@@ -59,9 +59,28 @@ async function send(
   return parseResponse(res);
 }
 
-export function asyncPost(url: string, body: {} | FormData) {
-  return send("POST", url, body);
+// utils/fetch.ts
+export async function asyncPost(url: string, data?: any) {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",   // ← 一定加
+    },
+    body: data ? JSON.stringify(data) : undefined,
+  });
+
+  const text = await res.text();            // 先拿純文字，方便錯誤顯示
+  let json: any;
+  try { json = text ? JSON.parse(text) : {}; } catch { json = { raw: text }; }
+
+  if (!res.ok) {
+    // 把伺服器回的錯誤訊息帶出來（很多 400 都在這裡）
+    const msg = json?.message || json?.error || json?.raw || res.statusText;
+    throw new Error(`HTTP ${res.status} ${msg}`);
+  }
+  return json;
 }
+
 // src/utils/fetch.ts（只貼 asyncPut；其他函式不動）
 export async function asyncPut(api: string, body: {} | FormData): Promise<any> {
   try {
