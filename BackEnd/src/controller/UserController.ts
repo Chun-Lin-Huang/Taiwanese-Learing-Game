@@ -1,61 +1,53 @@
+// src/controller/UserController.ts
 import { Contorller } from "../abstract/Contorller";
-import { Request, response, Response } from "express";
+import { Request, Response } from "express";
 import { UserService } from "../Service/UserService";
-import { resp } from "../utils/resp";
-import { DBResp } from "../interfaces/DBResp";
-import { Users } from "../interfaces/Users";
-require('dotenv').config()
+import type { resp } from "../utils/resp";
 
 export class UserController extends Contorller {
-    protected service: UserService;
+  protected service: UserService;
 
-    constructor() {
-        super();
-        this.service = new UserService();
+  constructor() {
+    super();
+    this.service = new UserService();
+  }
+
+  /** GET /api/v1/user/findAll */
+  public async findAll(req: Request, res: Response) {
+    const out: resp<any> = { code: 200, message: "", body: undefined };
+    try {
+      const rows = await this.service.getAllUsers();
+      if (!rows) { out.code = 500; out.message = "server error"; return res.status(500).send(out); }
+      out.code = 200; out.message = "find success"; out.body = rows;
+      return res.send(out);
+    } catch {
+      out.code = 500; out.message = "server error";
+      return res.status(500).send(out);
     }
+  }
 
-    public async findAll(Request: Request, Response: Response) {
+  /** POST /api/v1/user/insertOne */
+  public async insertOne(req: Request, res: Response) {
+    const out = await this.service.insertOne(req.body);
+    return res.status(out.code).send(out);
+  }
 
-        const res: resp<Array<DBResp<Users>> | undefined> = {
-            code: 200,
-            message: "",
-            body: undefined
-        }
+  /** POST /api/v1/user/login */
+  public async login(req: Request, res: Response) {
+    const out = await this.service.login(req.body);
+    return res.status(out.code).send(out);
+  }
 
-        const dbResp = await this.service.getAllUsers();
-        if (dbResp) {
-            res.body = dbResp;
-            res.message = "find sucess";
-            Response.send(res);
-        } else {
-            res.code = 500;
-            res.message = "server error";
-            Response.status(500).send(res);
-        }
+  /** POST /api/v1/user/updateById */
+  public async updateById(req: Request, res: Response) {
+    try {
+      const { _id, name, userName, password } = req.body || {};
+      if (!_id) return res.status(400).json({ code: 400, message: "缺少 _id" });
 
+      const out = await this.service.updateById(_id, { name, userName, password });
+      return res.status(out.code).send(out);
+    } catch (err: any) {
+      return res.status(500).json({ code: 500, message: err.message || "server error" });
     }
-
-    public async insertOne(Request: Request, Response: Response) {
-        const resp = await this.service.insertOne(Request.body)
-        Response.status(resp.code).send(resp)
-    }
-
-    public async login(Request: Request, Response: Response) {
-        const resp = await this.service.login(Request.body)
-        Response.status(resp.code).send(resp)
-    }
-
-    public async updateById(req: Request, res: Response) {
-        try {
-            const { _id, name, userName } = req.body || {};
-            if (!_id) {
-                return res.status(400).json({ code: 400, message: "缺少 _id" });
-            }
-
-            const resp = await this.service.updateById(_id, { name, userName });
-            return res.status(resp.code).send(resp);
-        } catch (err: any) {
-            return res.status(500).json({ code: 500, message: err.message || "server error" });
-        }
-    }
+  }
 }

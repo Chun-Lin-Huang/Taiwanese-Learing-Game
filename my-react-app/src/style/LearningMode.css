@@ -1,266 +1,157 @@
-/* 假設 body 和其他通用樣式不變 */
-body, html {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background: #fdf5e6; /* 可以考慮換成更柔和的淺黃色或淺米色 */
-}
-
-.learn-selection-bg {
+.learning-page {
   min-height: 100vh;
   min-width: 100vw;
   width: 100vw;
   height: 100vh;
   position: relative;
-  /* 背景色可以調整為更活潑的淺色，例如： */
-  background: linear-gradient(to bottom right, #fdf5e6, #e0f2f7); /* 淺黃到淺藍漸變 */
+  background: linear-gradient(to bottom right, #fdf5e6, #e0f2f7);
   overflow-x: hidden;
   overflow-y: auto;
   z-index: 0;
 }
 
-.learn-selection-bg::before {
-   content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background: url('../assets/22600173.png') center no-repeat;
-  background-size: 120% auto; /* 寬度60%，高度自動 */
-  opacity: 0.15;         /* 透明度，0~1之間可調 */
-  pointer-events: none;  /* 不影響點擊 */
-}
-
-.selection-header {
+/* ===== Header ===== */
+.learning-page .selection-header {
   position: fixed;
   top: 0; left: 0; right: 0;
   height: 80px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: #ffec97; /* 更鮮明的黃色 */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 增加一點陰影 */
+  justify-content: flex-start;    /* Hello 靠左 */
+  background: #ffec97;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   z-index: 1000;
+  padding: 0 20px;
 }
 
-.back-button {
-  position: absolute;
-  left: 70px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 80px;
-  height: 80px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  transition: background-color 0.3s; /* 增加過渡效果 */
-}
-.back-button:hover {
-  background-color: rgba(255, 255, 255, 0.2); /* 懸停時的背景效果 */
-}
-.back-button img {
-    width: 50px;
-    height: 50px;
-}
-
-.header-title {
-  width: 100%;
-  text-align: center;
+.learning-page .greeting-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  white-space: nowrap;
   margin: 0;
-  font-weight: 700; /* 字體可以再粗一點 */
-  font-size: 2.2rem; /* 稍微放大 */
-  color: #3f3e3e; /* 更深的顏色，增加對比 */
-  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5); /* 輕微的文字陰影讓字體更突出 */
 }
 
-/* 新增一個容器樣式 */
-.nav-actions {
+.learning-page .nav-actions {
   position: absolute;
-  right: 20px;   /* 貼右邊 */
+  right: 20px;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
-  gap: 10px;     /* ← 調整三顆之間的間距 (你可以改成 12px 或 16px) */
+  gap: 10px;
 }
 
-/* 個別按鈕保持自適應 */
-.nav-button {
-  width: auto; 
+.learning-page .nav-button {
   background: transparent;
   border: none;
   display: flex;
   align-items: center;
-  gap: 6px;      /* icon 和文字的距離 */
+  gap: 6px;
   cursor: pointer;
 }
 
-.nav-icon { 
-  width: 50px; /* 從 120px 改為視窗寬度的 7% */
-  height: 50ox; /* 保持比例 */
-  object-fit: contain; 
-  min-width: 50px; /* 最小尺寸 */
+.learning-page .nav-icon {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  min-width: 50px;
   min-height: 50px;
 }
 
-.nav-label { 
-  font-weight: 600; 
-  font-weight: 700; /* 字體可以再粗一點 */
-  font-size: 20px; /* 稍微放大 */
-  color: #3f3e3e; /* 更深的顏色，增加對比 */
-}
-.chevron-icon { 
-  width: 2vw; /* 從 42px 改為視窗寬度的 2% */
-  height: 2vw; 
-  object-fit: contain; 
-  margin-left: 0.5vw; 
-  min-width: 16px; /* 最小尺寸 */
-  min-height: 16px;
+.learning-page .nav-label {
+  font-weight: 700;
+  font-size: 20px;
+  color: #3f3e3e;
 }
 
-/* 確保 learn-selection-main 是個 flex 容器，且內容居中 */
-.learn-selection-main {
-  padding-top: 150px;
+/* ===== Main ===== */
+.learning-page .learn-selection-main {
+  width: 100%;
+  height: calc(100vh - 80px); /* 扣掉 header */
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  flex-grow: 1;
-  height: calc(100vh - 80px);
+  align-items: center;        /* 垂直置中 */
+  justify-content: center;    /* 水平置中容器 */
+  padding: 0;
   box-sizing: border-box;
 }
 
-.learn-cards-container {
+/* ===== Cards ===== */
+:root {
+  --card-w: 320px;
+}
+
+.learning-page .learn-cards-container {
   width: 100%;
-  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 50vw;
+  overscroll-behavior-x: contain;
+}
+.learning-page .learn-cards-container::-webkit-scrollbar { display: none; }
+
+.learning-page .modes-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  background: transparent;
-  padding-bottom: 20px;
+  flex-wrap: nowrap;
+  gap: 40px;
+  padding-inline: max(24px, calc(50vw - var(--card-w) / 2));
 }
 
-.learn-cards-container::-webkit-scrollbar {
-  display: none;
-}
-
-.learn-modes-container {
-  display: flex;
-  gap: 50px; /* 增加卡片間距，讓每個卡片更突出 */
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  width: auto;
-  padding: 20px; /* 增加內邊距 */
-}
-
-.learn-card-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* 針對中間三張卡片的核心修改 */
-.learn-card {
+.learning-page .card-wrapper {
+  scroll-snap-align: center;
   flex: 0 0 auto;
-  width: 320px; /* 稍微縮小一點，讓間距感更明顯 */
-  height: 350px; /* 配合寬度調整 */
-  border-radius: 40px; /* **大幅增加圓角，看起來更可愛和圓潤** */
-  /* background-color: #ffaf53;  原來的橙色 */
+}
+
+.learning-page .learn-card {
+  flex: 0 0 auto;
+  width: var(--card-w);
+  height: 350px;
+  border-radius: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; /* 調整過渡效果，更平滑 */
-  box-shadow: 0 8px 15px rgba(0,0,0,0.2); /* 增加陰影強度，讓卡片有浮動感 */
+  transition: transform .3s ease-out, box-shadow .3s ease-out, border .3s ease-out;
+  box-shadow: 0 8px 15px rgba(0,0,0,0.2);
   position: relative;
   z-index: 1;
-  overflow: hidden; /* 確保內容不會溢出圓角 */
-  border: 4px solid transparent; /* 預留邊框空間，hover時使用 */
-  cursor: pointer; /* 顯示可點擊 */
+  overflow: hidden;
+  border: 4px solid transparent;
+  cursor: pointer;
+  background-color: #a8dadc;
 }
 
-/* 建議為三張卡片設定不同的鮮豔顏色，而不是單一顏色 */
-/* 範例：你可以為不同的卡片加不同的 class，或在 JS 中動態賦予顏色 */
-.learn-card:nth-child(1) { /* 第一張卡片 */
-  background-color: #a8dadc; /* 活潑的淺藍色 */
+.learning-page .learn-card:hover {
+  transform: scale(1.08);
+  box-shadow: 0 16px 25px -8px rgba(89,79,79,0.55);
+  border: 6px solid #fff;
+  z-index: 2;
 }
 
-.learn-card:nth-child(2) { /* 第二張卡片 */
-  background-color: #fca3b7; /* 溫暖的粉紅色 */
+.learning-page .learn-card.focused {
+  transform: scale(1.04);
 }
 
-.learn-card:nth-child(3) { /* 第三張卡片 */
-  background-color: #c9e265; /* 清新的淺綠色 */
-}
-
-/* 調整 .learn-card.color-red 的定義，如果還需要使用 */
-.learn-card.color-red {
-  background-color: #F9AB5D; /* 保持原有的，或改成更活潑的橙紅色 */
-}
-
-
-.learn-active-card-title {
+.learning-page .learn-active-card-title {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  background: none;
-  color: #ffffff; /* 文字顏色保持白色，與鮮豔背景形成對比 */
-  font-family: 'Arial Rounded MT Bold', '微軟正黑體', sans-serif; /* **建議使用圓潤、可愛的字體** (需確保字體已導入) */
-  font-size: 3.8rem; /* 稍微調整字體大小，確保在新的卡片大小下仍清晰 */
+  color: #fff;
+  font-family: 'Arial Rounded MT Bold','微軟正黑體',sans-serif;
+  font-size: 3.2rem;
   font-weight: bold;
   text-align: center;
-  line-height: 1.3; /* 增加行高，讓文字不那麼擁擠 */
-  letter-spacing: 0.08em; /* 稍微調整字間距 */
+  line-height: 1.3;
+  letter-spacing: .08em;
   z-index: 2;
   white-space: pre-line;
-  padding: 0;
-  margin: 0;
+  margin: 0; padding: 0;
   width: 90%;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4); /* 更明顯的陰影，讓文字更突出 */
+  text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
 }
 
-button:focus {
+.learning-page button:focus {
   outline: none;
   box-shadow: none;
-}
-
-:root {
-  --card-focus-border: #ffffff; /* 保持白色邊框，但可以加粗 */
-}
-
-.learn-card:hover {
-  transform: scale(1.08) rotate(2deg); /* **增加輕微的旋轉效果，更有趣** */
-  box-shadow: 0 16px 25px -8px rgba(89, 79, 79, 0.55); /* 增強 hover 時的陰影 */
-  border: 6px solid var(--card-focus-border); /* **加粗邊框，更明顯** */
-  z-index: 2;
-}
-
-/* 可以為卡片加入一個小小的圖標或裝飾，這部分需要用到圖片或 icon font */
-/* 範例： */
-/*
-.learn-card::after {
-  content: '';
-  position: absolute;
-  bottom: 15px;
-  right: 15px;
-  width: 60px;
-  height: 60px;
-  background: url('../assets/star-icon.png') center no-repeat;
-  background-size: contain;
-  opacity: 0.8;
-  z-index: 3;
-}
-*/
-
-.greeting-title {
-  font-size: 24px;       /* 放大字體 */
-  font-weight: bold;     /* 粗體 */
-  color: #333;           /* 深色字體 */
-  margin: 0 20px;
-  white-space: nowrap;   /* 🚀 保證文字不換行 */
 }
