@@ -1,0 +1,216 @@
+/* ===== Dictionary Container ===== */
+.dictionary-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 20px;
+    padding-top: 150px;
+    /* header 下方間距 */
+    height: 100vh;
+    /* 佔滿整個視窗 */
+    box-sizing: border-box;
+}
+
+/* ===== 搜尋區 ===== */
+.search-section {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    /* 調整搜尋區和結果區間距 */
+}
+
+.search-form {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.search-bar-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    /* 垂直置中所有子元素 */
+    width: 995px;
+    max-width: 100%;
+    height: 77px;
+}
+
+.search-bar-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 38.5px;
+    z-index: 0;
+}
+
+.search-icon {
+    position: absolute;
+    left: 35px;
+    width: 22px;
+    height: 22px;
+    z-index: 1;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.search-input {
+    flex-grow: 1;
+    border: none;
+    background-color: transparent;
+    margin: 0 15px;
+    padding-left: 70px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 24px;
+    color: #545050;
+    outline: none;
+    z-index: 1;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.search-button {
+    position: absolute;
+    right: 35px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 146px;
+    height: 43px;
+    background-color: #f9ab5d;
+    border-radius: 60px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border: none;
+    color: #ffffff;
+    font-family: 'Kanit', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+/* ===== 查詢結果區 ===== */
+.results-section {
+    width: 100%;
+    max-width: 1125px;
+    flex-grow: 1;
+    /* 讓結果區自動填滿剩餘高度 */
+    display: flex;
+    flex-direction: column;
+}
+
+.results-body,
+.results-container {
+    overflow-y: auto;
+    /* 滾動 */
+    padding-right: 10px;
+    /* 預留捲軸空間 */
+    box-sizing: border-box;
+}
+
+.results-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 50px;
+    max-width: 100%;       /* 不超過父容器寬度 */
+    overflow-x: hidden;    /* 禁止水平滾動 */
+    margin: 0 auto;
+}
+
+.result-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.result-column:nth-child(1),
+.result-column:nth-child(2) {
+    width: 166px;
+    flex-shrink: 0;
+}
+
+.result-column-definition {
+    flex-grow: 1;
+}
+
+.result-header {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 24px;      /* 調整文字大小 */
+    color: #000;
+    border-bottom: 4px solid #545050;
+    padding-bottom: 8px;   /* 調整下方間距 */
+    text-align: center;    /* 水平置中 */
+}
+
+.result-content,
+.result-content.pronunciation {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 24px;       /* 可再調整大小 */
+    color: #000;
+    line-height: 1.6;
+    text-align: center;     /* 水平置中 */
+    display: flex;          /* 對 pronunciation 也有效 */
+    justify-content: center;/* 水平置中 */
+    align-items: center;    /* 垂直置中按鈕與文字 */
+    gap: 10px;              /* 音讀區文字與音量按鈕間距 */
+}
+
+.volume-button {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.volume-button img {
+    width: 22px;
+    height: 20px;
+}
+
+/* 沒有查詢結果 */
+.no-results-message {
+    color: #838181;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 32px;
+    text-align: center;
+    margin-top: 50px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1200px) {
+    .results-container {
+        flex-wrap: wrap;
+        gap: 30px 50px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .result-header,
+    .result-content {
+        font-size: 24px;
+    }
+
+    .search-input {
+        font-size: 18px;
+    }
+
+    .search-button {
+        width: 100px;
+        height: 40px;
+        font-size: 16px;
+    }
+}
