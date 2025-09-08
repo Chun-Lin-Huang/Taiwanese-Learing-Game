@@ -67,12 +67,50 @@
 	top: 0; right: 0;
 }
 
+/* 通知內容區域 */
+.notification-content {
+	margin-left: clamp(10px, 3vw, 24px);
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
 /* 文字與時間 */
 .notification-text {
-	margin-left: clamp(10px, 3vw, 24px);
 	font-size: clamp(14px, 2.5vw, 22px);
-	flex: 1;
 	word-break: break-word;
+	margin: 0;
+}
+
+/* 學習進度信息 */
+.progress-info {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-top: 4px;
+}
+
+.progress-bar {
+	flex: 1;
+	height: 8px;
+	background-color: rgba(0, 0, 0, 0.1);
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.progress-fill {
+	height: 100%;
+	background: linear-gradient(90deg, #4ade80, #22c55e, #16a34a);
+	border-radius: 4px;
+	transition: width 0.3s ease;
+}
+
+.progress-text {
+	font-size: clamp(12px, 2vw, 16px);
+	font-weight: 600;
+	color: var(--text-primary);
+	white-space: nowrap;
 }
 .notification-time {
 	font-size: clamp(12px, 2vw, 18px);

@@ -1,5 +1,5 @@
 // src/view/FlashcardApp.tsx
-// 台語單字卡（例句 + 音檔 + URL index + 收藏）
+// 台語單字卡（例句 + 音檔 + URL index + 收藏 + 進度條/續看）
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
@@ -35,10 +35,12 @@ type Sentence = {
   tl?: string;
   chinese?: string;
   ch?: string;
+  audioId?: string;
   audioFileId?: any;
   audio_file_id?: any;
   audiourl?: string;
   audioUrl?: string;
+  audioFilename?: string;
   sentenceIndex?: number;
 };
 
@@ -61,7 +63,7 @@ function extractId(input: any): string {
   return "";
 }
 
-// 簡易 POST JSON（若你已有 asyncPostJson，可替換）
+// 簡易 POST JSON
 async function postJSON(url: string, data: any) {
   const res = await fetch(url, {
     method: "POST",
@@ -74,9 +76,22 @@ async function postJSON(url: string, data: any) {
 }
 
 function getUserId(): string | null {
-  // 依你的登入儲存方式調整（localStorage/sessionStorage…）
-  // 假設登入後有存 userId
   return localStorage.getItem("userId");
+}
+
+// 節流
+function throttle<T extends any[]>(fn: (...args: T) => void, wait = 600) {
+  let timer: number | null = null;
+  let lastArgs: T | null = null;
+  return (...args: T) => {
+    lastArgs = args;
+    if (timer !== null) window.clearTimeout(timer);
+    timer = window.setTimeout(() => {
+      if (lastArgs) fn(...lastArgs);
+      timer = null;
+      lastArgs = null;
+    }, wait);
+  };
 }
 
 /* ------------------ 元件 ------------------ */
@@ -91,7 +106,7 @@ const FlashcardApp: React.FC = () => {
   const effectiveCategoryId = paramCategoryId || queryCategoryId || stateCategoryId;
 
   const titleFromQuery = query.get("title") || "";
-  const indexFromQuery = Number(query.get("index") || "0");
+  const indexFromQuery = query.get("index") ? Number(query.get("index")) : null;
 
   const [cards, setCards] = useState<VocabCard[]>([]);
   const [loading, setLoading] = useState(false);
@@ -100,19 +115,27 @@ const FlashcardApp: React.FC = () => {
   const [sentences, setSentences] = useState<Sentence[]>([]);
   const [flipped, setFlipped] = useState(false);
 
-  // 收藏狀態：用 Set 快速查詢
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
+  const [currentIndex, setCurrentIndex] = useState(0);
+  
+  // 學習進度：記錄用戶實際學習到的最遠位置，不會因為回看而減少
+  const [learningProgress, setLearningProgress] = useState(0);
+  
+  
 
-  // 目前索引
-  const [currentIndex, setCurrentIndex] = useState(indexFromQuery >= 0 ? indexFromQuery : 0);
+  const total = cards.length;
+  // 進度條顯示學習進度，而不是當前位置
+  const percent = total ? Math.round(((learningProgress + 1) / total) * 100) : 0;
+
+
 
   // 音訊
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const userId = getUserId(); // 沒登入就 null → 星星會 disabled
+  const userId = getUserId();
 
-  /* 讀取某分類的單字卡 */
+  /* 讀取某分類的單字卡＋讀取「上次進度」 */
   useEffect(() => {
     if (!effectiveCategoryId) return;
 
@@ -122,16 +145,51 @@ const FlashcardApp: React.FC = () => {
         setLoading(true);
         setErrMsg(null);
 
+        // 先拿卡片
         const url = `${api.vocabCardsByCategory}/${encodeURIComponent(effectiveCategoryId)}`;
         const res = await asyncGet(url);
         const list: VocabCard[] = res?.body ?? res ?? [];
         if (!Array.isArray(list) || list.length === 0) throw new Error("此主題暫無單字卡");
 
+        // 讀進度
+        let learningProgressIndex = 0;
+        if (userId) {
+          try {
+            const progressUrl = `${api.vocabProgress}/${encodeURIComponent(userId)}/${encodeURIComponent(
+              effectiveCategoryId
+            )}`;
+            const pr = await asyncGet(progressUrl);
+            const pi = Number(pr?.body?.currentIndex ?? pr?.currentIndex ?? 0);
+            if (!Number.isNaN(pi) && pi >= 0 && pi < list.length) {
+              learningProgressIndex = pi; // 學習進度等於當前進度
+            }
+          } catch {
+            // 沒紀錄就從 0
+          }
+        }
+        // 優先使用學習進度，除非 URL 參數明確指定了更高的位置
+        const safeIndex = 
+          indexFromQuery !== null && 
+          Number.isFinite(indexFromQuery) && 
+          indexFromQuery >= 0 && 
+          indexFromQuery < list.length &&
+          indexFromQuery > learningProgressIndex
+            ? indexFromQuery
+            : learningProgressIndex; // 預設從學習進度開始
+
+
         if (!cancelled) {
           setCards(list);
-          const safeIndex = indexFromQuery >= 0 && indexFromQuery < list.length ? indexFromQuery : 0;
           setCurrentIndex(safeIndex);
+          setLearningProgress(learningProgressIndex);
           setFlipped(false);
+          
+          // 如果 URL 參數小於學習進度，同步 URL 到學習進度位置
+          if (indexFromQuery === null || !Number.isFinite(indexFromQuery) || indexFromQuery < 0 || indexFromQuery >= list.length || indexFromQuery < learningProgressIndex) {
+            const params = new URLSearchParams(location.search);
+            params.set("index", String(learningProgressIndex));
+            navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+          }
         }
       } catch (e: any) {
         if (!cancelled) setErrMsg(e?.message || "讀取單字卡失敗");
@@ -148,9 +206,10 @@ const FlashcardApp: React.FC = () => {
         audioRef.current = null;
       }
     };
-  }, [effectiveCategoryId, indexFromQuery]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [effectiveCategoryId]);
 
-  /* 讀我的收藏清單（一次，避免每張卡都 call has） */
+  /* 讀我的收藏清單 */
   useEffect(() => {
     if (!userId) {
       setFavoriteIds(new Set());
@@ -160,14 +219,10 @@ const FlashcardApp: React.FC = () => {
     (async () => {
       try {
         const res = await asyncGet(`${api.vocabCollectionList}/${encodeURIComponent(userId)}`);
-        // 可能 body 是陣列，或 { vocabulary: [...] }
         const raw = res?.body ?? res ?? [];
         const list: any[] = Array.isArray(raw?.vocabulary) ? raw.vocabulary : Array.isArray(raw) ? raw : [];
-        // 後端收藏的每一筆可能長這樣：
-        // { _id, han, tl, ch } 或 { _id: <cardId> } 或 { vocabulary: [{ _id: <cardId>, ... }] }
         const set = new Set<string>();
         for (const item of list) {
-          // 支援幾種形狀
           const id =
             typeof item === "string"
               ? item
@@ -185,7 +240,7 @@ const FlashcardApp: React.FC = () => {
   }, [userId]);
 
   /* 目前卡片 */
-  const currentCard = cards[currentIndex];
+  const currentCard = cards[currentIndex] || null;
 
   /* 切卡時載入例句 */
   useEffect(() => {
@@ -200,7 +255,8 @@ const FlashcardApp: React.FC = () => {
         const res = await asyncGet(url);
         const list: Sentence[] = res?.body ?? res ?? [];
         if (!cancelled) setSentences(Array.isArray(list) ? list : []);
-      } catch {
+      } catch (err) {
+        console.error('Failed to load sentences:', err);
         if (!cancelled) setSentences([]);
       }
     })();
@@ -220,7 +276,7 @@ const FlashcardApp: React.FC = () => {
   }, [currentCard]);
 
   const activeSentence: Sentence | null = useMemo(() => {
-    if (!sentences.length) return null;
+    if (!sentences.length || currentIndex === null) return null;
     const idx = ((currentIndex % sentences.length) + sentences.length) % sentences.length;
     return sentences[idx];
   }, [sentences, currentIndex]);
@@ -236,6 +292,7 @@ const FlashcardApp: React.FC = () => {
 
   /* 收藏（toggle + 樂觀更新） */
   const isCurrentCardFavorited = currentCard?._id ? favoriteIds.has(currentCard._id) : false;
+  
 
   const handleFavoriteToggle = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -246,16 +303,13 @@ const FlashcardApp: React.FC = () => {
     }
     const cardId = currentCard._id;
     const next = new Set(favoriteIds);
-    // 樂觀更新
     if (next.has(cardId)) next.delete(cardId);
     else next.add(cardId);
     setFavoriteIds(next);
 
     try {
       await postJSON(api.vocabCollectionToggle, { userId, cardId });
-      // 後端成功就不用動
     } catch (err) {
-      // 失敗就回滾
       console.error("toggle favorite failed:", err);
       const rollback = new Set(next);
       if (rollback.has(cardId)) rollback.delete(cardId);
@@ -265,20 +319,63 @@ const FlashcardApp: React.FC = () => {
     }
   };
 
-  /* URL 同步 index */
-  const updateIndexInUrl = (newIndex: number) => {
-    const params = new URLSearchParams(location.search);
-    params.set("index", String(newIndex));
-    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
-  };
-
-  /* 音訊控制（共用） */
+  /* URL 同步 index + 音訊處理 + 進度節流儲存 */
   const stopAudio = () => {
     if (!audioRef.current) return;
     audioRef.current.pause();
     setIsPlaying(false);
   };
 
+  const saveProgressThrottled = useMemo(
+    () =>
+      throttle(async (learningIdx: number) => {
+        if (!userId || !effectiveCategoryId) return;
+        try {
+          await postJSON(api.vocabProgressUpdate, {
+            userId,
+            categoryId: effectiveCategoryId,
+            currentIndex: learningIdx,
+          });
+        } catch {
+          // 靜默
+        }
+      }, 500),
+    [userId, effectiveCategoryId]
+  );
+
+  // 當學習進度更新時儲存進度
+  useEffect(() => {
+    if (!total || learningProgress === 0) return;
+    saveProgressThrottled(learningProgress);
+  }, [learningProgress, total, saveProgressThrottled]);
+
+  // 當當前位置更新時更新 URL 和重置翻轉狀態
+  useEffect(() => {
+    if (!total) return;
+    const params = new URLSearchParams(location.search);
+    params.set("index", String(currentIndex));
+    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+    setFlipped(false);
+    stopAudio();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex, total]);
+
+  // 離開頁面前做一次保險存檔
+  useEffect(() => {
+    const onBeforeUnload = () => {
+      if (!userId || !effectiveCategoryId) return;
+      navigator.sendBeacon?.(
+        api.vocabProgressUpdate,
+        new Blob([JSON.stringify({ userId, categoryId: effectiveCategoryId, currentIndex: learningProgress })], {
+          type: "application/json",
+        })
+      );
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [userId, effectiveCategoryId, learningProgress]);
+
+  /* 音訊控制（共用） */
   const playPauseWithUrl = async (url: string | null) => {
     if (!url) return;
     try {
@@ -286,9 +383,13 @@ const FlashcardApp: React.FC = () => {
         audioRef.current = new Audio();
         audioRef.current.preload = "auto";
         audioRef.current.crossOrigin = "anonymous";
-        audioRef.current.addEventListener("ended", () => setIsPlaying(false));
+        audioRef.current.addEventListener("ended", () => {
+          setIsPlaying(false);
+        });
         audioRef.current.addEventListener("pause", () => setIsPlaying(false));
-        audioRef.current.addEventListener("play", () => setIsPlaying(true));
+        audioRef.current.addEventListener("play", () => {
+          setIsPlaying(true);
+        });
       }
       const el = audioRef.current;
       if (!el.paused && el.src === url) {
@@ -297,9 +398,10 @@ const FlashcardApp: React.FC = () => {
       }
       el.src = url;
       await el.play();
+      
     } catch (err) {
       console.error("audio play failed:", err);
-      alert("音檔播放失敗，可能尚未提供或 CORS 設定不足。");
+      alert("此例句的音檔暫時無法播放，請稍後再試。");
     }
   };
 
@@ -311,30 +413,40 @@ const FlashcardApp: React.FC = () => {
   }, [currentCard]);
 
   const backAudioUrl = useMemo(() => {
+    // 優先使用後端直接提供的 audioUrl
     const direct = activeSentence?.audiourl || activeSentence?.audioUrl || "";
-    if (direct) return direct;
-    const audioKeyRaw = activeSentence?.audioFileId ?? activeSentence?.audio_file_id;
+    if (direct) {
+      return direct;
+    }
+    
+    // 如果沒有直接 URL，嘗試從 audioId 構建
+    const audioKeyRaw = activeSentence?.audioId ?? activeSentence?.audioFileId ?? activeSentence?.audio_file_id;
     const id = extractId(audioKeyRaw);
-    if (!id) return null;
-    return `${api.sentenceAudioStream}/${encodeURIComponent(id)}?cb=${Date.now()}`;
+    if (!id) {
+      return null;
+    }
+    const url = `${api.sentenceAudioStream}/${encodeURIComponent(id)}?cb=${Date.now()}`;
+    return url;
   }, [activeSentence]);
 
   /* 翻頁 */
   const handleNextCard = () => {
-    if (currentIndex >= cards.length - 1) return;
+    if (currentIndex === null || currentIndex >= cards.length - 1) return;
+    
+    
     const newIndex = currentIndex + 1;
     setCurrentIndex(newIndex);
-    updateIndexInUrl(newIndex);
-    setFlipped(false);
-    stopAudio();
+    
+    // 只有前進到新位置時才更新學習進度
+    if (newIndex > learningProgress) {
+      setLearningProgress(newIndex);
+    }
   };
+  
   const handlePrevCard = () => {
-    if (currentIndex <= 0) return;
-    const newIndex = currentIndex - 1;
-    setCurrentIndex(newIndex);
-    updateIndexInUrl(newIndex);
-    setFlipped(false);
-    stopAudio();
+    if (currentIndex === null || currentIndex <= 0) return;
+    setCurrentIndex((i) => (i || 0) - 1);
+    // 回看不會影響學習進度
   };
 
   /* 無分類時 */
@@ -346,7 +458,21 @@ const FlashcardApp: React.FC = () => {
             <button className="back-button" aria-label="Go back" onClick={() => navigate(-1)}>
               <img src={backIcon} alt="Back Icon" />
             </button>
-            <h1 className="header-title">台語單字卡</h1>
+
+            <h1 className="header-title">{titleFromQuery || "台語單字卡"}</h1>
+
+            {/* 右上固定的進度條：即使資料還沒回來也先渲染 */}
+            <div className="progress-inline">
+              <div className="progress-bar-cute">
+                <div
+                  className="progress-fill-cute"
+                  style={{ width: `${Math.min(100, Math.max(0, percent || 0))}%` }}
+                />
+              </div>
+              <span className="progress-text">
+                {learningProgress + 1}/{total || 0} ({percent || 0}%)
+              </span>
+            </div>
           </div>
         </header>
         <main className="flashcard-section">
@@ -368,6 +494,19 @@ const FlashcardApp: React.FC = () => {
             <img src={backIcon} alt="Back Icon" />
           </button>
           <h1 className="header-title">{titleFromQuery || "台語單字卡"}</h1>
+
+          {/* 右上固定的進度條：膠囊型現代風格 */}
+          <div className="progress-inline">
+            <div className="progress-bar-cute">
+              <div
+                className={`progress-fill-cute ${percent === 100 ? 'completed' : ''}`}
+                style={{ width: `${Math.min(100, Math.max(0, percent || 0))}%` }}
+              />
+            </div>
+            <span className="progress-text">
+              {learningProgress + 1}/{total || 0} ({percent || 0}%)
+            </span>
+          </div>
         </div>
       </header>
 
@@ -375,14 +514,14 @@ const FlashcardApp: React.FC = () => {
         <img className="background-pattern" src={bgImage} alt="background pattern" />
 
         {loading && <div style={{ padding: 24, textAlign: "center", fontWeight: 700 }}>讀取中…</div>}
+
         {!loading && errMsg && (
-          <div style={{ padding: 24, textAlign: "center", color: "#b00", fontWeight: 700 }}>
-            {errMsg}
-          </div>
+          <div style={{ padding: 24, textAlign: "center", color: "#b00", fontWeight: 700 }}>{errMsg}</div>
         )}
 
         {!loading && !errMsg && cards.length > 0 && (
           <div className="flashcard-area">
+            {/* 卡片 */}
             <div className={`flashcard ${flipped ? "flipped" : ""}`} onClick={() => setFlipped(!flipped)}>
               <div className="flashcard-inner">
                 {/* Front */}
@@ -463,7 +602,10 @@ const FlashcardApp: React.FC = () => {
                       <p className="flashcard-text-line">此單字暫無例句</p>
                     ) : (
                       backLines.map((line, i) => (
-                        <p key={`b-${i}`} className={`flashcard-text-line example-line ${i === 2 ? "flashcard-text-chinese" : ""}`}>
+                        <p
+                          key={`b-${i}`}
+                          className={`flashcard-text-line example-line ${i === 2 ? "flashcard-text-chinese" : ""}`}
+                        >
                           {line}
                         </p>
                       ))
@@ -473,16 +615,23 @@ const FlashcardApp: React.FC = () => {
               </div>
             </div>
 
+            {/* 導覽 */}
             <nav className="card-navigation">
-              <button className="nav-arrow" aria-label="Previous card" onClick={handlePrevCard} disabled={currentIndex === 0}>
+              <button className="nav-arrow" aria-label="Previous card" onClick={handlePrevCard} disabled={currentIndex === null || currentIndex === 0}>
                 <img src={leftArrow} alt="Previous" />
               </button>
 
               <span className="page-counter">
-                {currentIndex + 1}/{cards.length}
+                {(currentIndex || 0) + 1}/{cards.length}
               </span>
 
-              <button className="nav-arrow" aria-label="Next card" onClick={handleNextCard} disabled={currentIndex === cards.length - 1}>
+              <button
+                className="nav-arrow"
+                aria-label="Next card"
+                onClick={handleNextCard}
+                disabled={currentIndex === null || currentIndex === cards.length - 1}
+                title="下一張"
+              >
                 <img src={rightArrow} alt="Next" />
               </button>
             </nav>

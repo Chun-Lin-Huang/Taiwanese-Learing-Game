@@ -30,4 +30,7 @@ export enum api {
     scenarioStart = "http://127.0.0.1:2083/api/v1/scenario/start",
     scenarioTurnText = "http://127.0.0.1:2083/api/v1/scenario/turn_text",
     scenarioVoiceTurn = "http://127.0.0.1:2083/api/v1/scenario/voice_turn",
+    vocabProgress = "http://127.0.0.1:2083/api/v1/vocab-progress",
+    vocabProgressUpdate = "http://127.0.0.1:2083/api/v1/vocab-progress/update",
+    vocabProgressAll = "http://127.0.0.1:2083/api/v1/vocab-progress/all"
 }

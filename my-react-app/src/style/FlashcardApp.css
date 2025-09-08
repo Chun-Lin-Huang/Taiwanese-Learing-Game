@@ -216,13 +216,42 @@ header.site-header,
   min-height: 70px !important;
   max-height: 70px !important;
   background: var(--header-bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5%;
 }
 
-/* 裡面文字跟按鈕也要縮小一點 */
+/* Header 內容容器 */
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  position: relative;
+}
+
+/* 標題絕對居中 */
 header.site-header .header-title,
 #header.site-header .header-title {
   font-size: 32px !important;  /* 調整標題字體大小 */
   line-height: 1 !important;
+  text-align: center;
+  margin: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+/* 返回按鈕絕對定位在左側 */
+header.site-header .back-button,
+#header.site-header .back-button {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
 }
 
 header.site-header .back-button img,
@@ -257,14 +286,122 @@ header.site-header .back-button img,
 
 /* 背面例句專用：整體縮小 */
 .flashcard-back .example-line {
-  font-size: clamp(18px, 3.6vw, 40px); /* 小一階 */
+  font-size: clamp(14px, 2.8vw, 32px); /* 更小 */
   line-height: 1.3;
   font-weight: 600; /* 比正面柔和 */
 }
 
 /* 中文再小一點 */
 .flashcard-back .example-line.flashcard-text-chinese {
-  font-size: clamp(16px, 3vw, 32px);
+  font-size: clamp(12px, 2.4vw, 24px);
   font-weight: 400;
   color: #444;
+}
+
+/* 進度條絕對定位在右側 */
+.progress-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  background: #ffffff;
+  padding: 8px 16px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
+}
+
+.progress-bar-cute {
+  width: 200px;
+  height: 28px;
+  background: #ffffff;
+  border-radius: 999px; /* 膠囊型圓角 */
+  overflow: hidden;
+  position: relative;
+  border: 2px solid #000000; /* 黑色外框 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 進度條填充 - 淺藍色漸變 */
+.progress-fill-cute {
+  height: 100%;
+  background: linear-gradient(135deg, 
+    #60a5fa 0%, 
+    #3b82f6 50%, 
+    #2563eb 100%);
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 淺藍色填充的光澤效果 */
+.progress-fill-cute::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, 
+    rgba(255, 255, 255, 0.3) 0%, 
+    transparent 100%);
+  border-radius: 999px;
+}
+
+/* 進度條完成時的慶祝效果 */
+.progress-fill-cute.completed {
+  background: linear-gradient(135deg, 
+    #60a5fa 0%, 
+    #3b82f6 50%, 
+    #2563eb 100%);
+  animation: celebration 0.8s ease-out;
+}
+
+@keyframes celebration {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+/* 現代簡潔的文字樣式 */
+.progress-text {
+  font-size: 24px;
+  font-weight: 900;
+  color: #374151;
+  white-space: nowrap;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.3px;
+  min-width: 50px;
+  text-align: right;
+}
+
+/* 懸停效果 */
+.progress-inline:hover .progress-bar-cute {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+/* 響應式調整 */
+@media (max-width: 768px) {
+  .progress-inline {
+    gap: 8px;
+    padding: 6px 12px;
+    right: 8px;
+  }
+  
+  .progress-bar-cute {
+    width: 150px;
+    height: 24px;
+  }
+  
+  .progress-text {
+    font-size: 22px;
+    font-weight: 900;
+    min-width: 40px;
+  }
 }
