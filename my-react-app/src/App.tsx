@@ -33,6 +33,11 @@ import Register from "./view/Register";
 import First from "./view/First";
 import Welcome from "./view/Welcome";
 
+// 大富翁區
+import MonopolyPage from "./view/MonopolyPage";
+import ThemeSelectionPage2 from "./view/ThemeSelection2";
+import Home2 from "./view/Home2";
+
 import "./Main.css";
 import "./App.css";
 import "./style/Game.css";
@@ -92,6 +97,12 @@ function AppRoutes() {
 
       {/* 收藏頁面（別名） */}
       <Route path="/favorites" element={<FavoriteCollectionPage />} />
+
+      {/* 大富翁 */}
+      <Route path="/MonopolyPage" element={<MonopolyPage />} />
+      <Route path="/ThemeSelection2" element={<ThemeSelectionPage2 />} />
+      <Route path="/Home2" element={<Home2 />} />
+
     </Routes>
   );
 }
