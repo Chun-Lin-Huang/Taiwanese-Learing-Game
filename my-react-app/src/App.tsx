@@ -38,6 +38,9 @@ import MonopolyPage from "./view/MonopolyPage";
 import ThemeSelectionPage2 from "./view/ThemeSelection2";
 import Home2 from "./view/Home2";
 
+// 字典區
+import SearchPage from "./view/SearchPage";
+
 import "./Main.css";
 import "./App.css";
 import "./style/Game.css";
@@ -103,6 +106,8 @@ function AppRoutes() {
       <Route path="/ThemeSelection2" element={<ThemeSelectionPage2 />} />
       <Route path="/Home2" element={<Home2 />} />
 
+      {/* 字典區 */}
+      <Route path="/DictionaryPage" element={<SearchPage />} />
     </Routes>
   );
 }
