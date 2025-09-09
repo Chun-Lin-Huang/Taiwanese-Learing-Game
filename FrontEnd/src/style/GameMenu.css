@@ -1,0 +1,273 @@
+:root {
+  --bg-color: #fffbd3;
+  --text-primary: #545050;
+
+  --gm-btn1-bg: #fff7b1;
+  --gm-btn1-shadow: #d6b770;
+
+  --gm-btn2-bg: #ffa24b;
+  --gm-btn2-shadow: #c8752c;
+
+  --gm-btn-text: #956B39; /* 按鈕字色 */
+}
+
+.selection-bg {
+  background: var(--bg-color);
+  height: 100vh;
+  width: 100vw;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  overflow: hidden;
+}
+
+.game-menu-main {
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+/*  舞台背景 */
+.game-menu-stage {
+  width: 1920px;
+  height: 1080px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+/* 響應式設計 */
+/* 超大螢幕 (1920px 以上) */
+@media (min-width: 1920px) {
+  .game-menu-stage {
+    width: 1920px;
+    height: 1080px;
+  }
+}
+
+/* 大螢幕 (1440px - 1919px) */
+@media (max-width: 1919px) and (min-width: 1440px) {
+  .game-menu-stage {
+    width: 1440px;
+    height: 810px;
+    transform: scale(calc(100vw / 1440));
+    transform-origin: top left;
+  }
+}
+
+/* 中等螢幕 (1024px - 1439px) */
+@media (max-width: 1439px) and (min-width: 1024px) {
+  .game-menu-stage {
+    width: 1024px;
+    height: 576px;
+    transform: scale(calc(100vw / 1024));
+    transform-origin: top left;
+  }
+}
+
+/* 平板 (768px - 1023px) */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .game-menu-stage {
+    width: 768px;
+    height: 432px;
+    transform: scale(calc(100vw / 768));
+    transform-origin: top left;
+  }
+  
+  .gm-actions {
+    top: 300px;
+    width: 500px;
+    gap: 20px;
+  }
+  
+  .gm-btn {
+    font-size: 50px;
+    padding: 15px 25px;
+  }
+  
+  .gm-icon {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .gm-btn-accent .gm-icon {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* 手機 (480px - 767px) */
+@media (max-width: 767px) and (min-width: 480px) {
+  .game-menu-stage {
+    width: 480px;
+    height: 270px;
+    transform: scale(calc(100vw / 480));
+    transform-origin: top left;
+  }
+  
+  .gm-actions {
+    top: 180px;
+    width: 350px;
+    gap: 15px;
+  }
+  
+  .gm-btn {
+    font-size: 35px;
+    padding: 12px 20px;
+    border-radius: 20px;
+  }
+  
+  .gm-icon {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .gm-btn-accent .gm-icon {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .gm-back {
+    top: 20px;
+    left: 20px;
+    padding: 8px;
+  }
+  
+  .gm-back img {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* 小手機 (320px - 479px) */
+@media (max-width: 479px) {
+  .game-menu-stage {
+    width: 320px;
+    height: 180px;
+    transform: scale(calc(100vw / 320));
+    transform-origin: top left;
+  }
+  
+  .gm-actions {
+    top: 120px;
+    width: 280px;
+    gap: 12px;
+  }
+  
+  .gm-btn {
+    font-size: 28px;
+    padding: 10px 16px;
+    border-radius: 16px;
+  }
+  
+  .gm-icon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .gm-btn-accent .gm-icon {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .gm-back {
+    top: 15px;
+    left: 15px;
+    padding: 6px;
+  }
+  
+  .gm-back img {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/*  返回箭頭 */
+.gm-back {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  background: rgba(255, 255, 255, 0.6);
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 12px;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s;
+}
+.gm-back:hover {
+  background: rgba(255, 255, 255, 0.85);
+}
+.gm-back img {
+  width: 48px;
+  height: 48px;
+  display: block;
+}
+
+/* 按鈕容器 */
+.gm-actions {
+  position: absolute;
+  top: 420px; /* 往上移 100px */
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  gap: 28px;
+  width: 580px;
+}
+
+/* 按鈕基底樣式 */
+.gm-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+
+  padding: 20px 32px;
+  border-radius: 40px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 800; /* Extra Bold */
+  font-size: 70px;
+  color: var(--gm-btn-text);
+
+  border: none;
+  user-select: none;
+  cursor: pointer;
+
+  transition: transform 0.06s ease, box-shadow 0.06s ease, filter 0.2s ease;
+}
+.gm-btn:hover {
+  filter: brightness(1.05);
+}
+
+/* 圖示 */
+.gm-icon {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+/* 創建房間 */
+.gm-btn-primary {
+  background: var(--gm-btn1-bg);
+  box-shadow: 0 6px 0 var(--gm-btn1-shadow);
+}
+.gm-btn-primary:active {
+  transform: translateY(3px);
+  box-shadow: 0 3px 0 var(--gm-btn1-shadow);
+}
+
+/*  加入房間 */
+.gm-btn-accent {
+  background: var(--gm-btn2-bg);
+  box-shadow: 0 6px 0 var(--gm-btn2-shadow);
+}
+.gm-btn-accent:active {
+  transform: translateY(3px);
+  box-shadow: 0 3px 0 var(--gm-btn2-shadow);
+}
+
+/* 加入房間按鈕的圖標更大 */
+.gm-btn-accent .gm-icon {
+  width: 80px;
+  height: 80px;
+}

@@ -1,0 +1,327 @@
+:root{
+  --text: #956B39;          /* 文字顏色（Figma） */
+
+  --card-bg: #fff7b1;       /* 中央卡片底色 */
+  --card-shadow: #d6b770;   /* 卡片陰影 */
+
+  --cta-bg: #FF9933;        /* 建立房間主色 */
+  --cta-shadow: #FF9933;    /* 主按鈕陰影 */
+}
+
+.selection-bg {
+  height: 100vh;
+  width: 100vw;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  overflow: hidden;
+}
+
+.cr-main{
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+/* 舞台：鋪 1920×1080 底圖 */
+.cr-stage{
+  width: 1920px;
+  height: 1080px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+/* 響應式設計 */
+/* 超大螢幕 (1920px 以上) */
+@media (min-width: 1920px) {
+  .cr-stage {
+    width: 1920px;
+    height: 1080px;
+  }
+}
+
+/* 大螢幕 (1440px - 1919px) */
+@media (max-width: 1919px) and (min-width: 1440px) {
+  .cr-stage {
+    width: 1440px;
+    height: 810px;
+    transform: scale(calc(100vw / 1440));
+    transform-origin: top left;
+  }
+}
+
+/* 中等螢幕 (1024px - 1439px) */
+@media (max-width: 1439px) and (min-width: 1024px) {
+  .cr-stage {
+    width: 1024px;
+    height: 576px;
+    transform: scale(calc(100vw / 1024));
+    transform-origin: top left;
+  }
+}
+
+/* 平板 (768px - 1023px) */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .cr-stage {
+    width: 768px;
+    height: 432px;
+    transform: scale(calc(100vw / 768));
+    transform-origin: top left;
+  }
+  
+  .cr-title {
+    font-size: 50px;
+    top: 100px;
+  }
+  
+  .cr-card {
+    width: 600px;
+    height: 300px;
+    top: 200px;
+    padding: 30px 20px;
+  }
+  
+  .cr-card-title {
+    font-size: 40px;
+  }
+  
+  .cr-option {
+    width: 120px;
+    height: 90px;
+    font-size: 45px;
+  }
+  
+  .cr-confirm {
+    font-size: 32px;
+    padding: 18px 60px;
+    top: 450px;
+  }
+}
+
+/* 手機 (480px - 767px) */
+@media (max-width: 767px) and (min-width: 480px) {
+  .cr-stage {
+    width: 480px;
+    height: 270px;
+    transform: scale(calc(100vw / 480));
+    transform-origin: top left;
+  }
+  
+  .cr-title {
+    font-size: 35px;
+    top: 60px;
+  }
+  
+  .cr-card {
+    width: 350px;
+    height: 180px;
+    top: 120px;
+    padding: 20px 15px;
+  }
+  
+  .cr-card-title {
+    font-size: 28px;
+    margin-bottom: 15px;
+  }
+  
+  .cr-options {
+    gap: 15px;
+  }
+  
+  .cr-option {
+    width: 80px;
+    height: 60px;
+    font-size: 30px;
+    border-radius: 15px;
+  }
+  
+  .cr-confirm {
+    font-size: 24px;
+    padding: 12px 40px;
+    top: 280px;
+    border-radius: 25px;
+  }
+  
+  .cr-back {
+    top: 20px;
+    left: 20px;
+    padding: 6px;
+  }
+  
+  .cr-back img {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* 小手機 (320px - 479px) */
+@media (max-width: 479px) {
+  .cr-stage {
+    width: 320px;
+    height: 180px;
+    transform: scale(calc(100vw / 320));
+    transform-origin: top left;
+  }
+  
+  .cr-title {
+    font-size: 28px;
+    top: 40px;
+  }
+  
+  .cr-card {
+    width: 250px;
+    height: 120px;
+    top: 80px;
+    padding: 15px 10px;
+  }
+  
+  .cr-card-title {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  
+  .cr-options {
+    gap: 10px;
+  }
+  
+  .cr-option {
+    width: 60px;
+    height: 45px;
+    font-size: 22px;
+    border-radius: 12px;
+  }
+  
+  .cr-confirm {
+    font-size: 18px;
+    padding: 8px 25px;
+    top: 180px;
+    border-radius: 20px;
+  }
+  
+  .cr-back {
+    top: 15px;
+    left: 15px;
+    padding: 4px;
+  }
+  
+  .cr-back img {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* 左上角返回 */
+.cr-back{
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  background: rgba(255,255,255,.6);
+  border: 0;
+  border-radius: 50%;
+  padding: 12px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background .2s;
+}
+.cr-back:hover{ background: rgba(255,255,255,.85); }
+.cr-back img{ width: 48px; height: 48px; display:block; }
+
+/*  頂部標題：創建房間（置中） */
+.cr-title{
+  position: absolute;
+  top: 100px;                 /* 往上移 50px */
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;           /* Extra Bold */
+  font-size: 70px;
+  color: var(--text);
+}
+.cr-title-icon{
+  width: 60px; height: 60px; object-fit: contain;
+}
+
+/* 中央卡片（選擇人數）：949×447、radius 30 */
+.cr-card{
+  position: absolute;
+  top: 250px;                 /* 往上移 69px */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1100px;
+  height: 520px;
+  background: var(--card-bg);
+  border-radius: 30px;
+  box-shadow: 0 10px 0 var(--card-shadow);
+  text-align: center;
+  padding: 50px 30px 35px;
+}
+
+.cr-card-title{
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 60px;
+  color: var(--text);
+  margin: 0 0 24px;
+}
+
+/* 人數選項（2/3/4） */
+.cr-options{
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 12px;
+}
+
+.cr-option{
+  width: 180px;
+  height: 130px;
+  border: none;
+  border-radius: 20px;
+  background: #FFECA8;             /* 跟卡片內的小方塊顏色 */
+  box-shadow: 0 8px 0 #d1b067;     /* 立體陰影 */
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 64px;
+  cursor: pointer;
+  transition: transform .06s ease, box-shadow .06s ease, filter .15s ease;
+}
+.cr-option:hover{ filter: brightness(1.04); }
+.cr-option:active{ transform: translateY(3px); box-shadow: 0 4px 0 #d1b067; }
+
+.cr-option.active{
+  outline: 3px solid rgba(233, 102, 14, 0.35);
+  filter: brightness(1.06);
+}
+
+/* 主行動：建立房間（#FF9933） */
+.cr-confirm{
+  position: absolute;
+  top: 580px;                 /* 往上移 70px */
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 22px 84px;
+  border: none;
+  border-radius: 40px;
+  background: var(--cta-bg);          /* 使用 FF9933 */
+  box-shadow: 0 8px 0 var(--cta-shadow);
+  color: var(--text);                 /* 文字顏色 #956B39 */
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 44px;
+  cursor: pointer;
+  transition: transform .06s ease, box-shadow .06s ease, filter .15s ease;
+}
+.cr-confirm:hover{ filter: brightness(1.04); }
+.cr-confirm:active{
+  transform: translateY(3px);
+  box-shadow: 0 4px 0 var(--cta-shadow);
+}
+.cr-confirm:disabled{
+  cursor: not-allowed;
+  filter: grayscale(.25) brightness(.93);
+  box-shadow: 0 8px 0 rgba(0,0,0,.08);
+}

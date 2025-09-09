@@ -37,6 +37,10 @@ import Welcome from "./view/Welcome";
 import MonopolyPage from "./view/MonopolyPage";
 import ThemeSelectionPage2 from "./view/ThemeSelection2";
 import Home2 from "./view/Home2";
+import SuperMonopoly from "./view/GameMenu";
+import CreateRoom from "./view/CreateRoom";
+import JoinRoom from "./view/JoinRoom";
+import RoomLobby from "./view/RoomLobby";
 
 // 字典區
 import SearchPage from "./view/SearchPage";
@@ -63,10 +67,7 @@ function AppRoutes() {
       {/* 小琳區 */}
       <Route path="/ThemeSelection" element={<ThemeSelectionPage />} />
       <Route path="/Learn" element={<LearningMode />} />
-      <Route
-        path="/FlashcardApp"
-        element={<FlashcardApp onBack={() => navigate(-1)} />}
-      />
+      <Route path="/FlashcardApp" element={<FlashcardApp />} />
       <Route path="/FavoriteCollection" element={<FavoriteCollectionPage />} />
 
       <Route
@@ -105,6 +106,10 @@ function AppRoutes() {
       <Route path="/MonopolyPage" element={<MonopolyPage />} />
       <Route path="/ThemeSelection2" element={<ThemeSelectionPage2 />} />
       <Route path="/Home2" element={<Home2 />} />
+      <Route path="/SuperMonopoly" element={<SuperMonopoly />} />
+      <Route path="/rooms/create" element={<CreateRoom />} />
+      <Route path="/rooms/join" element={<JoinRoom />} />
+      <Route path="/rooms/lobby" element={<RoomLobby />} />
 
       {/* 字典區 */}
       <Route path="/DictionaryPage" element={<SearchPage />} />
