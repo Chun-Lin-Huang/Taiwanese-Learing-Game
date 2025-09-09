@@ -190,15 +190,17 @@ const StoryModePage: React.FC<StoryModePageProps> = ({ onBack, onStoryClick }) =
 
       <main className="game-selection-main">
         {/* 搜尋列 */}
-        <div className="search-bar">
-          <img src={searchIcon} alt="Search Icon" className="search-icon" />
-          <input
-            type="text"
-            className="search-input"
-            placeholder="揣故事"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
+        <div className="search-container">
+          <div className="search-input-wrapper">
+            <img src={searchIcon} alt="Search Icon" className="search-icon-new" />
+            <input
+              type="text"
+              className="search-input-new"
+              placeholder="揣故事"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+          </div>
         </div>
 
         {/* Hero 圖 */}

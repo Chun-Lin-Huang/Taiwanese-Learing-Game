@@ -158,9 +158,9 @@
     box-shadow: none;
     display: flex;
     align-items: center;
-    /* 讓喇叭按鈕和文字包裝器垂直居中對齊 */
-    gap: 60px;
-    /* 喇叭按鈕和文字之間的間距 */
+    /* 改回垂直居中，讓喇叭與題目文字中心對齊 */
+    gap: 20px;
+    /* 調整間距 */
     width: 100%;
     max-width: 999px;
     /* 這裡請設定一個合理的寬度，不要是 100% 或 1980px，因為整個 container 要居中 */
@@ -177,19 +177,21 @@
 }
 
 .speaker-button-container {
-    width: 100%;
-    /* 佔滿可用寬度 */
-    max-width: 800px;
-    /* 讓其與題目區塊的寬度保持一致 */
+    width: auto;
+    /* 改為自動寬度，不佔滿 */
+    max-width: none;
+    /* 移除最大寬度限制 */
     display: flex;
     /* 啟用 Flexbox */
     justify-content: flex-start;
     /* <--- 讓播放鍵靠左 */
     align-items: center;
-    /* 垂直居中 */
-    padding: 0 0 0 25px;
-    /* 添加左側 padding，讓播放鍵不完全貼邊 */
+    /* 改回垂直居中，與整個題目文字中心對齊 */
+    padding: 0;
+    /* 移除 padding */
     box-sizing: border-box;
+    flex-shrink: 0;
+    /* 防止被壓縮 */
 }
 
 .speaker-button {
@@ -225,17 +227,21 @@
 
     display: flex;
     /* 讓其成為一個 flex 容器 */
-    justify-content: center;
-    /* <-- 讓內部文字水平居中 */
+    justify-content: flex-start;
+    /* 左對齊，與喇叭按鈕對齊 */
     align-items: center;
-    /* 確保文字在包裝器內垂直居中 */
-    gap: 50px;
-    height: 100%;
-    /* 確保高度撐開 */
-    padding: 120px 40px 40px 40px;
+    /* 改回垂直居中，與喇叭按鈕中心對齊 */
+    gap: 0;
+    /* 移除間距 */
+    height: auto;
+    /* 改為自動高度 */
+    padding: 0;
+    /* 移除 padding */
     box-sizing: border-box;
     position: relative;
     z-index: 1;
+    flex: 1;
+    /* 佔滿剩餘空間 */
 }
 
 .question-text {
@@ -261,8 +267,10 @@
     width: 100%;
     max-width: 1000px;
     /* 比 70% 更穩定，外框感更明顯 */
-    margin: 0 auto;
-    padding: 120px 40px 40px 40px;
+    margin: -40px auto 0 auto;
+    /* 往上移 40px */
+    padding: 80px 40px 40px 40px;
+    /* 減少上方的 padding */
     box-sizing: border-box;
     position: relative;
     z-index: 1;
@@ -290,6 +298,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    /* 確保文字完全置中 */
+    text-align: center;
+    line-height: 1.2;
 }
 
 /* Hover/Active 仍保留外框感 */
@@ -438,8 +449,8 @@
 
     .question-text-container {
         padding: 20px;
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
         gap: 15px;
         min-height: auto;
     }
@@ -462,6 +473,10 @@
     .options-grid {
         grid-template-columns: 1fr;
         gap: 20px;
+        margin: -20px auto 0 auto;
+        /* 手機版也往上移 20px */
+        padding: 60px 20px 20px 20px;
+        /* 減少手機版上方的 padding */
     }
 
     .option-button {
@@ -469,6 +484,11 @@
         min-height: 80px;
         padding: 20px 25px;
         padding-right: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        line-height: 1.2;
     }
 
     .correct-check-icon,

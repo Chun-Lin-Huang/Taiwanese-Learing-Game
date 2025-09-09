@@ -4,11 +4,18 @@ html, body {
   overflow: hidden;   /* 不允許水平/垂直捲動 */
 }
 
-/* 內層真正可滾的容器（保留你原本的設定） */
+/* 內層容器 - 完全隱藏滾動條 */
 .page-bg {
   min-height: 100svh;      /* 更穩定的視窗高度單位 */
-  overflow-x: hidden;
-  overflow-y: auto;        /* 🔑 只在這裡顯示垂直滾輪 */
+  overflow: hidden;        /* 完全隱藏滾動條 */
+  /* 隱藏滾動條但保持滾動功能 */
+  scrollbar-width: none;   /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* 隱藏 Webkit 瀏覽器的滾動條 */
+.page-bg::-webkit-scrollbar {
+  display: none;
 }
 
 /* =========================
@@ -21,9 +28,10 @@ html, body {
   margin: 0 auto;
   position: relative;
   padding-top: 80px;       /* 與固定 header 高度一致 */
-  overflow-x: hidden;
+  overflow: hidden;        /* 完全隱藏滾動條 */
   padding-left: 20px;
   padding-right: 20px;
+  height: calc(100vh - 80px); /* 限制高度避免滾動 */
 }
 
 /* 保險：徹底關掉水平滾輪的可能來源 */

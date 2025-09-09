@@ -178,7 +178,7 @@ button { border: none; background: transparent; cursor: pointer; padding: 0; }
   font-size: clamp(16px, 2.6vw, 28px);
   font-weight: 700;
   line-height: 1.2;
-  color: var(--text);
+  color: #000000;
 }
 
 /* 手機：如果想更細可再降到 56px */
