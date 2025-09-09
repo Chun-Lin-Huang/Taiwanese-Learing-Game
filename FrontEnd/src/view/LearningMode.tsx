@@ -119,14 +119,33 @@ export default function LearningMode() {
       setFocusedIndex(closestCardIndex % cards.length);
     };
 
+    // 處理滑鼠滾輪和觸控板事件
+    const handleWheel = (e: WheelEvent) => {
+      // 檢查是否為水平滾動（觸控板通常會有 deltaX）
+      const isHorizontalScroll = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+      
+      if (isHorizontalScroll) {
+        // 水平滾動：讓觸控板自然處理
+        return;
+      } else {
+        // 垂直滾動：轉換為水平滾動
+        e.preventDefault();
+        const delta = e.deltaY;
+        const scrollAmount = delta * 0.5; // 調整滾動速度
+        container.scrollLeft += scrollAmount;
+      }
+    };
+
     const tid = setTimeout(() => {
       handleScroll();
       container.addEventListener("scroll", handleScroll);
+      container.addEventListener("wheel", handleWheel, { passive: false });
     }, 100);
 
     return () => {
       clearTimeout(tid);
       container.removeEventListener("scroll", handleScroll);
+      container.removeEventListener("wheel", handleWheel);
     };
   }, [getCardDimensions]);
 

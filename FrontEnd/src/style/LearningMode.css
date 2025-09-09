@@ -89,6 +89,7 @@
   scroll-snap-type: x mandatory;
   scroll-padding-inline: 50vw;
   overscroll-behavior-x: contain;
+  touch-action: pan-x;
 }
 .learning-page .learn-cards-container::-webkit-scrollbar { display: none; }
 
