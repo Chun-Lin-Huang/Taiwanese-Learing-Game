@@ -1,0 +1,186 @@
+:root{
+  --text: #956B39;       /* 與整體一致 */
+  --title: #956B39;      /* 頁面大標題（與請輸入房號同色） */
+  --card-bg: #FFF7E1;    /* 輸入卡片底色（米白） */
+  --card-shadow: #D6C7A5;
+
+  --digit-bg: #FFF0C8;   /* 每個數字格的底色 */
+  --digit-shadow: #D1B067;
+
+  --cta-bg: #D6E7FF;     /* 確認加入按鈕：淺藍 */
+  --cta-shadow: #7FA7E1; /* 淺藍陰影 */
+  --white: #FFFFFF;
+}
+
+.join-main{
+  position: relative;
+  z-index: 1;
+  padding:16px;
+}
+
+/* 背景設定 */
+.selection-bg{
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* 舞台背景 */
+.join-stage{
+  width:1920px;
+  height:1080px;
+  position:relative;
+  overflow:hidden;
+  border-radius:8px;
+  margin: 0 auto;
+}
+/* 響應式設計 */
+@media (max-width: 1920px) {
+  .join-stage {
+    transform: scale(calc(100vw / 1920));
+    transform-origin: top left;
+  }
+}
+
+@media (max-width: 1366px) {
+  .join-stage {
+    transform: scale(calc(100vw / 1366));
+    transform-origin: top left;
+  }
+}
+
+@media (max-width: 1024px) {
+  .join-stage {
+    transform: scale(calc(100vw / 1024));
+    transform-origin: top left;
+  }
+}
+
+@media (max-width: 768px) {
+  .join-stage {
+    transform: scale(calc(100vw / 768));
+    transform-origin: top left;
+  }
+}
+
+@media (max-width: 480px) {
+  .join-stage {
+    transform: scale(calc(100vw / 480));
+    transform-origin: top left;
+  }
+}
+
+/* 手機橫向 */
+@media (max-height: 500px) and (orientation: landscape) {
+  .join-stage {
+    transform: scale(calc(100vh / 1080));
+    transform-origin: top left;
+  }
+}
+
+/* 返回 */
+.join-back{
+  position:absolute; top:40px; left:40px;
+  background:rgba(255,255,255,.6);
+  border:0; border-radius:50%; padding:12px;
+  backdrop-filter: blur(4px);
+  cursor:pointer; transition: background .2s;
+}
+.join-back:hover{ background:rgba(255,255,255,.85); }
+.join-back img{ width:48px; height:48px; display:block; }
+
+/* 頁面標題（置中靠上） */
+.join-title{
+  position:absolute; top:140px; left:50%; transform:translateX(-50%);
+  margin:0;
+  font-family:'Inter', sans-serif;
+  font-weight:900;
+  font-size:72px;
+  color: var(--title);
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.join-title-icon{
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+/* 中央卡片 */
+.join-card{
+  position:absolute; top:280px; left:50%; transform:translateX(-50%);
+  width:900px;
+  background:var(--card-bg);
+  border-radius:30px;
+  box-shadow:0 10px 0 var(--card-shadow);
+  text-align:center;
+  padding:36px 24px 28px;
+}
+
+.join-card-title{
+  margin:0 0 16px;
+  font-family:'Inter', sans-serif;
+  font-weight:800;
+  font-size:48px;
+  color: var(--text);
+}
+
+/* 4 碼輸入 */
+.join-code-inputs{
+  display:flex; justify-content:center; gap:24px;
+  margin: 8px 0 20px;
+}
+.join-digit{
+  width:130px; height:110px;
+  text-align:center;
+  background: var(--digit-bg);
+  border:none;
+  border-radius:20px;
+  box-shadow:0 8px 0 var(--digit-shadow);
+  font-family:'Inter', sans-serif;
+  font-weight:900;
+  font-size:60px;
+  color: var(--text);
+  outline:none;
+}
+.join-digit:focus{
+  outline:4px solid rgba(149,107,57,.35);
+}
+
+/* 確認加入 */
+.join-submit{
+  margin-top: 8px;
+  padding: 18px 72px;
+  background: var(--cta-bg);
+  color: #545050;
+  border:none;
+  border-radius:40px;
+  font-family:'Inter', sans-serif;
+  font-weight:900;
+  font-size:36px;
+  box-shadow:0 8px 0 var(--cta-shadow);
+  cursor:pointer;
+  transition: transform .06s ease, box-shadow .06s ease, filter .15s ease;
+}
+.join-submit:hover{ filter: brightness(1.05); }
+.join-submit:active{ transform: translateY(3px); box-shadow: 0 4px 0 var(--cta-shadow); }
+.join-submit:disabled{
+  cursor:not-allowed;
+  filter: grayscale(.35) brightness(.9);
+  box-shadow:0 8px 0 rgba(0,0,0,.08);
+}
+
+/* 底下小提示 */
+.join-hint{
+  margin: 14px 0 0;
+  font-family:'Inter', sans-serif;
+  font-weight:700;
+  font-size:20px;
+  color:#545050;
+}

@@ -43,8 +43,6 @@ body, html {
   z-index: 0;
 }
 
-
-
 .selection-bg::before {
   content: "";
   position: absolute;
@@ -56,6 +54,26 @@ body, html {
                                 
   opacity: 0.5; /* 如果您需要透明度，請確保這一行沒有被移除 */
   pointer-events: none;  /* 不影響點擊，非常正確 */
+}
+
+/* GameMenu 頁面不使用全域背景 */
+.selection-bg.game-menu-bg::before {
+  display: none !important;
+}
+
+/* CreateRoom 頁面不使用全域背景 */
+.selection-bg.cr-bg::before {
+  display: none !important;
+}
+
+/* JoinRoom 頁面不使用全域背景 */
+.selection-bg.join-bg::before {
+  display: none !important;
+}
+
+/* RoomLobby 頁面不使用全域背景 */
+.selection-bg.rl-bg::before {
+  display: none !important;
 }
 
 .back-button {
