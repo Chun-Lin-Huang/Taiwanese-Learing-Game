@@ -16,5 +16,8 @@ export class ScenarioRoute extends Route {
 
     // POST /api/v1/scenario/turn_text
     this.router.post(`${this.url}turn_text`, (req, res) => this.Contorller.turnText(req, res));
+
+    // GET /api/v1/scenario/history/:sessionId
+    this.router.get(`${this.url}history/:sessionId`, (req, res) => this.Contorller.getHistory(req, res));
   }
 }
