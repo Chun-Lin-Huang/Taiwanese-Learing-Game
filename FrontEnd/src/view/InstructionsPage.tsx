@@ -20,7 +20,7 @@ const InstructionsPage: React.FC = () => {
         >
           <img src={BackIcon} alt="返回" />
         </button>
-        <h1 className="game-header-title">互動遊戲</h1>
+        <h1 className="game-header-title">使用說明</h1>
       </header>
 
       {/* ===== 使用說明內容 ===== */}

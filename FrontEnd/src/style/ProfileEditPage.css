@@ -1,3 +1,22 @@
+/* 隱藏滾動條 */
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 隱藏滾動條但保持滾動功能 */
+.page-bg {
+  overflow: hidden;
+  scrollbar-width: none;   /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  height: 100vh;
+}
+
+/* 隱藏 Webkit 瀏覽器的滾動條 */
+.page-bg::-webkit-scrollbar {
+  display: none;
+}
+
 :root {
     /* 全站共用色彩變數 */
     --text-primary: #545050;
@@ -15,9 +34,9 @@
     max-width: 1920px;
     margin: 0 auto;
     position: relative;
-    min-height: 100vh;
+    height: calc(100vh - 80px); /* 限制高度避免滾動 */
     padding-top: 80px; /* 預留 header 高度 */
-    overflow-x: hidden;
+    overflow: hidden; /* 完全隱藏滾動條 */
     padding-left: 20px;
     padding-right: 20px;
 }
