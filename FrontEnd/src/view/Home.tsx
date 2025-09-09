@@ -128,79 +128,98 @@ const Home: React.FC = () => {
     }
   }, [mediaRecorder, isRecording]);
 
-  /** 處理語音輸入 */
+  /** 處理台語語音輸入 */
+
   const processVoiceInput = useCallback(async (audioBlob: Blob) => {
     if (!sessionId) return;
     
     setIsProcessing(true);
     
     try {
-      // 建立 FormData 上傳音頻檔案
+      // 呼叫台語語音服務
       const formData = new FormData();
       formData.append('audio', audioBlob, 'recording.webm');
-      formData.append('session_id', sessionId);
-      formData.append('topic_prompt', topic?.name || '');
+      formData.append('session_id', sessionId || '');
+      formData.append('user_id', localStorage.getItem('userId') || 'default_user');
+      formData.append('chat_choose_id', topic?.id || 'default_chat_choose');
+      formData.append('title', topic?.name || '台語語音對話');
       
-      // 調用語音處理 API
-      const response = await fetch(api.scenarioVoiceTurn, {
+      const response = await fetch('http://localhost:5050/process_audio', {
         method: 'POST',
         body: formData,
       });
       
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        throw new Error(`台語語音服務錯誤: ${response.status}`);
       }
       
       const result = await response.json();
-      const { transcript, reply_text, reply_audio, finished } = result.body || result;
       
-      // 顯示用戶語音識別結果
-      if (transcript) {
-        setChatLog(prev => [...prev, { 
-          type: "outgoing", 
-          sender: "你", 
-          content: <span>{transcript}</span> 
-        }]);
-      }
-      
-      // 顯示小熊回覆
-      if (reply_text) {
-        setChatLog(prev => [...prev, { 
-          type: "incoming", 
-          sender: "小熊", 
-          content: <span>{reply_text}</span> 
-        }]);
-      }
-      
-      // 播放音頻回覆
-      if (reply_audio) {
-        await playAudio(reply_audio);
-      }
-      
-      if (finished) {
-        // 對話結束，回到主題選單
-        setSessionId(null);
-        setTopic(null);
-        setShowTopicMenu(true);
-        setChatLog(prev => [
-          ...prev,
-          { type: "incoming", sender: "小熊", content: <span>本回合結束囉！再選一個主題吧～</span> },
-        ]);
+      if (result.success) {
+        // 顯示台語辨識結果
+        if (result.transcription) {
+          setChatLog(prev => [...prev, { 
+            type: "outgoing", 
+            sender: "你", 
+            content: <span>{result.transcription}</span> 
+          }]);
+        }
+        
+        // 顯示台語AI回應
+        if (result.ai_response) {
+          setChatLog(prev => [...prev, { 
+            type: "incoming", 
+            sender: "小熊", 
+            content: <span>{result.ai_response}</span> 
+          }]);
+        }
+        
+        // 使用現有的 scenario API 保存對話記錄
+        if (result.transcription) {
+          try {
+            const turnResult = await asyncPost(api.scenarioTurnText, {
+              session_id: sessionId,
+              text: result.transcription
+            });
+
+            if (turnResult?.body?.finished) {
+              // 對話已結束，重新選擇主題
+              setTimeout(() => {
+                setShowTopicMenu(true);
+                setChatLog([]);
+                setSessionId(null);
+              }, 2000);
+            }
+          } catch (error) {
+            console.error('保存對話記錄失敗:', error);
+          }
+        }
+        
+        // 播放台語語音
+        if (result.audio_url) {
+          const audio = new Audio(result.audio_url);
+          setIsPlaying(true);
+          audio.onended = () => setIsPlaying(false);
+          audio.onerror = () => setIsPlaying(false);
+          await audio.play();
+        }
+      } else {
+        throw new Error(result.error || '台語語音處理失敗');
       }
     } catch (error: any) {
-      console.error('語音處理失敗:', error);
+      console.error('台語語音處理失敗:', error);
       setChatLog(prev => [
         ...prev,
         {
           type: "incoming",
           sender: "小熊",
-          content: <span style={{ color: "#b00" }}>語音處理失敗：{error?.message || "未知錯誤"}</span>,
+          content: <span style={{ color: "#b00" }}>台語語音處理失敗：{error?.message || "未知錯誤"}</span>,
         },
       ]);
     } finally {
       setIsProcessing(false);
     }
-  }, [sessionId, topic]);
+  }, [sessionId]);
 
   /** 播放音頻 */
   const playAudio = useCallback(async (audioUrl: string) => {
@@ -268,7 +287,7 @@ const Home: React.FC = () => {
         <div className="character-area">
           <button className="character-button" onClick={resetChat}>
             <img src={bearImage} alt="小熊" className="character-image" />
-            <p className="character-caption">點我回主題選單</p>
+            <p className="character-caption">重新選擇主題點下方</p>
           </button>
           <button onClick={resetChat} className="reset-button">
             重新開始對話

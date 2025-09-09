@@ -197,4 +197,23 @@ export class ScenarioService {
       out.code = 500; out.message = "server error"; out.body = undefined; return out;
     }
   }
+
+  /** 查詢 ChatHistory 記錄 */
+  async getHistory(sessionId: string): Promise<resp<any>> {
+    const out: resp<any> = { code: 200, message: "", body: undefined };
+    try {
+      const chatHistory = await ChatHistoryModel.findOne({ session_id: sessionId })
+        .populate('userId', 'name email')
+        .populate('chatChooseId', 'name')
+        .lean();
+      
+      if (!chatHistory) {
+        out.code = 404; out.message = "ChatHistory not found"; return out;
+      }
+      
+      out.code = 200; out.message = "success"; out.body = chatHistory; return out;
+    } catch {
+      out.code = 500; out.message = "server error"; out.body = undefined; return out;
+    }
+  }
 }

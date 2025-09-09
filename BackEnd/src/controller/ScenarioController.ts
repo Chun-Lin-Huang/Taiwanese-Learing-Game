@@ -48,4 +48,21 @@ export class ScenarioController extends Contorller {
             return Response.status(500).send({ code: 500, message: err?.message || "server error" });
         }
     }
+
+    /**
+     * 查詢 ChatHistory 記錄
+     * GET /api/v1/scenario/history/:sessionId
+     */
+    public async getHistory(Request: Request, Response: Response) {
+        try {
+            const sessionId = Request.params?.sessionId;
+            if (!sessionId) {
+                return Response.status(400).send({ code: 400, message: "缺少 session_id" });
+            }
+            const resp = await this.service.getHistory(sessionId);
+            return Response.status(resp.code).send(resp);
+        } catch (err: any) {
+            return Response.status(500).send({ code: 500, message: err?.message || "server error" });
+        }
+    }
 }
