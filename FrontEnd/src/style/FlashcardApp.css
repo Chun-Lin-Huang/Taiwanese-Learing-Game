@@ -29,16 +29,7 @@ body {
 
 button { border: none; background: transparent; cursor: pointer; padding: 0; }
 
-/* 背景底圖 */
-.background-pattern {
-  position: fixed;
-  inset: 0;
-  width: 100svw;
-  height: 100svh;
-  object-fit: cover;
-  z-index: -1;
-  pointer-events: none;
-}
+/* 背景底圖 - 已移除 */
 
 /* ===== 主體（用彈簧把卡片＋導覽夾在正中央） ===== */
 .flashcard-section {
@@ -170,8 +161,8 @@ button { border: none; background: transparent; cursor: pointer; padding: 0; }
 }
 .nav-arrow { display: flex; align-items: center; }
 .nav-arrow img {
-  width: clamp(20px, 3.5vw, 32px);
-  height: clamp(24px, 4vw, 40px);
+  width: clamp(32px, 5.5vw, 48px);
+  height: clamp(40px, 6vw, 60px);
 }
 .left-arrow img { transform: rotate(180deg); }
 .page-counter {

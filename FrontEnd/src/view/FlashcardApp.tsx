@@ -476,7 +476,6 @@ const FlashcardApp: React.FC = () => {
           </div>
         </header>
         <main className="flashcard-section">
-          <img className="background-pattern" src={bgImage} alt="background pattern" />
           <div style={{ padding: 24, textAlign: "center", fontWeight: 700 }}>
             請從「主題選擇」進入單字卡（缺少 categoryId）。
           </div>
@@ -511,8 +510,6 @@ const FlashcardApp: React.FC = () => {
       </header>
 
       <main id="flashcard-app" className="flashcard-section">
-        <img className="background-pattern" src={bgImage} alt="background pattern" />
-
         {loading && <div style={{ padding: 24, textAlign: "center", fontWeight: 700 }}>讀取中…</div>}
 
         {!loading && errMsg && (
