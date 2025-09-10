@@ -6,7 +6,7 @@ import Back from "../assets/back.svg";
 import InputBox from "../assets/InputBox.png";
 import SearchIcon from "../assets/Search.svg";
 import VolumeIcon from "../assets/Volume.png";
-import { moedictService, type SearchResult } from "../services/MoedictService";
+import { moedictService, type SearchResult, audioService } from "../services/MoedictService";
 
 const SearchPage: React.FC = () => {
   const navigate = useNavigate();
@@ -41,56 +41,22 @@ const SearchPage: React.FC = () => {
   };
 
   const playAudio = async (_src: string | undefined, text?: string) => {
-    // 使用瀏覽器原生語音合成
-    if (text && 'speechSynthesis' in window) {
-      try {
-        // 停止當前播放
-        speechSynthesis.cancel();
-        
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'zh-TW';
-        utterance.rate = 0.7; // 稍微慢一點，更清楚
-        utterance.pitch = 1;
-        utterance.volume = 1;
-        
-        // 等待語音載入完成
-        const voices = speechSynthesis.getVoices();
-        if (voices.length === 0) {
-          // 如果語音還沒載入，等待一下
-          await new Promise(resolve => {
-            speechSynthesis.onvoiceschanged = resolve;
-            setTimeout(resolve, 1000); // 最多等待1秒
-          });
-        }
-        
-        // 重新獲取語音列表
-        const updatedVoices = speechSynthesis.getVoices();
-        const chineseVoice = updatedVoices.find(voice => 
-          voice.lang.includes('zh') || voice.lang.includes('TW') || voice.lang.includes('CN')
-        );
-        
-        if (chineseVoice) {
-          utterance.voice = chineseVoice;
-          console.log('使用語音:', chineseVoice.name, chineseVoice.lang);
-        } else {
-          console.log('未找到中文語音，使用預設語音');
-        }
-        
-        // 添加事件監聽器
-        utterance.onstart = () => console.log('開始播放語音');
-        utterance.onend = () => console.log('語音播放結束');
-        utterance.onerror = (event) => console.error('語音播放錯誤:', event.error);
-        
-        speechSynthesis.speak(utterance);
-        return;
-      } catch (error) {
-        console.error('語音合成失敗:', error);
-      }
+    if (!text) {
+      console.warn('沒有文字可以播放');
+      return;
     }
-    
-    // 如果語音合成不可用，顯示提示
-    if (!('speechSynthesis' in window)) {
-      alert('您的瀏覽器不支援語音合成功能，請使用 Chrome 或 Edge 瀏覽器');
+
+    try {
+      // 使用台語語音服務播放音讀
+      const success = await audioService.playTaiwaneseAudio(text);
+      
+      if (!success) {
+        console.warn('台語語音播放失敗，請檢查語音服務');
+        alert('語音播放失敗，請檢查語音服務是否正常運行');
+      }
+    } catch (error) {
+      console.error('播放台語語音時發生錯誤:', error);
+      alert('語音播放失敗，請稍後再試');
     }
   };
 

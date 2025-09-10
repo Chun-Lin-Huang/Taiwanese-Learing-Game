@@ -22,8 +22,127 @@ export interface SearchResult {
   audioSrc?: string;
 }
 
+// 台語語音服務
+export class TaiwaneseTTSService {
+  private baseUrl = 'http://localhost:5050';
+
+  /**
+   * 使用台語TTS服務生成語音
+   * @param text 要轉換的文字
+   * @returns 音檔 URL
+   */
+  async generateTaiwaneseAudio(text: string): Promise<string | null> {
+    try {
+      const response = await fetch(`${this.baseUrl}/tts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: text,
+          language: 'taiwanese'
+        }),
+      });
+
+      if (!response.ok) {
+        console.warn('台語TTS服務不可用，使用備用方案');
+        return null;
+      }
+
+      const result = await response.json();
+      return result.audio_url || null;
+    } catch (error) {
+      console.error('台語TTS服務錯誤:', error);
+      return null;
+    }
+  }
+
+  /**
+   * 播放台語語音
+   * @param text 要播放的文字
+   * @returns Promise<boolean> 是否成功播放
+   */
+  async playTaiwaneseAudio(text: string): Promise<boolean> {
+    try {
+      // 先嘗試使用台語TTS服務
+      const audioUrl = await this.generateTaiwaneseAudio(text);
+      
+      if (audioUrl) {
+        const audio = new Audio(audioUrl);
+        await audio.play();
+        return true;
+      }
+
+      // 備用方案：使用瀏覽器原生語音合成
+      return this.playWithBrowserTTS(text);
+    } catch (error) {
+      console.error('播放台語語音失敗:', error);
+      // 最後備用方案
+      return this.playWithBrowserTTS(text);
+    }
+  }
+
+  /**
+   * 使用瀏覽器原生TTS播放台語
+   * @param text 要播放的文字
+   * @returns Promise<boolean> 是否成功播放
+   */
+  private async playWithBrowserTTS(text: string): Promise<boolean> {
+    if (!('speechSynthesis' in window)) {
+      console.warn('此瀏覽器不支援語音合成功能');
+      return false;
+    }
+
+    try {
+      // 停止當前播放
+      speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'zh-TW';
+      utterance.rate = 0.7; // 稍微慢一點，更清楚
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      
+      // 等待語音載入完成
+      const voices = speechSynthesis.getVoices();
+      if (voices.length === 0) {
+        await new Promise(resolve => {
+          speechSynthesis.onvoiceschanged = resolve;
+          setTimeout(resolve, 1000); // 最多等待1秒
+        });
+      }
+      
+      // 重新獲取語音列表
+      const updatedVoices = speechSynthesis.getVoices();
+      const chineseVoice = updatedVoices.find(voice => 
+        voice.lang.includes('zh') || voice.lang.includes('TW') || voice.lang.includes('CN')
+      );
+      
+      if (chineseVoice) {
+        utterance.voice = chineseVoice;
+        console.log('使用語音:', chineseVoice.name, chineseVoice.lang);
+      } else {
+        console.log('未找到中文語音，使用預設語音');
+      }
+      
+      // 添加事件監聽器
+      utterance.onstart = () => console.log('開始播放台語語音');
+      utterance.onend = () => console.log('台語語音播放結束');
+      utterance.onerror = (event) => console.error('台語語音播放錯誤:', event.error);
+      
+      speechSynthesis.speak(utterance);
+      return true;
+    } catch (error) {
+      console.error('瀏覽器TTS播放失敗:', error);
+      return false;
+    }
+  }
+}
+
 // 音檔生成服務
 export class AudioService {
+  private taiwaneseTTS = new TaiwaneseTTSService();
+
   /**
    * 使用瀏覽器原生 Web Speech API 播放語音
    * @param text 要轉換的文字
@@ -51,6 +170,15 @@ export class AudioService {
     } else {
       console.warn('此瀏覽器不支援語音合成功能');
     }
+  }
+  
+  /**
+   * 播放台語語音（優先使用台語TTS服務）
+   * @param text 要播放的文字
+   * @returns Promise<boolean> 是否成功播放
+   */
+  async playTaiwaneseAudio(text: string): Promise<boolean> {
+    return await this.taiwaneseTTS.playTaiwaneseAudio(text);
   }
   
   /**
@@ -239,3 +367,4 @@ export class MoedictService {
 // 導出單例
 export const moedictService = new MoedictService();
 export const audioService = new AudioService();
+export const taiwaneseTTS = new TaiwaneseTTSService();
