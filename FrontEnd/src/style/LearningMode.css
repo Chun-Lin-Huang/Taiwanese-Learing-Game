@@ -156,3 +156,185 @@
   outline: none;
   box-shadow: none;
 }
+
+/* ===== 新增樣式 ===== */
+
+.back-button {
+  position: absolute;
+  left: 70px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 80px;
+  height: 80px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background-color 0.3s;
+}
+.back-button:hover { background-color: rgba(255, 255, 255, 0.2); }
+.back-button img { width: 50px; height: 50px; }
+
+.header-title {
+  width: 100%;
+  text-align: center;
+  margin: 0;
+  font-weight: 700;
+  font-size: 200px;
+  color: #552626;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.nav-button {
+  width: 35%;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  cursor: pointer;
+  padding: 1.5vw 2.5vw;
+  font-size: 3vw;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: background 0.2s ease;
+  min-font-size: 16px;
+}
+.nav-icon { width: 50px; height: 50px; object-fit: contain; min-width: 50px; min-height: 50px; }
+.nav-label { font-weight: 700; font-size: 20px; color: #3f3e3e; }
+.chevron-icon { width: 2vw; height: 2vw; object-fit: contain; margin-left: 0.5vw; min-width: 16px; min-height: 16px; }
+
+/* 主要區域 - 不覆蓋原有樣式，保持滑動功能 */
+/* 保持原有的滑動功能，不覆蓋 .learn-cards-container */
+.learn-modes-container {
+  display: flex;
+  gap: 50px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  width: auto;
+  padding: 20px;
+}
+/* 移除可能衝突的樣式，保持原有滑動功能 */
+
+/* Modal 背景 */
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: grid; place-items: center;
+  z-index: 1000;
+}
+
+/* Modal 面板 */
+.modal-panel {
+  width: min(92vw, 2200px);
+  height: min(80vh, 1800px);
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px 40px 100px; /* 底部多留 100px 讓右下角固定的區不壓住內容 */
+  box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+  overflow: hidden;         /* 讓內層控制滾動 */
+  position: relative;
+}
+
+/* 標題 */
+.modal-title {
+  font-size: 40px;
+  font-weight: 700;
+  margin: 4px 0 14px;
+}
+
+/* 可滾動內容區（和按鈕區分開） */
+.modal-content {
+  margin: 0 0 14px 20px;
+  line-height: 1.7;
+  color: #000;
+  font-size: 30px;
+  height: calc(100% - 60px); /* 撐滿 panel，但不吃到底部固定區 */
+  overflow-y: auto;
+  padding-right: 12px;
+}
+
+/* 圖片示意排版（上下排列） */
+.guide-split {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  margin-top: 12px;
+  width: 100%;
+}
+.guide-pane {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  max-width: 380px;
+}
+.guide-pane-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #333;
+}
+.guide-img {
+  width: 100%;
+  max-width: 320px;
+  max-height: 420px;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 2px solid #ddd;
+  background: #f9f9f9;
+}
+.guide-img img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+/* 右下角固定：勾選 + 開始使用 + 取消 */
+.modal-actions {
+  position: absolute;
+  bottom: 32px;
+  right: 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 5;
+}
+
+/* 勾選「本次登入不再顯示」 */
+.modal-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 28px;
+  color: #374151;
+  user-select: none;
+  cursor: pointer;
+}
+.modal-option input {
+  width: 28px; height: 28px;
+  cursor: pointer;
+}
+
+/* 按鈕 */
+.btn-primary, .btn-secondary {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 20px;
+}
+.btn-primary { background: #3b82f6; color: #fff; }
+.btn-primary:hover { filter: brightness(0.95); }
+.btn-secondary { background: #e5e7eb; color: #111; }
+.btn-secondary:hover { filter: brightness(0.97); }
