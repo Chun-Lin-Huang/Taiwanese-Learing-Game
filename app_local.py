@@ -487,6 +487,7 @@ def index():
         "version": "1.0.0",
         "endpoints": {
             "process_audio": "/process_audio (POST)",
+            "tts": "/tts (POST)",
             "health": "/health (GET)"
         }
     })
@@ -707,6 +708,56 @@ def process_audio():
             'success': False,
             'error': str(e)
         }), 500
+
+@app.route('/tts', methods=['POST'])
+def tts():
+    """台語文字轉語音 API"""
+    try:
+        data = request.get_json()
+        if not data or 'text' not in data:
+            return jsonify({'success': False, 'error': '請求缺少文字內容'}), 400
+
+        text = data['text'].strip()
+        if not text:
+            return jsonify({'success': False, 'error': '文字內容不可為空'}), 400
+
+        print(f"🔊 TTS 請求: '{text}'")
+
+        # 步驟1: 台語標音轉換
+        romanization, _, kiatko_data = get_taiwanese_pronunciation(text)
+        if not romanization:
+            return jsonify({'success': False, 'error': '無法取得羅馬拼音'}), 500
+
+        # 步驟2: 格式轉換（羅馬拼音轉數字調）
+        if romanization_converter:
+            numeric_tone_text = romanization_converter.convert_to_numeric_tone(romanization)
+        else:
+            numeric_tone_text = romanization
+
+        # 步驟3: 文字轉語音
+        audio_file_path = None
+        if remote_tts_service:
+            audio_file_path = remote_tts_service.generate_speech(numeric_tone_text)
+        else:
+            print("⚠️ 遠端TTS服務未初始化，無法進行語音合成。")
+            return jsonify({'success': False, 'error': 'TTS服務未初始化'}), 500
+
+        if not audio_file_path:
+            return jsonify({'success': False, 'error': '語音合成失敗'}), 500
+
+        # 組合回傳結果
+        result = {
+            'success': True,
+            'original_text': text,
+            'romanization': romanization,
+            'numeric_tone_text': numeric_tone_text,
+            'audio_url': f'http://localhost:5050/{audio_file_path}'
+        }
+        return jsonify(result)
+
+    except Exception as e:
+        debug_print(f"TTS 處理失敗: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/generate_flashcard', methods=['POST'])
 def generate_flashcard():
