@@ -24,7 +24,7 @@ const cards = [
   { title: "情境\n對話", path: "/Home" },
   { title: "互動\n遊戲", path: "/GameSelection2" },
   { title: "台語\n故事集", path: "/StoryModePage" },
-  { title: "大富翁", path: "/MonopolyPage" },
+  { title: "大富翁", path: "/SuperMonopoly" },
   { title: "台語\n辭典", path: "/DictionaryPage" },
 ];
 

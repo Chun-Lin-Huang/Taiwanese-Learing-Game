@@ -1,5 +1,5 @@
 // src/view/FlashcardApp.tsx
-// 台語單字卡（例句 + 音檔 + URL index + 收藏 + 進度條/續看）
+// 台語單字卡（例句 + 音檔 + URL index + 收藏）
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
@@ -78,20 +78,6 @@ function getUserId(): string | null {
   return localStorage.getItem("userId");
 }
 
-// 節流
-function throttle<T extends any[]>(fn: (...args: T) => void, wait = 600) {
-  let timer: number | null = null;
-  let lastArgs: T | null = null;
-  return (...args: T) => {
-    lastArgs = args;
-    if (timer !== null) window.clearTimeout(timer);
-    timer = window.setTimeout(() => {
-      if (lastArgs) fn(...lastArgs);
-      timer = null;
-      lastArgs = null;
-    }, wait);
-  };
-}
 
 /* ------------------ 元件 ------------------ */
 const FlashcardApp: React.FC = () => {
@@ -118,14 +104,10 @@ const FlashcardApp: React.FC = () => {
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [currentIndex, setCurrentIndex] = useState(0);
   
-  // 學習進度：記錄用戶實際學習到的最遠位置，不會因為回看而減少
-  const [learningProgress, setLearningProgress] = useState(0);
   
   
 
   const total = cards.length;
-  // 進度條顯示學習進度，而不是當前位置
-  const percent = total ? Math.round(((learningProgress + 1) / total) * 100) : 0;
 
 
 
@@ -135,7 +117,7 @@ const FlashcardApp: React.FC = () => {
 
   const userId = getUserId();
 
-  /* 讀取某分類的單字卡＋讀取「上次進度」 */
+  /* 讀取某分類的單字卡 */
   useEffect(() => {
     if (!effectiveCategoryId) return;
 
@@ -151,24 +133,8 @@ const FlashcardApp: React.FC = () => {
         const list: VocabCard[] = res?.body ?? res ?? [];
         if (!Array.isArray(list) || list.length === 0) throw new Error("此主題暫無單字卡");
 
-        // 讀進度
-        let learningProgressIndex = 0;
-        if (userId) {
-          try {
-            const progressUrl = `${api.vocabProgress}/${encodeURIComponent(userId)}/${encodeURIComponent(
-              effectiveCategoryId
-            )}`;
-            const pr = await asyncGet(progressUrl);
-            const pi = Number(pr?.body?.currentIndex ?? pr?.currentIndex ?? 0);
-            if (!Number.isNaN(pi) && pi >= 0 && pi < list.length) {
-              learningProgressIndex = pi; // 學習進度等於當前進度
-            }
-          } catch {
-            // 沒紀錄就從 0
-          }
-        }
-        // 優先處理 cardId 參數，然後是 index 參數，最後是學習進度
-        let safeIndex = learningProgressIndex; // 預設從學習進度開始
+        // 優先處理 cardId 參數，然後是 index 參數，最後從 0 開始
+        let safeIndex = 0; // 預設從 0 開始
 
         // 如果有 cardId 參數，找到對應的索引
         if (cardIdFromQuery) {
@@ -177,12 +143,11 @@ const FlashcardApp: React.FC = () => {
             safeIndex = cardIndex;
           }
         }
-        // 如果沒有 cardId 但有 index 參數，且 index 大於學習進度
+        // 如果沒有 cardId 但有 index 參數
         else if (indexFromQuery !== null && 
                  Number.isFinite(indexFromQuery) && 
                  indexFromQuery >= 0 && 
-                 indexFromQuery < list.length &&
-                 indexFromQuery > learningProgressIndex) {
+                 indexFromQuery < list.length) {
           safeIndex = indexFromQuery;
         }
 
@@ -190,15 +155,7 @@ const FlashcardApp: React.FC = () => {
         if (!cancelled) {
           setCards(list);
           setCurrentIndex(safeIndex);
-          setLearningProgress(learningProgressIndex);
           setFlipped(false);
-          
-          // 如果 URL 參數小於學習進度，同步 URL 到學習進度位置
-          if (indexFromQuery === null || !Number.isFinite(indexFromQuery) || indexFromQuery < 0 || indexFromQuery >= list.length || indexFromQuery < learningProgressIndex) {
-            const params = new URLSearchParams(location.search);
-            params.set("index", String(learningProgressIndex));
-            navigate(`${location.pathname}?${params.toString()}`, { replace: true });
-          }
         }
       } catch (e: any) {
         if (!cancelled) setErrMsg(e?.message || "讀取單字卡失敗");
@@ -328,35 +285,14 @@ const FlashcardApp: React.FC = () => {
     }
   };
 
-  /* URL 同步 index + 音訊處理 + 進度節流儲存 */
+  /* URL 同步 index + 音訊處理 */
   const stopAudio = () => {
     if (!audioRef.current) return;
     audioRef.current.pause();
     setIsPlaying(false);
   };
 
-  const saveProgressThrottled = useMemo(
-    () =>
-      throttle(async (learningIdx: number) => {
-        if (!userId || !effectiveCategoryId) return;
-        try {
-          await postJSON(api.vocabProgressUpdate, {
-            userId,
-            categoryId: effectiveCategoryId,
-            currentIndex: learningIdx,
-          });
-        } catch {
-          // 靜默
-        }
-      }, 500),
-    [userId, effectiveCategoryId]
-  );
 
-  // 當學習進度更新時儲存進度
-  useEffect(() => {
-    if (!total || learningProgress === 0) return;
-    saveProgressThrottled(learningProgress);
-  }, [learningProgress, total, saveProgressThrottled]);
 
   // 當當前位置更新時更新 URL 和重置翻轉狀態
   useEffect(() => {
@@ -369,20 +305,6 @@ const FlashcardApp: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex, total]);
 
-  // 離開頁面前做一次保險存檔
-  useEffect(() => {
-    const onBeforeUnload = () => {
-      if (!userId || !effectiveCategoryId) return;
-      navigator.sendBeacon?.(
-        api.vocabProgressUpdate,
-        new Blob([JSON.stringify({ userId, categoryId: effectiveCategoryId, currentIndex: learningProgress })], {
-          type: "application/json",
-        })
-      );
-    };
-    window.addEventListener("beforeunload", onBeforeUnload);
-    return () => window.removeEventListener("beforeunload", onBeforeUnload);
-  }, [userId, effectiveCategoryId, learningProgress]);
 
   /* 音訊控制（共用） */
   const playPauseWithUrl = async (url: string | null) => {
@@ -446,16 +368,11 @@ const FlashcardApp: React.FC = () => {
     const newIndex = currentIndex + 1;
     setCurrentIndex(newIndex);
     
-    // 只有前進到新位置時才更新學習進度
-    if (newIndex > learningProgress) {
-      setLearningProgress(newIndex);
-    }
   };
   
   const handlePrevCard = () => {
     if (currentIndex === null || currentIndex <= 0) return;
     setCurrentIndex((i) => (i || 0) - 1);
-    // 回看不會影響學習進度
   };
 
   /* 無分類時 */
