@@ -63,15 +63,15 @@ export default function ThemeSelectionPage() {
     return [...cards, ...cards, ...cards, ...cards, ...cards];
   }, [cards]);
 
-  /** 👉 點卡片導頁：帶上 index=0 */
+  /** 👉 點卡片導頁：先到總覽頁面 */
   const onCardClick = useCallback(
     (card: Card) => {
-      const params = new URLSearchParams({
-        categoryId: card.id,
-        title: card.title,
-        index: "0", // 預設第一張
+      navigate(`/VocabularyOverview/${card.id}`, {
+        state: { 
+          categoryName: card.title,
+          categoryId: card.id 
+        }
       });
-      navigate(`/FlashcardApp?${params.toString()}`);
     },
     [navigate]
   );

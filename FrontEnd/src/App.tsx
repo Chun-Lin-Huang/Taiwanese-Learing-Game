@@ -13,6 +13,7 @@ import GameSelection2 from "./view/GameSelection2";
 // 小琳區
 import StoryModePage from "./view/StoryModePage";
 import ThemeSelectionPage from "./view/ThemeSelectionPage";
+import VocabularyOverview from "./view/VocabularyOverview";
 import FavoriteCollectionPage from "./view/FavoriteCollectionPage";
 import FlashcardApp from "./view/FlashcardApp";
 import LoveStoryPage from "./view/LoveStoryPage";
@@ -66,8 +67,10 @@ function AppRoutes() {
 
       {/* 小琳區 */}
       <Route path="/ThemeSelection" element={<ThemeSelectionPage />} />
+      <Route path="/VocabularyOverview/:categoryId" element={<VocabularyOverview />} />
       <Route path="/Learn" element={<LearningMode />} />
       <Route path="/FlashcardApp" element={<FlashcardApp />} />
+      <Route path="/FlashcardApp/:cardId" element={<FlashcardApp />} />
       <Route path="/FavoriteCollection" element={<FavoriteCollectionPage />} />
 
       <Route

@@ -32,5 +32,8 @@ export enum api {
     scenarioVoiceTurn = "http://127.0.0.1:2083/api/v1/scenario/voice_turn",
     vocabProgress = "http://127.0.0.1:2083/api/v1/vocab-progress",
     vocabProgressUpdate = "http://127.0.0.1:2083/api/v1/vocab-progress/update",
-    vocabProgressAll = "http://127.0.0.1:2083/api/v1/vocab-progress/all"
+    vocabProgressAll = "http://127.0.0.1:2083/api/v1/vocab-progress/all",
+    vocabularyPicturesByCategory = "http://127.0.0.1:2083/api/v1/vocabulary-pictures/by-category",
+    vocabularyPictureStream = "http://127.0.0.1:2083/api/v1/vocabulary-pictures/stream",
+    vocabularyPictureByCard = "http://127.0.0.1:2083/api/v1/vocabulary-pictures/by-card"
 }
