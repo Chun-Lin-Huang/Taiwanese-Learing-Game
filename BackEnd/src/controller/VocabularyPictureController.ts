@@ -9,9 +9,7 @@ export class VocabularyPictureController {
   public async getByCategory(req: Request, res: Response) {
     try {
       const { categoryId } = req.params as { categoryId: string };
-      console.log('VocabularyPictureController.getByCategory - categoryId:', categoryId);
       const out = await this.service.listByCategory(categoryId);
-      console.log('VocabularyPictureController.getByCategory - result:', out);
       res.status(out.code).send(out);
     } catch (e) {
       console.error('VocabularyPictureController.getByCategory - error:', e);
