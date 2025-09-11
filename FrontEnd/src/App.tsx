@@ -35,9 +35,6 @@ import First from "./view/First";
 import Welcome from "./view/Welcome";
 
 // 大富翁區
-import MonopolyPage from "./view/MonopolyPage";
-import ThemeSelectionPage2 from "./view/ThemeSelection2";
-import Home2 from "./view/Home2";
 import SuperMonopoly from "./view/GameMenu";
 import CreateRoom from "./view/CreateRoom";
 import JoinRoom from "./view/JoinRoom";
@@ -106,9 +103,6 @@ function AppRoutes() {
       <Route path="/favorites" element={<FavoriteCollectionPage />} />
 
       {/* 大富翁 */}
-      <Route path="/MonopolyPage" element={<MonopolyPage />} />
-      <Route path="/ThemeSelection2" element={<ThemeSelectionPage2 />} />
-      <Route path="/Home2" element={<Home2 />} />
       <Route path="/SuperMonopoly" element={<SuperMonopoly />} />
       <Route path="/rooms/create" element={<CreateRoom />} />
       <Route path="/rooms/join" element={<JoinRoom />} />
