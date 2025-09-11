@@ -1,0 +1,361 @@
+/* VocabularyOverview 總覽頁面樣式 - 完全獨立設計 */
+
+/* ===== 總覽頁面容器 ===== */
+.vocabulary-overview-page {
+  width: 100% !important;
+  min-height: 100vh !important;
+  height: auto !important;
+  position: relative !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+/* 總覽頁面主內容區域 */
+.vocabulary-overview-page .learn-selection-main {
+  width: 100% !important;
+  min-height: calc(100vh - 80px) !important;
+  height: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  padding: 120px 0 60px 0 !important;
+  box-sizing: border-box !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* ===== 圖片網格佈局 ===== */
+.vocabulary-overview-page .overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  justify-content: center;
+  align-items: start;
+}
+
+/* ===== 卡片樣式 ===== */
+.vocabulary-overview-page .overview-card {
+  width: 100%;
+  max-width: 350px;
+  height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  padding: 20px;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+.vocabulary-overview-page .overview-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== 圖片樣式 ===== */
+.vocabulary-overview-page .overview-image {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  display: block;
+}
+
+.vocabulary-overview-page .overview-card:hover .overview-image {
+  transform: scale(1.05);
+}
+
+
+/* ===== 返回按鈕 ===== */
+.vocabulary-overview-page .back-button {
+  position: absolute;
+  left: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 60px;
+  height: 60px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.vocabulary-overview-page .back-button img {
+  width: 40px;
+  height: 40px;
+}
+
+/* ===== 標題 ===== */
+.vocabulary-overview-page .header-title {
+  text-align: center;
+  margin: 0 auto;
+  font-weight: 700;
+  font-size: 32px;
+  color: #000000;
+  position: relative;
+  z-index: 5;
+}
+
+/* ===== Modal 樣式 ===== */
+.vocabulary-overview-page .image-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.vocabulary-overview-page .image-modal-content {
+  position: relative;
+  max-width: 80%;
+  max-height: 80%;
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.vocabulary-overview-page .image-modal-content img {
+  max-width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+/* Modal 按鈕 */
+.vocabulary-overview-page .modal-close-btn {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  z-index: 3;
+}
+
+.vocabulary-overview-page .modal-close-btn:hover {
+  background: #e60000;
+}
+
+.vocabulary-overview-page .modal-flashcard-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  z-index: 3;
+}
+
+.vocabulary-overview-page .modal-flashcard-btn:hover {
+  background: #1e40af;
+}
+
+.vocabulary-overview-page .modal-audio-btn {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 3;
+}
+
+.vocabulary-overview-page .modal-audio-btn:hover {
+  background: #059669;
+}
+
+.vocabulary-overview-page .modal-audio-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.vocabulary-overview-page .modal-audio-btn img {
+  width: 18px;
+  height: 18px;
+}
+
+/* 單字資訊 */
+.vocabulary-overview-page .modal-word-info {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  text-align: left;
+  max-width: 200px;
+  z-index: 3;
+}
+
+.vocabulary-overview-page .modal-word-info h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  color: white;
+}
+
+.vocabulary-overview-page .taiwanese-romanization {
+  font-size: 16px;
+  color: #fbbf24;
+  margin: 0 0 4px 0;
+  font-style: italic;
+}
+
+.vocabulary-overview-page .chinese-meaning {
+  font-size: 14px;
+  color: #e5e7eb;
+  margin: 0;
+}
+
+/* ===== 載入和錯誤狀態 ===== */
+.vocabulary-overview-page .loading-container,
+.vocabulary-overview-page .error-container,
+.vocabulary-overview-page .empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  min-height: 400px;
+}
+
+.vocabulary-overview-page .error-container button {
+  margin-top: 16px;
+  padding: 12px 24px;
+  background: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.vocabulary-overview-page .error-container button:hover {
+  background: #1976D2;
+}
+
+/* ===== 響應式設計 ===== */
+@media (max-width: 1200px) {
+  .vocabulary-overview-page .overview-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 800px;
+    gap: 25px;
+  }
+  
+  .vocabulary-overview-page .overview-card {
+    max-width: 300px;
+    height: 350px;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .vocabulary-overview-page .overview-grid {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+    gap: 20px;
+  }
+  
+  .vocabulary-overview-page .overview-card {
+    max-width: 280px;
+    height: 320px;
+    padding: 15px;
+  }
+  
+  .vocabulary-overview-page .header-title {
+    font-size: 36px;
+  }
+  
+  .vocabulary-overview-page .back-button {
+    left: 15px;
+    width: 50px;
+    height: 50px;
+  }
+  
+  .vocabulary-overview-page .back-button img {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .vocabulary-overview-page .image-modal-content {
+    max-width: 95vw;
+    max-height: 95vh;
+    padding: 15px;
+  }
+  
+  .vocabulary-overview-page .modal-word-info {
+    position: static;
+    margin-top: 15px;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .vocabulary-overview-page .overview-grid {
+    padding: 0 10px;
+  }
+  
+  .vocabulary-overview-page .overview-card {
+    max-width: 100%;
+    height: 280px;
+  }
+  
+  .vocabulary-overview-page .header-title {
+    font-size: 28px;
+  }
+}

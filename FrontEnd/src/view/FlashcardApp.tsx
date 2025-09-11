@@ -6,7 +6,6 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import "../style/FlashcardApp.css";
 
 import backIcon from "../assets/back.svg";
-import bgImage from "../assets/22600173.png";
 import volumeIcon from "../assets/volume up.svg";
 import leftArrow from "../assets/left.svg";
 import rightArrow from "../assets/right.svg";
@@ -107,6 +106,7 @@ const FlashcardApp: React.FC = () => {
 
   const titleFromQuery = query.get("title") || "";
   const indexFromQuery = query.get("index") ? Number(query.get("index")) : null;
+  const cardIdFromQuery = query.get("cardId") || undefined;
 
   const [cards, setCards] = useState<VocabCard[]>([]);
   const [loading, setLoading] = useState(false);
@@ -167,15 +167,24 @@ const FlashcardApp: React.FC = () => {
             // 沒紀錄就從 0
           }
         }
-        // 優先使用學習進度，除非 URL 參數明確指定了更高的位置
-        const safeIndex = 
-          indexFromQuery !== null && 
-          Number.isFinite(indexFromQuery) && 
-          indexFromQuery >= 0 && 
-          indexFromQuery < list.length &&
-          indexFromQuery > learningProgressIndex
-            ? indexFromQuery
-            : learningProgressIndex; // 預設從學習進度開始
+        // 優先處理 cardId 參數，然後是 index 參數，最後是學習進度
+        let safeIndex = learningProgressIndex; // 預設從學習進度開始
+
+        // 如果有 cardId 參數，找到對應的索引
+        if (cardIdFromQuery) {
+          const cardIndex = list.findIndex(card => card._id === cardIdFromQuery);
+          if (cardIndex !== -1) {
+            safeIndex = cardIndex;
+          }
+        }
+        // 如果沒有 cardId 但有 index 參數，且 index 大於學習進度
+        else if (indexFromQuery !== null && 
+                 Number.isFinite(indexFromQuery) && 
+                 indexFromQuery >= 0 && 
+                 indexFromQuery < list.length &&
+                 indexFromQuery > learningProgressIndex) {
+          safeIndex = indexFromQuery;
+        }
 
 
         if (!cancelled) {
@@ -461,18 +470,6 @@ const FlashcardApp: React.FC = () => {
 
             <h1 className="header-title">{titleFromQuery || "台語單字卡"}</h1>
 
-            {/* 右上固定的進度條：即使資料還沒回來也先渲染 */}
-            <div className="progress-inline">
-              <div className="progress-bar-cute">
-                <div
-                  className="progress-fill-cute"
-                  style={{ width: `${Math.min(100, Math.max(0, percent || 0))}%` }}
-                />
-              </div>
-              <span className="progress-text">
-                {learningProgress + 1}/{total || 0} ({percent || 0}%)
-              </span>
-            </div>
           </div>
         </header>
         <main className="flashcard-section">
@@ -494,18 +491,6 @@ const FlashcardApp: React.FC = () => {
           </button>
           <h1 className="header-title">{titleFromQuery || "台語單字卡"}</h1>
 
-          {/* 右上固定的進度條：膠囊型現代風格 */}
-          <div className="progress-inline">
-            <div className="progress-bar-cute">
-              <div
-                className={`progress-fill-cute ${percent === 100 ? 'completed' : ''}`}
-                style={{ width: `${Math.min(100, Math.max(0, percent || 0))}%` }}
-              />
-            </div>
-            <span className="progress-text">
-              {learningProgress + 1}/{total || 0} ({percent || 0}%)
-            </span>
-          </div>
         </div>
       </header>
 

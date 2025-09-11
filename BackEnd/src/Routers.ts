@@ -19,6 +19,7 @@ import { VocabularyCollectionRoute } from "./routers/VocabularyCollectionRoute";
 import { ChatChooseRoute } from "./routers/ChatChooseRoute";
 import { ScenarioRoute } from "./routers/ScenarioRoute";
 import { VocabProgressRoute } from "./routers/VocabProgressRoute";
+import { VocabularyPictureRoute } from "./routers/VocabularyPictureRoute";
 
 export const router: Array<Route> = [
     new PageRoute(),new UserRoute()
@@ -40,4 +41,5 @@ export const router: Array<Route> = [
     ,new ChatChooseRoute()
     ,new ScenarioRoute()
     ,new VocabProgressRoute()
+    ,new VocabularyPictureRoute()
 ];
