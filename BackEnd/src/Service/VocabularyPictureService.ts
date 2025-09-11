@@ -22,14 +22,10 @@ export class VocabularyPictureService {
     try {
       if (!categoryId) return { code: 400, message: "categoryId required", body: [] };
 
-      console.log('VocabularyPictureService.listByCategory - categoryId:', categoryId);
-
       // 1) 先取得該分類的所有單字卡
       const cards = await VocabularyCardModel.find({ category_id: categoryId })
         .select("_id han tl ch")
         .lean();
-
-      console.log('VocabularyPictureService.listByCategory - cards found:', cards.length);
 
       if (!cards.length) return { code: 200, message: "find success", body: [] };
 
