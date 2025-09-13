@@ -55,5 +55,14 @@ export class UserRoute extends Route {
         this.router.put(`${this.url}updateById`, (req, res) => {
             this.Contorller.updateById(req, res);
         });
+
+        /**
+         * 根據 userName 查找使用者
+         * @param userName - 使用者名稱
+         * @returns resp<Users>
+         */
+        this.router.get(`${this.url}findByUserName/:userName`, (req, res) => {
+            this.Contorller.findByUserName(req, res);
+        });
     }
 }

@@ -17,6 +17,32 @@ export class UserService {
     }
   }
 
+  /** 根據 userName 查找使用者 */
+  async findByUserName(userName: string): Promise<resp<any>> {
+    const out: resp<any> = { code: 200, message: "", body: undefined };
+    try {
+      const normalizedUserName = (userName || "").trim().toLowerCase();
+      if (!normalizedUserName) {
+        out.code = 400; out.message = "缺少 userName"; return out;
+      }
+
+      const user = await UserModel.findOne({ userName: normalizedUserName })
+        .select("_id name userName createdAt updatedAt")
+        .lean();
+      
+      if (!user) {
+        out.code = 404; out.message = "user not found"; return out;
+      }
+
+      out.code = 200;
+      out.message = "find success";
+      out.body = { _id: String(user._id), name: user.name, userName: user.userName };
+      return out;
+    } catch {
+      out.code = 500; out.message = "server error"; return out;
+    }
+  }
+
   /** 註冊（insertOne） */
   async insertOne(payload: RegisterBody): Promise<resp<any>> {
     const out: resp<any> = { code: 200, message: "", body: undefined };
