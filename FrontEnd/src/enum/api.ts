@@ -35,5 +35,14 @@ export enum api {
     vocabProgressAll = "http://127.0.0.1:2083/api/v1/vocab-progress/all",
     vocabularyPicturesByCategory = "http://127.0.0.1:2083/api/v1/vocabulary-pictures/by-category",
     vocabularyPictureStream = "http://127.0.0.1:2083/api/v1/vocabulary-pictures/stream",
-    vocabularyPictureByCard = "http://127.0.0.1:2083/api/v1/vocabulary-pictures/by-card"
+    vocabularyPictureByCard = "http://127.0.0.1:2083/api/v1/vocabulary-pictures/by-card",
+    // 地圖相關 API
+    mapBoardFindAll = "http://127.0.0.1:2083/api/v1/map-board/findAll",
+    mapBoardFindById = "http://127.0.0.1:2083/api/v1/map-board/findById",
+    mapNodeFindByBoardId = "http://127.0.0.1:2083/api/v1/map-node/findByBoardId",
+    mapNodeFindById = "http://127.0.0.1:2083/api/v1/map-node/findById",
+    mapEdgeFindByBoardId = "http://127.0.0.1:2083/api/v1/map-edge/findByBoardId",
+    mapEdgeFindFromNode = "http://127.0.0.1:2083/api/v1/map-edge/findFromNode",
+    gameMove = "http://127.0.0.1:2083/api/v1/game/move",
+    gameMapInfo = "http://127.0.0.1:2083/api/v1/game/mapInfo"
 }

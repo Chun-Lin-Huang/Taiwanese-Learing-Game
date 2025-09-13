@@ -599,9 +599,20 @@ def process_audio():
             if not recognized_text:
                 return jsonify({'error': '無法辨識台語語音內容'}), 400
             
+            # 檢查是否需要跳過某些步驟（用於單字挑戰等）
+            skip_llm = request.form.get('skip_llm', 'false').lower() == 'true'
+            skip_tts = request.form.get('skip_tts', 'false').lower() == 'true'
+            skip_db = request.form.get('skip_db', 'false').lower() == 'true'
+            
+            debug_print(f"跳過選項: LLM={skip_llm}, TTS={skip_tts}, DB={skip_db}")
+            
             # 步驟4: LLM 對話（使用本地 Ollama）
             step_start = time.time()
-            ai_response = chat_with_ollama_local(recognized_text)
+            if skip_llm:
+                ai_response = "跳過 LLM 對話"
+                debug_print("跳過 LLM 對話處理")
+            else:
+                ai_response = chat_with_ollama_local(recognized_text)
             step_times['LLM對話'] = time.time() - step_start
             log_step_time("LLM智能對話", step_times['LLM對話'], f"AI回應: '{ai_response}'")
             
@@ -611,7 +622,12 @@ def process_audio():
             chat_choose_id = request.form.get('chat_choose_id', 'default_chat_choose')
             title = request.form.get('title', '台語語音對話')
             
-            save_success, is_max_turns = save_chat_history(session_id, user_id, chat_choose_id, title, recognized_text, ai_response)
+            save_success = True
+            is_max_turns = False
+            if skip_db:
+                debug_print("跳過資料庫保存")
+            else:
+                save_success, is_max_turns = save_chat_history(session_id, user_id, chat_choose_id, title, recognized_text, ai_response)
             
             # 如果達到最大輪數，修改 AI 回應
             if is_max_turns:
@@ -637,15 +653,18 @@ def process_audio():
             
             # 步驟7: 文字轉語音（使用遠端 TTS 服務）
             step_start = time.time()
-            print(f"\n🔊 步驟6: 台語語音合成")
             audio_file_path = None
-            if remote_tts_service:
-                print(f"使用遠端 TTS 服務 ({remote_tts_service.base_url})")
-                audio_file_path = remote_tts_service.generate_speech(numeric_tone_text)
+            if skip_tts:
+                debug_print("跳過 TTS 語音合成")
             else:
-                print("⚠️ 遠端TTS服務未初始化，無法進行語音合成。")
+                print(f"\n🔊 步驟6: 台語語音合成")
+                if remote_tts_service:
+                    print(f"使用遠端 TTS 服務 ({remote_tts_service.base_url})")
+                    audio_file_path = remote_tts_service.generate_speech(numeric_tone_text)
+                else:
+                    print("⚠️ 遠端TTS服務未初始化，無法進行語音合成。")
             step_times['語音合成'] = time.time() - step_start
-            log_step_time("台語語音合成", step_times['語音合成'], f"音檔: {audio_file_path if audio_file_path else '失敗'}")
+            log_step_time("台語語音合成", step_times['語音合成'], f"音檔: {audio_file_path if audio_file_path else '跳過'}")
             
             if audio_file_path:
                 print(f"🔊 TTS 成功: {audio_file_path}")

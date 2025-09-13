@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import backIcon from "../assets/Back.svg";
@@ -14,11 +14,33 @@ const RoomLobby: React.FC = () => {
   // 依照上一頁選擇的人數決定幾個座位，沒有的話示範 4 位
   const total = Number(params.get("players") || 4);
 
-  // 假資料：第 1 位已就緒，其餘等待中
-  const seats = useMemo(
-    () => Array.from({ length: total }, (_, i) => (i === 0 ? "玩家1" : "等待中")),
-    [total]
+  // 玩家名稱狀態
+  const [playerNames, setPlayerNames] = useState<string[]>(
+    Array.from({ length: total }, (_, i) => `玩家${i + 1}`)
   );
+
+  // 更新玩家名稱
+  const updatePlayerName = (index: number, name: string) => {
+    const newNames = [...playerNames];
+    newNames[index] = name;
+    setPlayerNames(newNames);
+  };
+
+  // 檢查是否所有玩家都有名稱
+  const allPlayersReady = playerNames.every(name => name.trim() !== "");
+
+  // 開始遊戲
+  const startGame = () => {
+    if (allPlayersReady) {
+      // 使用 state 傳遞資料，不在 URL 中顯示
+      navigate('/game', {
+        state: {
+          roomCode: roomCode,
+          players: playerNames
+        }
+      });
+    }
+  };
 
   return (
     <div
@@ -45,21 +67,29 @@ const RoomLobby: React.FC = () => {
           <div className="rl-code">{roomCode}</div>
 
           {/* 提示文字 */}
-          <p className="rl-hint">請把房號分享給朋友，讓他們輸入加入！</p>
+          <p className="rl-hint">請輸入所有玩家的名稱，然後開始遊戲！</p>
 
-          {/* 座位列 */}
+          {/* 座位列 - 現在包含輸入框 */}
           <div className="rl-seats">
-            {seats.map((label, i) => (
+            {playerNames.map((name, i) => (
               <div key={i} className="rl-seat">
-                {label}
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => updatePlayerName(i, e.target.value)}
+                  placeholder={`玩家${i + 1}`}
+                  className="rl-player-input"
+                  maxLength={10}
+                />
               </div>
             ))}
           </div>
 
           {/* 主行動：開始遊戲 */}
           <button
-            className="rl-start"
-            onClick={() => navigate(`/game?code=${roomCode}`)}
+            className={`rl-start ${!allPlayersReady ? 'rl-start-disabled' : ''}`}
+            onClick={startGame}
+            disabled={!allPlayersReady}
           >
             開始遊戲
           </button>

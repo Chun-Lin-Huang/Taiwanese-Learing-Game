@@ -116,6 +116,46 @@
   min-width: 0;
 }
 
+/* 玩家名稱輸入框 */
+.rl-player-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: clamp(24px, 5vw, 44px);
+  color: var(--text);
+  text-align: center;
+  padding: 0;
+  margin: 0;
+  border-radius: clamp(16px, 3vw, 28px);
+}
+
+.rl-player-input::placeholder {
+  color: rgba(149, 107, 57, 0.6);
+}
+
+.rl-player-input:focus {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* 按鈕禁用狀態 */
+.rl-start-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(0.3);
+}
+
+.rl-start-disabled:hover {
+  filter: grayscale(0.3);
+}
+
+.rl-start-disabled:active {
+  transform: none;
+  box-shadow: 0 10px 0 var(--cta-shadow);
+}
+
 /* 主行動：開始遊戲 */
 .rl-start{
   display: block;

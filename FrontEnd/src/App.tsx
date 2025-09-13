@@ -39,6 +39,8 @@ import SuperMonopoly from "./view/GameMenu";
 import CreateRoom from "./view/CreateRoom";
 import JoinRoom from "./view/JoinRoom";
 import RoomLobby from "./view/RoomLobby";
+import Monopoly from "./view/Monopoly";
+import ScoreSummary from "./view/ScoreSummary";
 
 // 字典區
 import SearchPage from "./view/SearchPage";
@@ -107,6 +109,8 @@ function AppRoutes() {
       <Route path="/rooms/create" element={<CreateRoom />} />
       <Route path="/rooms/join" element={<JoinRoom />} />
       <Route path="/rooms/lobby" element={<RoomLobby />} />
+      <Route path="/game" element={<Monopoly />} />
+      <Route path="/Scoresummary" element={<ScoreSummary />} />
 
       {/* 字典區 */}
       <Route path="/DictionaryPage" element={<SearchPage />} />

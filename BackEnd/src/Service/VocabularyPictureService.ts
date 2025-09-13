@@ -34,9 +34,12 @@ export class VocabularyPictureService {
       .map(s => (Types.ObjectId.isValid(s) ? new Types.ObjectId(s) : null))
       .filter(Boolean) as Types.ObjectId[];
 
-    // 2) 取得對應的圖片
+    // 2) 取得對應的圖片 - 同時支援 ObjectId 和 String 格式
     const pictures = await VocabularyPictureModel.find({
-      vocId: { $in: vocIdObj }
+      $or: [
+        { vocId: { $in: vocIdObj } }, // ObjectId 格式
+        { vocId: { $in: cardIds } }   // String 格式
+      ]
     })
       .select("_id imageFileName imageSize imageType vocId")
       .lean();
@@ -106,15 +109,23 @@ export class VocabularyPictureService {
 
   /** 根據單字卡ID取得對應圖片 */
   async getByCardId(cardId: string): Promise<resp<any>> {
-    if (!Types.ObjectId.isValid(cardId)) {
-      return { code: 400, message: "cardId invalid", body: null };
+    if (!cardId) {
+      return { code: 400, message: "cardId required", body: null };
     }
 
+    console.log('VocabularyPictureService.getByCardId - 查詢 cardId:', cardId);
+
+    // 查詢時同時支援 ObjectId 和 String 格式的 vocId
     const picture = await VocabularyPictureModel.findOne({
-      vocId: new Types.ObjectId(cardId)
+      $or: [
+        { vocId: cardId }, // String 格式
+        { vocId: new Types.ObjectId(cardId) } // ObjectId 格式（向後兼容）
+      ]
     })
       .select("_id imageFileName imageSize imageType vocId")
       .lean();
+
+    console.log('VocabularyPictureService.getByCardId - 查詢結果:', picture);
 
     if (!picture) return { code: 404, message: "not found", body: null };
 
