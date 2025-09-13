@@ -116,15 +116,23 @@
   min-width: 0;
 }
 
+/* 輸入組容器 */
+.rl-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
 /* 玩家名稱輸入框 */
 .rl-player-input {
-  width: 100%;
+  flex: 1;
   background: transparent;
   border: none;
   outline: none;
   font-family: 'Inter', sans-serif;
   font-weight: 800;
-  font-size: clamp(24px, 5vw, 44px);
+  font-size: clamp(20px, 4vw, 36px);
   color: var(--text);
   text-align: center;
   padding: 0;
@@ -138,6 +146,40 @@
 
 .rl-player-input:focus {
   background: rgba(255, 255, 255, 0.1);
+}
+
+/* 查找按鈕 */
+.rl-find-btn {
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.rl-find-btn:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+.rl-find-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 使用者資訊 */
+.rl-user-info {
+  font-size: clamp(12px, 2.5vw, 18px);
+  color: rgba(149, 107, 57, 0.8);
+  margin-top: 4px;
+  text-align: center;
+  font-weight: 600;
 }
 
 /* 按鈕禁用狀態 */

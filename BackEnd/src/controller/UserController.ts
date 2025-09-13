@@ -50,4 +50,17 @@ export class UserController extends Contorller {
       return res.status(500).json({ code: 500, message: err.message || "server error" });
     }
   }
+
+  /** GET /api/v1/user/findByUserName/:userName */
+  public async findByUserName(req: Request, res: Response) {
+    try {
+      const { userName } = req.params;
+      if (!userName) return res.status(400).json({ code: 400, message: "缺少 userName" });
+
+      const out = await this.service.findByUserName(userName);
+      return res.status(out.code).send(out);
+    } catch (err: any) {
+      return res.status(500).json({ code: 500, message: err.message || "server error" });
+    }
+  }
 }

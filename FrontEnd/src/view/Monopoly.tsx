@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import '../style/Monopoly.css';
 import "../App.css";
 import BackIcon from "../assets/Back.svg";
@@ -27,7 +27,7 @@ const challengeQuestions = {
 interface PlayerRecord {
   id: number;
   timestamp: Date;
-  location: number;
+  location: string;
   locationName: string;
   action: string;
   details?: string;
@@ -40,7 +40,7 @@ interface Player {
   avatarImage?: string;
   round: number;
   status: string;
-  location: number; // 改為數字位置 (0-35)
+  location: string; // 位置字符串 (如 "S0", "A1", "B2")
   locationName: string; // 位置名稱
   record: string; // 保留用於顯示最新記錄
   records: PlayerRecord[]; // 詳細記錄數組
@@ -52,7 +52,7 @@ interface Player {
 interface Property {
   id: number;
   name: string;
-  type: 'property' | 'challenge' | 'chance' | 'start' | 'go' | 'special' | 'shortcut';
+  type: 'property' | 'challenge' | 'chance' | 'start' | 'go' | 'special' | 'shortcut' | 'reward' | 'vocabulary';
   price?: number;
   rent?: number;
   description: string;
@@ -96,6 +96,7 @@ interface GameHistory {
 
 const Monopoly: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     
     // 地圖資料狀態
     const [mapBoard, setMapBoard] = useState<MapBoard | null>(null);
@@ -152,7 +153,7 @@ const Monopoly: React.FC = () => {
   const [challengeMessages, setChallengeMessages] = useState<Array<{type: 'incoming' | 'outgoing', sender: string, content: string}>>([]);
   const [challengeIsProcessing, setChallengeIsProcessing] = useState(false);
   
-  // O17挑戰成功後的特殊移動規則
+  // 17挑戰成功後的特殊移動規則
   const [o17ChallengeSuccessPlayers, setO17ChallengeSuccessPlayers] = useState<{[playerId: number]: boolean}>({});
   
   // 路徑選擇相關狀態
@@ -161,6 +162,7 @@ const Monopoly: React.FC = () => {
     normal: {new_position: string, position_info: any, path: string[]},
     alternative: {new_position: string, path: string[]}
   } | null>(null);
+  
   
   // 遊戲主題狀態
   const [gameTheme, setGameTheme] = useState<string>('traffic'); // 默認使用交通主題
@@ -270,103 +272,51 @@ const Monopoly: React.FC = () => {
     initializeMap();
   }, []);
 
+  // 初始化玩家數據的函數
+  const initializePlayers = (playerNames: string[]): Player[] => {
+    const avatars = ['🐻', '🐯', '🐘', '🐱'];
+    const avatarImages = [
+      '/src/assets/小熊頭.png',
+      '/src/assets/小貓.png', 
+      '/src/assets/老虎.png',
+      '/src/assets/大象.png'
+    ];
+    
+    return playerNames.map((name, index) => ({
+      id: index + 1,
+      name: name,
+      avatar: avatars[index] || '🎮',
+      avatarImage: avatarImages[index] || '/src/assets/default.png',
+      round: 0,
+      status: '正常',
+      location: 'S0', // 從起始點開始
+      locationName: 'S0',
+      record: '準備開始',
+      records: [{
+        id: 1,
+        timestamp: new Date(),
+        location: 'S0',
+        locationName: 'S0',
+        action: '遊戲開始',
+        details: '準備開始遊戲'
+      }],
+      isCurrentPlayer: index === 0, // 第一個玩家是當前玩家
+      score: 0,
+      diceSum: 0,
+    }));
+  };
+
+  // 從location state獲取玩家數據，如果沒有則使用默認值
+  const playerNames = location.state?.players || ['彌豆子', '小貓咪', '老虎王', '大象哥'];
+  
   // 玩家狀態 - 動態管理
-  const [players, setPlayers] = useState<Player[]>([
-    {
-      id: 1,
-      name: '彌豆子',
-      avatar: '🐻',
-      avatarImage: '/src/assets/小熊頭.png',
-      round: 0,
-      status: '正常',
-      location: 0, // 從起始點開始
-      locationName: 'S0',
-      record: '準備開始',
-      records: [{
-        id: 1,
-        timestamp: new Date(),
-        location: 0,
-        locationName: 'S0',
-        action: '遊戲開始',
-        details: '準備開始遊戲'
-      }],
-      isCurrentPlayer: true,
-      score: 0,
-      diceSum: 0,
-    },
-    {
-      id: 2,
-      name: '小貓咪',
-      avatar: '🐯',
-      avatarImage: '/src/assets/小貓.png',
-      round: 0,
-      status: '正常',
-      location: 0, // 從起始點開始
-      locationName: 'S0',
-      record: '準備開始',
-      records: [{
-        id: 1,
-        timestamp: new Date(),
-        location: 0,
-        locationName: 'S0',
-        action: '遊戲開始',
-        details: '準備開始遊戲'
-      }],
-      isCurrentPlayer: false,
-      score: 0,
-      diceSum: 0,
-    },
-    {
-      id: 3,
-      name: '老虎王',
-      avatar: '🐘',
-      avatarImage: '/src/assets/老虎.png',
-      round: 0,
-      status: '正常',
-      location: 0, // 從起始點開始
-      locationName: 'S0',
-      record: '準備開始',
-      records: [{
-        id: 1,
-        timestamp: new Date(),
-        location: 0,
-        locationName: 'S0',
-        action: '遊戲開始',
-        details: '準備開始遊戲'
-      }],
-      isCurrentPlayer: false,
-      score: 0,
-      diceSum: 0,
-    },
-    {
-      id: 4,
-      name: '大象哥',
-      avatar: '🐱',
-      avatarImage: '/src/assets/大象.png',
-      round: 0,
-      status: '正常',
-      location: 0, // 從起始點開始
-      locationName: 'S0',
-      record: '準備開始',
-      records: [{
-        id: 1,
-        timestamp: new Date(),
-        location: 0,
-        locationName: 'S0',
-        action: '遊戲開始',
-        details: '準備開始遊戲'
-      }],
-      isCurrentPlayer: false,
-      score: 0,
-      diceSum: 0,
-    }
-  ]);
+  const [players, setPlayers] = useState<Player[]>(() => initializePlayers(playerNames));
 
   const currentPlayer = players.find(player => player.isCurrentPlayer);
   const diceValues = [3, 5, 1, 6, 2, 4]; // 隨機骰子值
 
   // 添加玩家記錄的函數
-  const addPlayerRecord = (playerId: number, location: number, locationName: string, action: string, details?: string) => {
+  const addPlayerRecord = (playerId: number, location: string, locationName: string, action: string, details?: string) => {
     setPlayers(prevPlayers => 
       prevPlayers.map(player => {
         if (player.id === playerId) {
@@ -437,10 +387,11 @@ const Monopoly: React.FC = () => {
       currentPlayer.name,
       'move',
       `${currentPlayer.name} 選擇${selectedPath === 'normal' ? '正常' : 'D5'}路徑移動到 ${selectedOption.new_position}`,
-      selectedOption.new_position,
-      selectedOption.new_position,
-      '移動到',
-      `選擇${selectedPath === 'normal' ? '正常' : 'D5'}路徑，移動到${selectedOption.new_position}`
+      {
+        path: selectedPath,
+        newPosition: selectedOption.new_position,
+        details: `選擇${selectedPath === 'normal' ? '正常' : 'D5'}路徑，移動到${selectedOption.new_position}`
+      }
     );
     
     // 更新玩家位置
@@ -450,7 +401,7 @@ const Monopoly: React.FC = () => {
           return {
             ...player,
             locationName: selectedOption.new_position,
-            location: selectedOption.new_position === 'S0' ? 0 : parseInt(selectedOption.new_position) || 0,
+            location: selectedOption.new_position,
             record: `${selectedOption.new_position} - 路徑選擇移動完成`
           };
         }
@@ -458,9 +409,9 @@ const Monopoly: React.FC = () => {
       })
     );
     
-    // 如果選擇了D5路徑，清除O17挑戰成功記錄
+    // 如果選擇了D5路徑，清除17挑戰成功記錄
     if (selectedPath === 'alternative') {
-      console.log('玩家選擇D5路徑，清除O17挑戰成功記錄');
+      console.log('玩家選擇D5路徑，清除17挑戰成功記錄');
       setO17ChallengeSuccessPlayers(prev => {
         const newState = { ...prev };
         delete newState[currentPlayer.id];
@@ -509,16 +460,11 @@ const Monopoly: React.FC = () => {
         player_id: currentPlayer.id.toString(),
         current_position: currentPlayer.locationName,
         dice_value: value,
-        // 檢查是否有O17挑戰成功記錄
+        // 檢查是否有17挑戰成功記錄
         o17_challenge_success: o17ChallengeSuccessPlayers[currentPlayer.id] || false
       };
       
-      // 臨時測試：如果當前位置是O17，強制設置為true
       console.log('當前玩家位置:', currentPlayer.locationName, '類型:', typeof currentPlayer.locationName);
-      if (currentPlayer.locationName === '017' || currentPlayer.locationName === 'O17') {
-        moveRequest.o17_challenge_success = true;
-        console.log('測試模式：強制設置O17挑戰成功');
-      }
       
       console.log('移動請求:', moveRequest);
 
@@ -563,7 +509,7 @@ const Monopoly: React.FC = () => {
               const updatedPlayer = {
                 ...player,
                 locationName: new_position,
-                location: position_info.node_id === 'S0' ? 0 : parseInt(position_info.node_id) || 0, // 處理 S0 和數字節點
+                location: position_info.node_id, // 使用節點ID作為位置
                 record: `${position_info.name} - 移動完成`
               };
               console.log(`${player.name} 位置更新:`, {
@@ -577,8 +523,8 @@ const Monopoly: React.FC = () => {
           })
         );
 
-        // 檢查是否經過起點 S0，並更新經過次數
-        if (passed_start && position_info.node_id === 'S0') {
+        // 檢查是否經過起點，並更新經過次數和回合數
+        if (passed_start) {
           const currentPlayerId = currentPlayer.id;
           setPlayersPassedStart(prev => {
             const newCount = (prev[currentPlayerId] || 0) + 1;
@@ -614,6 +560,17 @@ const Monopoly: React.FC = () => {
               [currentPlayerId]: newCount
             };
           });
+          
+          // 更新玩家回合數
+          setPlayers(prev => prev.map(player => {
+            if (player.id === currentPlayerId) {
+              return {
+                ...player,
+                round: player.round + 1
+              };
+            }
+            return player;
+          }));
         }
 
         // 記錄移動動作
@@ -633,11 +590,11 @@ const Monopoly: React.FC = () => {
       // 添加玩家記錄
       addPlayerRecord(
         currentPlayer.id,
-          position_info.node_id === 'S0' ? 0 : parseInt(position_info.node_id) || 0, 
-          position_info.name, 
+        position_info.node_id, 
+        position_info.name, 
         '移動到', 
-          `擲出${value}點，移動到${position_info.name}`
-        );
+        `擲出${value}點，移動到${position_info.name}`
+      );
 
         // 根據格子類型處理後續事件
         handleLocationEvent(position_info);
@@ -676,9 +633,9 @@ const Monopoly: React.FC = () => {
         // 道路施工顯示優惠券視窗
         setCouponType('road_construction');
         setShowCouponPanel(true);
-    } else if (positionInfo.type === 'challenge') {
+    } else if (positionInfo.type === 'challenge' || positionInfo.type === 'vocabulary') {
         // 檢查是否為"來學單字"格子
-      if (positionInfo.challenge?.type === 'vocabulary') {
+      if (positionInfo.challenge?.type === 'vocabulary' || positionInfo.type === 'vocabulary') {
           // 來學單字格子觸發單字卡片
           setIsDrawingCard(true);
           
@@ -753,14 +710,17 @@ const Monopoly: React.FC = () => {
           setShowChallengePanel(true);
         }
       } else {
-        // 其他格子顯示位置詳情，並自動切換到下一個玩家
+        // 其他格子顯示位置詳情
         setCurrentLocationDetail(positionInfo);
         setShowLocationDetail(true);
         
-        // 自動切換到下一個玩家
-        setTimeout(() => {
-          switchToNextPlayer();
-        }, 1000); // 1秒後自動切換
+        // 只有非機會格、非獎勵格、非起點格才自動切換到下一個玩家
+        if (positionInfo.type !== 'chance' && positionInfo.type !== 'reward' && positionInfo.type !== 'start') {
+          // 自動切換到下一個玩家
+          setTimeout(() => {
+            switchToNextPlayer();
+          }, 1000); // 1秒後自動切換
+        }
     }
   };
 
@@ -1244,8 +1204,17 @@ const Monopoly: React.FC = () => {
                     setCouponChallengeResult('success');
                     console.log('🎉 情境挑戰成功！');
                     
-                    // 記錄遊戲動作（只有成功時才記錄）
+                    // 檢查是否在17位置挑戰成功
                     const currentPlayer = players.find(p => p.isCurrentPlayer);
+                    if (currentPlayer && currentPlayer.locationName === '17') {
+                      console.log('17挑戰成功！設置該玩家可以往D5移動');
+                      setO17ChallengeSuccessPlayers(prev => ({
+                        ...prev,
+                        [currentPlayer.id]: true
+                      }));
+                    }
+                    
+                    // 記錄遊戲動作（只有成功時才記錄）
                     if (currentPlayer) {
                       recordGameAction(
                         currentPlayer.id,
@@ -1396,10 +1365,10 @@ const Monopoly: React.FC = () => {
                     setChallengeResult('success');
                     console.log('🎉 挑戰對話成功！');
                     
-                    // 檢查是否在O17位置挑戰成功
+                    // 檢查是否在17位置挑戰成功
                     const currentPlayer = players.find(p => p.isCurrentPlayer);
-                    if (currentPlayer && currentPlayer.location === '017') {
-                      console.log('O17挑戰成功！設置該玩家可以往D5移動');
+                    if (currentPlayer && currentPlayer.locationName === '17') {
+                      console.log('17挑戰成功！設置該玩家可以往D5移動');
                       setO17ChallengeSuccessPlayers(prev => ({
                         ...prev,
                         [currentPlayer.id]: true
@@ -1431,7 +1400,7 @@ const Monopoly: React.FC = () => {
 
   // 重置挑戰狀態
   const resetChallenge = () => {
-    const wasTrainChallenge = currentChallenge?.type === 'train';
+    const wasTrainChallenge = currentChallenge?.type === 'train' || currentChallenge?.type === 'transport';
     const currentPlayer = players.find(p => p.isCurrentPlayer);
     
     setSelectedCouponChallengeType(null);
@@ -1452,16 +1421,16 @@ const Monopoly: React.FC = () => {
     // 如果是火車挑戰，完成後自動切換到下一位玩家
     if (wasTrainChallenge) {
       switchToNextPlayer();
-    } else if (currentPlayer && currentPlayer.locationName === 'O17' && challengeResult === 'success') {
-      // O17 挑戰成功後移動到 D5
-      console.log('O17 挑戰成功，移動到 D5');
+    } else if (currentPlayer && currentPlayer.locationName === '17' && challengeResult === 'success') {
+      // 17 挑戰成功後移動到 D5
+      console.log('17 挑戰成功，移動到 D5');
       
       // 更新玩家位置到 D5
       const updatedPlayers = players.map(player => {
         if (player.id === currentPlayer.id) {
           return {
             ...player,
-            location: 0, // 重新計算位置索引
+            location: 'D5', // 使用D5作為位置
             locationName: 'D5'
           };
         }
@@ -1475,9 +1444,9 @@ const Monopoly: React.FC = () => {
         currentPlayer.id,
         currentPlayer.name,
         'move',
-        `${currentPlayer.name} O17挑戰成功，移動到 D5`,
+        `${currentPlayer.name} 17挑戰成功，移動到 D5`,
         { 
-          from: 'O17', 
+          from: '17', 
           to: 'D5', 
           reason: 'challenge_success',
           challengeType: 'culture'
@@ -1487,7 +1456,7 @@ const Monopoly: React.FC = () => {
       // 更新玩家狀態
       updatePlayerStatus(currentPlayer.id, {
         locationName: 'D5',
-        record: `O17挑戰成功，移動到D5`
+        record: `17挑戰成功，移動到D5`
       });
       
       // 挑戰完成後切換到下一位玩家
@@ -1903,7 +1872,7 @@ const Monopoly: React.FC = () => {
         <div className="path-selection-overlay">
           <div className="path-selection-panel">
             <h2 className="path-selection-title">選擇移動路徑</h2>
-            <p className="path-selection-subtitle">O17挑戰成功！你可以選擇移動路徑：</p>
+            <p className="path-selection-subtitle">17挑戰成功！你可以選擇移動路徑：</p>
             
             <div className="path-options">
               <button 
@@ -2040,7 +2009,9 @@ const Monopoly: React.FC = () => {
               <div className="detail-row">
                 <span className="detail-label">捷徑:</span>
                 <div className="detail-value">
-                  {((currentPlayer.location >= 37 && currentPlayer.location <= 42) || playerShortcutPrivileges[currentPlayer.id]?.nextMoveToShortcut) ? '🚂可' : '🚂否'}
+                  {((currentPlayer.locationName >= '37' && currentPlayer.locationName <= '42') || 
+                    (currentPlayer.locationName >= 'D0' && currentPlayer.locationName <= 'D5') || 
+                    playerShortcutPrivileges[currentPlayer.id]?.nextMoveToShortcut) ? '是' : '否'}
                 </div>
               </div>
              
@@ -2075,7 +2046,7 @@ const Monopoly: React.FC = () => {
             <div className="challenge-panel-side">
               <div className="challenge-header">
                 <h2 className="challenge-title">
-                  {currentChallenge?.type === 'train' ? '火車挑戰' : 
+                  {currentChallenge?.type === 'train' || currentChallenge?.type === 'transport' ? '火車挑戰' : 
                    currentChallenge?.type === 'vocabulary' ? '單字挑戰' : 
                    currentChallenge?.type === 'story' ? '情境挑戰' : 
                    currentChallenge?.type === 'action' ? '動作挑戰' : 
@@ -2116,7 +2087,7 @@ const Monopoly: React.FC = () => {
                         {couponChallengeResult === 'success' ? '🎉 挑戰成功！' : '❌ 挑戰失敗！'}
                       </div>
                       {/* 火車挑戰特殊獎勵信息 */}
-                      {currentChallenge?.type === 'train' ? (
+                      {currentChallenge?.type === 'train' || currentChallenge?.type === 'transport' ? (
                         <div className={`reward-bubble ${couponChallengeResult}`}>
                           {couponChallengeResult === 'success' ? '🚂 火車挑戰成功！下次按骰子將在捷徑路線移動！' : '🚂 火車挑戰失敗！本次不能使用捷徑'}
                         </div>
@@ -2522,7 +2493,8 @@ const Monopoly: React.FC = () => {
                 onClick={() => {
                   audioManager.play(AudioType.THEME_SELECTION, 0.3);
                   setShowLocationDetail(false);
-                  // 立即切換到下一玩家
+                  
+                  // 直接切換到下一個玩家（機會格不會自動切換，所以這裡只需要正常切換）
                   switchToNextPlayer();
                 }}
               >
@@ -2555,23 +2527,11 @@ const Monopoly: React.FC = () => {
                 </div>
               )}
               
-              {currentLocationDetail.chance && (
+              {(currentLocationDetail.chance || currentLocationDetail.type === 'reward') && (
                 <div className="chance-details">
-                  <div className="chance-type">{currentLocationDetail.chance.type}</div>
+                  <div className="chance-type">{currentLocationDetail.chance?.type || currentLocationDetail.type}</div>
                   <div className="chance-title">機會卡</div>
-                  <div className="chance-content">請抽取一張機會卡</div>
-                  
-                  <button 
-                    className="draw-chance-button"
-                    onClick={() => {
-                      audioManager.play(AudioType.THEME_SELECTION, 0.3);
-                      setShowLocationDetail(false);
-                      // 立即切換到下一玩家
-                      switchToNextPlayer();
-                    }}
-                  >
-                    抽取機會卡
-                  </button>
+                  <div className="chance-content">請抽取一張實體機會卡</div>
                 </div>
               )}
               

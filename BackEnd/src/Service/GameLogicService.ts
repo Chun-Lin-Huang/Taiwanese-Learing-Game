@@ -117,10 +117,23 @@ export class GameLogicService {
       let currentPos = currentPosition;
       const path: string[] = [currentPosition];
       
-      // 先移動到D5的路徑起點（假設有直接連接到D5的路徑）
-      // 這裡需要根據實際的地圖連接來調整
-      for (let step = 0; step < diceValue; step++) {
-        console.log(`第${step + 1}步，當前位置: ${currentPos}`);
+      // 第一步：移動到D5
+      const d5Edge = edges.find(edge => edge.from === currentPosition && edge.to === 'D5');
+      if (!d5Edge) {
+        console.log('找不到從當前位置到D5的連接');
+        return null;
+      }
+      
+      currentPos = 'D5';
+      path.push(currentPos);
+      console.log(`第1步：移動到D5`);
+      
+      // 剩餘步數：從D5繼續移動
+      const remainingSteps = diceValue - 1;
+      console.log(`剩餘步數：${remainingSteps}`);
+      
+      for (let step = 0; step < remainingSteps; step++) {
+        console.log(`第${step + 2}步，當前位置: ${currentPos}`);
         
         // 尋找從當前位置出發的連接
         const availableEdges = edges.filter(edge => edge.from === currentPos);
@@ -131,19 +144,12 @@ export class GameLogicService {
           break;
         }
         
-        // 優先選擇通往D5的路徑，如果沒有則選擇第一個可用路徑
-        let nextEdge = availableEdges.find(edge => edge.to === 'D5');
-        if (!nextEdge) {
-          nextEdge = availableEdges[0];
-        }
-        
+        // 選擇第一個可用路徑
+        const nextEdge = availableEdges[0];
         currentPos = nextEdge.to;
         path.push(currentPos);
         
-        // 如果到達D5就停止
-        if (currentPos === 'D5') {
-          break;
-        }
+        console.log(`移動到: ${currentPos}`);
       }
       
       console.log('D5路徑計算完成，最終位置:', currentPos, '路徑:', path);
@@ -181,11 +187,26 @@ export class GameLogicService {
         if (normalEdges.length > 0) {
           // 如果有 normal 連接，移動到目標位置
           currentPos = normalEdges[0].to;
-          console.log(`使用 normal 連接: ${outgoingEdges[0].from} → ${currentPos}`);
+          console.log(`使用 normal 連接: ${normalEdges[0].from} → ${currentPos}`);
         } else {
-          // 如果沒有 normal 連接，使用其他類型的連接
-          currentPos = outgoingEdges[0].to;
-          console.log(`使用其他連接: ${outgoingEdges[0].from} → ${currentPos}`);
+          // 如果沒有 normal 連接，處理 choice 類型的連接
+          const choiceEdges = outgoingEdges.filter(edge => edge.type === 'choice');
+          if (choiceEdges.length > 0) {
+            // 對於 choice 類型，優先選擇通往正常路徑的連接（不是 D 開頭的）
+            const normalPathEdge = choiceEdges.find(edge => !edge.to.startsWith('D'));
+            if (normalPathEdge) {
+              currentPos = normalPathEdge.to;
+              console.log(`使用 choice 正常路徑連接: ${normalPathEdge.from} → ${currentPos}`);
+            } else {
+              // 如果沒有正常路徑，使用第一個 choice 連接
+              currentPos = choiceEdges[0].to;
+              console.log(`使用 choice 連接: ${choiceEdges[0].from} → ${currentPos}`);
+            }
+          } else {
+            // 如果沒有 choice 連接，使用其他類型的連接
+            currentPos = outgoingEdges[0].to;
+            console.log(`使用其他連接: ${outgoingEdges[0].from} → ${currentPos}`);
+          }
         }
         
         path.push(currentPos); // 記錄路徑
