@@ -629,10 +629,33 @@ const Monopoly: React.FC = () => {
         // 加油站顯示優惠券視窗
         setCouponType('gas_station');
         setShowCouponPanel(true);
-    } else if (positionInfo.name === '道路施工') {
-        // 道路施工顯示優惠券視窗
-        setCouponType('road_construction');
-        setShowCouponPanel(true);
+    } else if (positionInfo.type === 'stop') {
+        // stop 類型格子直接暫停一回合，不顯示優惠券
+        const currentPlayer = players.find(p => p.isCurrentPlayer);
+        if (currentPlayer) {
+          setRoadConstructionSkip(prev => ({
+            ...prev,
+            [currentPlayer.id]: true
+          }));
+          
+          recordGameAction(
+            currentPlayer.id,
+            currentPlayer.name,
+            'move',
+            `${currentPlayer.name} 在${positionInfo.name}暫停一回合`,
+            { location: currentPlayer.location, skipped: true, positionType: 'stop' }
+          );
+          
+          // 顯示暫停提示
+          setSkipAlertMessage(`${currentPlayer.name} 在${positionInfo.name}暫停一回合`);
+          setShowSkipAlert(true);
+          
+          // 直接切換到下一位玩家
+          setTimeout(() => {
+            setShowSkipAlert(false);
+            switchToNextPlayer();
+          }, 2000);
+        }
     } else if (positionInfo.type === 'challenge' || positionInfo.type === 'vocabulary') {
         // 檢查是否為"來學單字"格子
       if (positionInfo.challenge?.type === 'vocabulary' || positionInfo.type === 'vocabulary') {
