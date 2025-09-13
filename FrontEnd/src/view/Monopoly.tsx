@@ -8,22 +8,6 @@ import AudioControls from '../components/AudioControls';
 import '../style/AudioControls.css';
 import { MapApiService, type MapBoard } from '../services/mapApi';
 
-// 挑戰問題定義
-const challengeQuestions = {
-  traffic: [
-    { question: "請問台語「火車」怎麼說？", answers: ["火車", "hoé-tshia"] },
-    { question: "請問台語「公車」怎麼說？", answers: ["公車", "kong-tshia"] },
-    { question: "請問台語「摩托車」怎麼說？", answers: ["摩托車", "oo-tóo-tshia"] },
-    { question: "請問台語「腳踏車」怎麼說？", answers: ["腳踏車", "kha-ta̍h-tshia"] }
-  ],
-  occupation: [
-    { question: "請問台語「老師」怎麼說？", answers: ["老師", "lāu-su"] },
-    { question: "請問台語「醫生」怎麼說？", answers: ["醫生", "i-sing"] },
-    { question: "請問台語「警察」怎麼說？", answers: ["警察", "kéng-tshat"] },
-    { question: "請問台語「司機」怎麼說？", answers: ["司機", "su-ki"] }
-  ]
-};
-
 interface PlayerRecord {
   id: number;
   timestamp: Date;
@@ -47,6 +31,8 @@ interface Player {
   isCurrentPlayer: boolean;
   score: number; // 玩家分數
   diceSum: number; // 骰子點數加總
+  userName?: string; // 使用者名稱（從資料庫查詢得到）
+  currency: number; // 玩家貨幣
 }
 
 interface Property {
@@ -109,8 +95,8 @@ const Monopoly: React.FC = () => {
     const [showGameHistory, setShowGameHistory] = useState(false);
     const [showLocationDetail, setShowLocationDetail] = useState(false);
     const [currentLocationDetail, setCurrentLocationDetail] = useState<Property | null>(null);
-  const [currentRound, setCurrentRound] = useState(1);
-  const [playersInCurrentRound, setPlayersInCurrentRound] = useState<number[]>([]);
+  const [currentRound] = useState(1);
+  const [playersInCurrentRound] = useState<number[]>([]);
   const [playersPassedStart, setPlayersPassedStart] = useState<{[playerId: number]: number}>({});
   const [showPassedStartCelebration, setShowPassedStartCelebration] = useState(false);
   const [passedStartMessage, setPassedStartMessage] = useState('');
@@ -118,7 +104,7 @@ const Monopoly: React.FC = () => {
     const [couponType, setCouponType] = useState<'property' | 'gas_station' | 'road_construction'>('property');
   const [showChallengePanel, setShowChallengePanel] = useState(false);
   const [currentChallenge, setCurrentChallenge] = useState<any>(null);
-  const [selectedChallengeType, setSelectedChallengeType] = useState<string | null>(null);
+  const [selectedChallengeType] = useState<string | null>(null);
   const [challengeQuestion, setChallengeQuestion] = useState<string>('');
   const [playerAnswer, setPlayerAnswer] = useState<string>('');
   const [challengeResult, setChallengeResult] = useState<'success' | 'failure' | null>(null);
@@ -149,9 +135,9 @@ const Monopoly: React.FC = () => {
   const [scenarioTopics, setScenarioTopics] = useState<Array<{_id: string, name: string}>>([]);
   
   // 一般挑戰對話相關狀態
-  const [challengeSessionId, setChallengeSessionId] = useState<string | null>(null);
+  const [challengeSessionId] = useState<string | null>(null);
   const [challengeMessages, setChallengeMessages] = useState<Array<{type: 'incoming' | 'outgoing', sender: string, content: string}>>([]);
-  const [challengeIsProcessing, setChallengeIsProcessing] = useState(false);
+  const [challengeIsProcessing] = useState(false);
   
   // 17挑戰成功後的特殊移動規則
   const [o17ChallengeSuccessPlayers, setO17ChallengeSuccessPlayers] = useState<{[playerId: number]: boolean}>({});
@@ -183,13 +169,16 @@ const Monopoly: React.FC = () => {
   const [skipAlertMessage, setSkipAlertMessage] = useState('');
   // 移除未使用的 playerGameStarted 狀態（現在由 API 處理）
 
-    // 遊戲歷程狀態
-    const [gameHistory, setGameHistory] = useState<GameHistory>({
-      gameId: `game_${Date.now()}`,
-      startTime: new Date(),
-      actions: [],
-      players: []
-    });
+  // 遊戲歷程狀態
+  const [gameHistory, setGameHistory] = useState<GameHistory>({
+    gameId: `game_${Date.now()}`,
+    startTime: new Date(),
+    actions: [],
+    players: []
+  });
+  
+  // 遊戲是否已在資料庫中創建
+  const [isGameCreatedInDB, setIsGameCreatedInDB] = useState(false);
 
   // 載入情境主題
   useEffect(() => {
@@ -303,6 +292,7 @@ const Monopoly: React.FC = () => {
       isCurrentPlayer: index === 0, // 第一個玩家是當前玩家
       score: 0,
       diceSum: 0,
+      currency: 1000, // 初始貨幣
     }));
   };
 
@@ -340,7 +330,7 @@ const Monopoly: React.FC = () => {
   };
 
   // 記錄遊戲動作的函數
-  const recordGameAction = (
+  const recordGameAction = async (
     playerId: number, 
     playerName: string, 
     actionType: GameAction['actionType'], 
@@ -357,10 +347,104 @@ const Monopoly: React.FC = () => {
       details
     };
 
+    // 更新前端狀態
     setGameHistory(prev => ({
       ...prev,
       actions: [...prev.actions, newAction]
     }));
+
+    // 如果遊戲還沒有在資料庫中創建，先創建遊戲
+    if (!isGameCreatedInDB) {
+      try {
+        const gameData = {
+          gameId: gameHistory.gameId,
+          gameName: gameTheme || '大富翁遊戲',
+          boardId: mapBoard?._id || '',
+          players: players.map(p => ({
+            id: p.id,
+            name: p.name,
+            userName: p.userName
+          }))
+        };
+
+        const response = await fetch('http://127.0.0.1:2083/api/v1/game-history/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(gameData),
+        });
+
+        if (response.ok) {
+          setIsGameCreatedInDB(true);
+          console.log('遊戲記錄已創建到資料庫');
+        } else {
+          console.error('創建遊戲記錄失敗:', await response.text());
+        }
+      } catch (error) {
+        console.error('創建遊戲記錄時發生錯誤:', error);
+      }
+    }
+
+    // 保存動作到資料庫
+    if (isGameCreatedInDB) {
+      try {
+        const actionData = {
+          actionType: newAction.actionType,
+          playerId: newAction.playerId,
+          playerName: newAction.playerName,
+          description: newAction.description,
+          details: newAction.details,
+          timestamp: newAction.timestamp.toISOString()
+        };
+
+        const response = await fetch(`http://127.0.0.1:2083/api/v1/game-history/${gameHistory.gameId}/action`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(actionData),
+        });
+
+        if (!response.ok) {
+          console.error('保存遊戲動作失敗:', await response.text());
+        }
+      } catch (error) {
+        console.error('保存遊戲動作時發生錯誤:', error);
+      }
+    }
+  };
+
+  // 結束遊戲並保存到資料庫
+  const endGameInDatabase = async (winner?: { playerId: number; playerName: string; reason: string }) => {
+    if (!isGameCreatedInDB) return;
+
+    try {
+      const finalPlayers = players.map(p => ({
+        id: p.id,
+        finalScore: p.currency,
+        finalRound: p.round
+      }));
+
+      const response = await fetch(`http://127.0.0.1:2083/api/v1/game-history/${gameHistory.gameId}/end`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          winner,
+          finalPlayers
+        }),
+      });
+
+      if (response.ok) {
+        console.log('遊戲結束記錄已保存到資料庫');
+      } else {
+        console.error('保存遊戲結束記錄失敗:', await response.text());
+      }
+    } catch (error) {
+      console.error('保存遊戲結束記錄時發生錯誤:', error);
+    }
   };
 
   // 處理路徑選擇
@@ -382,9 +466,9 @@ const Monopoly: React.FC = () => {
     audioManager.play(AudioType.THEME_SELECTION, 0.2);
 
     // 記錄移動動作
-    recordGameAction(
-      currentPlayer.id,
-      currentPlayer.name,
+      recordGameAction(
+        currentPlayer.id,
+        currentPlayer.name,
       'move',
       `${currentPlayer.name} 選擇${selectedPath === 'normal' ? '正常' : 'D5'}路徑移動到 ${selectedOption.new_position}`,
       {
@@ -395,11 +479,11 @@ const Monopoly: React.FC = () => {
     );
     
     // 更新玩家位置
-    setPlayers(prevPlayers => 
+      setPlayers(prevPlayers => 
       prevPlayers.map(player => {
         if (player.id === currentPlayer.id) {
           return {
-            ...player,
+                ...player,
             locationName: selectedOption.new_position,
             location: selectedOption.new_position,
             record: `${selectedOption.new_position} - 路徑選擇移動完成`
@@ -421,7 +505,7 @@ const Monopoly: React.FC = () => {
     
     // 獲取位置信息並處理後續事件
     console.log('準備獲取位置信息:', selectedOption.new_position);
-    fetchPositionInfo(selectedOption.new_position, selectedPath === 'alternative');
+    fetchPositionInfo(selectedOption.new_position);
     
     // 清除路徑選擇狀態
     setShowPathSelection(false);
@@ -429,7 +513,7 @@ const Monopoly: React.FC = () => {
   };
 
   // 獲取位置信息並處理事件
-  const fetchPositionInfo = async (positionId: string, isAlternativePath: boolean = false) => {
+  const fetchPositionInfo = async (positionId: string) => {
     try {
       console.log('fetchPositionInfo 被調用，positionId:', positionId, 'boardId:', mapBoard?._id);
       if (!mapBoard?._id) {
@@ -473,7 +557,7 @@ const Monopoly: React.FC = () => {
       console.log('移動結果:', moveResult);
       
       if (moveResult.code === 200 && moveResult.body) {
-        const { new_position, position_info, passed_start, round_completed, alternative_path } = moveResult.body;
+        const { new_position, position_info, passed_start, alternative_path } = moveResult.body;
 
         // 如果有alternative_path，顯示路徑選擇
         if (alternative_path) {
@@ -494,9 +578,9 @@ const Monopoly: React.FC = () => {
         audioManager.play(AudioType.THEME_SELECTION, 0.2);
 
     // 記錄擲骰子動作
-      recordGameAction(
-        currentPlayer.id,
-        currentPlayer.name,
+        recordGameAction(
+          currentPlayer.id,
+          currentPlayer.name,
       'dice_roll',
       `${currentPlayer.name} 擲出 ${value} 點`,
           { diceValue: value, location: currentPlayer.locationName }
@@ -542,16 +626,22 @@ const Monopoly: React.FC = () => {
             // 檢查是否獲勝（經過起點3次）
             if (newCount >= 3) {
               setWinner(currentPlayer);
-                recordGameAction(
-                  currentPlayer.id,
-                  currentPlayer.name,
+      recordGameAction(
+        currentPlayer.id,
+        currentPlayer.name,
                 'victory',
                 `${currentPlayer.name} 經過起點3次，獲得勝利！`,
                 { winner: true, passedStartCount: newCount }
               );
               
-            setTimeout(() => {
+            setTimeout(async () => {
                 setShowGameOver(true);
+                // 結束遊戲並保存到資料庫
+                await endGameInDatabase({
+                  playerId: currentPlayer.id,
+                  playerName: currentPlayer.name,
+                  reason: '經過起點3次'
+                });
               }, 1000);
           }
           
@@ -574,10 +664,10 @@ const Monopoly: React.FC = () => {
         }
 
         // 記錄移動動作
-        recordGameAction(
-          currentPlayer.id,
-          currentPlayer.name,
-          'move',
+      recordGameAction(
+        currentPlayer.id,
+        currentPlayer.name,
+        'move',
           `${currentPlayer.name} 移動到：${position_info.name}`,
           { 
             from: currentPlayer.locationName, 
@@ -743,7 +833,7 @@ const Monopoly: React.FC = () => {
           setTimeout(() => {
             switchToNextPlayer();
           }, 1000); // 1秒後自動切換
-        }
+      }
     }
   };
 
@@ -822,7 +912,7 @@ const Monopoly: React.FC = () => {
   };
 
   // 處理破產
-  const handleBankruptcy = () => {
+  const handleBankruptcy = async () => {
     if (currentPlayer) {
       // 播放遊戲結束音效
       audioManager.play(AudioType.VIEW_SCORE, 0.7);
@@ -846,6 +936,9 @@ const Monopoly: React.FC = () => {
     // 破產時不設置獲勝者，直接顯示遊戲結束
     setWinner(null);
     setShowGameOver(true);
+    
+    // 結束遊戲並保存到資料庫（無獲勝者）
+    await endGameInDatabase();
   };
 
 
@@ -953,21 +1046,13 @@ const Monopoly: React.FC = () => {
     
     let isCorrect = false;
     
-    // 優先使用 currentWordCard 來判斷答案（API獲取的單字卡）
+    // 使用 currentWordCard 來判斷答案（API獲取的單字卡）
     if (currentWordCard) {
       isCorrect = playerAnswer === currentWordCard.ch || playerAnswer === currentWordCard.han;
       console.log(`挑戰答案判斷 (API單字卡): "${playerAnswer}" vs 中文"${currentWordCard.ch}" 或 台語"${currentWordCard.han}" = ${isCorrect ? '正確' : '錯誤'}`);
     } else {
-      // 回退到硬編碼問題判斷
-    const questions = challengeQuestions[selectedChallengeType as keyof typeof challengeQuestions];
-    const currentQ = questions.find(q => q.question === challengeQuestion);
-    
-    if (currentQ) {
-        isCorrect = currentQ.answers.some((answer: string) => 
-        playerAnswer.toLowerCase().includes(answer.toLowerCase())
-      );
-        console.log(`挑戰答案判斷 (硬編碼): "${playerAnswer}" vs ${currentQ.answers} = ${isCorrect ? '正確' : '錯誤'}`);
-      }
+      console.warn('沒有可用的單字卡片來判斷答案');
+      isCorrect = false;
     }
     
     if (isCorrect !== undefined) {
@@ -1001,7 +1086,14 @@ const Monopoly: React.FC = () => {
             currentPlayer.name,
             'challenge',
             `火車挑戰${isCorrect ? '成功' : '失敗'}: ${challengeQuestion} - ${isCorrect ? '下一次移動將在捷徑路線(36-41)' : '本次不能使用捷徑'}`,
-            { answer: playerAnswer, correct: isCorrect, challengeType: 'train', nextMoveToShortcut: isCorrect }
+            { 
+              answer: playerAnswer, 
+              correct: isCorrect, 
+              challengeType: 'train', 
+              nextMoveToShortcut: isCorrect,
+              location: currentPlayer.locationName,
+              timestamp: new Date().toISOString()
+            }
           );
           
           // 添加玩家記錄
@@ -1023,7 +1115,13 @@ const Monopoly: React.FC = () => {
             currentPlayer.name,
             'challenge',
             `挑戰${isCorrect ? '成功' : '失敗'}: ${challengeQuestion}`,
-            { answer: playerAnswer, correct: isCorrect }
+            { 
+              answer: playerAnswer, 
+              correct: isCorrect, 
+              challengeType: 'general',
+              location: currentPlayer.locationName,
+              timestamp: new Date().toISOString()
+            }
           );
           
           // 添加玩家記錄
@@ -1246,7 +1344,10 @@ const Monopoly: React.FC = () => {
                         `${currentPlayer.name} 情境挑戰: 成功`,
                         { 
                           challengeType: 'scenario',
-                          conversationCount: conversationCount
+                          conversationCount: conversationCount,
+                          location: currentPlayer.locationName,
+                          timestamp: new Date().toISOString(),
+                          correct: true
                         }
                       );
                     }
@@ -1295,6 +1396,26 @@ const Monopoly: React.FC = () => {
           setWordCardChallengeResult(isCorrect ? 'success' : 'failure');
           
           console.log(`單字挑戰結果: "${transcription}" vs 中文翻譯"${currentWordCard.ch}" 或 台語漢字"${currentWordCard.han}" = ${isCorrect ? '成功' : '失敗'}`);
+          
+          // 記錄單字挑戰結果到資料庫
+          const currentPlayer = players.find(p => p.isCurrentPlayer);
+          if (currentPlayer) {
+            recordGameAction(
+              currentPlayer.id,
+              currentPlayer.name,
+              'challenge',
+              `單字挑戰${isCorrect ? '成功' : '失敗'}: ${currentWordCard.han} (${currentWordCard.ch})`,
+              {
+                challengeType: 'vocabulary',
+                word: currentWordCard.han,
+                meaning: currentWordCard.ch,
+                answer: transcription,
+                correct: isCorrect,
+                location: currentPlayer.locationName,
+                timestamp: new Date().toISOString()
+              }
+            );
+          }
         }
       } else if (selectedChallengeType && challengeSessionId) {
         // 挑戰對話模式 - 直接使用情境挑戰的語音處理邏輯
@@ -1425,6 +1546,44 @@ const Monopoly: React.FC = () => {
   const resetChallenge = () => {
     const wasTrainChallenge = currentChallenge?.type === 'train' || currentChallenge?.type === 'transport';
     const currentPlayer = players.find(p => p.isCurrentPlayer);
+    
+    // 記錄挑戰結果（如果有結果的話）
+    if (currentPlayer) {
+      if (challengeResult) {
+        const challengeTypeName = wasTrainChallenge ? '火車挑戰' : 
+                                 currentChallenge?.type === 'vocabulary' ? '單字挑戰' : 
+                                 currentChallenge?.type === 'story' ? '情境挑戰' : '挑戰';
+        
+        recordGameAction(
+          currentPlayer.id,
+          currentPlayer.name,
+          'challenge',
+          `${challengeTypeName}${challengeResult === 'success' ? '成功' : '失敗'}`,
+          {
+            challengeType: wasTrainChallenge ? 'train' : currentChallenge?.type || 'general',
+            correct: challengeResult === 'success',
+            location: currentPlayer.locationName,
+            timestamp: new Date().toISOString()
+          }
+        );
+      } else if (couponChallengeResult) {
+        // 記錄優惠券挑戰結果
+        const challengeTypeName = currentChallenge?.type === 'transport' ? '火車挑戰' : '情境挑戰';
+        
+        recordGameAction(
+          currentPlayer.id,
+          currentPlayer.name,
+          'challenge',
+          `${challengeTypeName}${couponChallengeResult === 'success' ? '成功' : '失敗'}`,
+          {
+            challengeType: 'coupon',
+            correct: couponChallengeResult === 'success',
+            location: currentPlayer.locationName,
+            timestamp: new Date().toISOString()
+          }
+        );
+      }
+    }
     
     setSelectedCouponChallengeType(null);
     setChallengeQuestion('');
@@ -1562,8 +1721,8 @@ const Monopoly: React.FC = () => {
     }
   };
 
-  // 處理情境對話提交
-  const handleScenarioSubmit = async () => {
+  // 處理情境對話提交 (未使用)
+  const _handleScenarioSubmit = async () => {
     if (!scenarioSessionId || !scenarioPlayerInput.trim() || scenarioIsProcessing) {
       return;
     }
@@ -1654,74 +1813,39 @@ const Monopoly: React.FC = () => {
     }
   };
 
-  // 處理優惠券挑戰答案提交
-  const handleCouponAnswerSubmit = () => {
-    if (!selectedCouponChallengeType || !couponPlayerAnswer.trim()) return;
-    
-    const questions = challengeQuestions[selectedCouponChallengeType as keyof typeof challengeQuestions];
-    const currentQ = questions.find(q => q.question === couponChallengeQuestion);
-    
-    if (currentQ) {
-      const isCorrect = currentQ.answers.some((answer: string) => 
-        couponPlayerAnswer.toLowerCase().includes(answer.toLowerCase())
-      );
-      
-      setCouponChallengeResult(isCorrect ? 'success' : 'failure');
-      
-      // 播放挑戰結果音效
-      if (isCorrect) {
-        audioManager.play(AudioType.CORRECT_ANSWER, 0.6);
-      } else {
-        audioManager.play(AudioType.WRONG_ANSWER, 0.6);
-      }
-      
-      // 記錄遊戲動作
-      const currentPlayer = players.find(p => p.isCurrentPlayer);
-      if (currentPlayer) {
-        const result = isCorrect ? '成功' : '失敗';
-        let reward;
-        
-        // 根據優惠券類型顯示不同的獎勵/懲罰消息
-        if (couponType === 'road_construction') {
-          reward = isCorrect ? '免於暫停一回合' : '暫停一回合';
-        } else if (couponType === 'gas_station') {
-          reward = isCorrect ? '免費加油一次' : '挑戰失敗請支付一百元';
-        } else {
-          reward = isCorrect ? '房地產減免100元' : '請付原價';
-        }
-        
-        recordGameAction(
-          currentPlayer.id,
-          currentPlayer.name,
-          'challenge',
-          `優惠券挑戰${result}: ${couponChallengeQuestion} - ${reward}`,
-          { answer: couponPlayerAnswer, correct: isCorrect, challengeType: 'coupon' }
-        );
-        
-        // 道路施工挑戰邏輯：成功免於暫停，失敗暫停一回合
-        if (couponType === 'road_construction') {
-          if (!isCorrect) {
-            // 挑戰失敗：設置暫停
-            setRoadConstructionSkip(prev => ({
-              ...prev,
-              [currentPlayer.id]: true
-            }));
-          }
-          // 挑戰成功：不需要設置暫停（免於暫停一回合）
-        }
-      }
-    }
-  };
+  // 處理優惠券挑戰答案提交 (未使用 - 已廢棄)
 
   // 重置優惠券挑戰狀態
   const resetCouponChallenge = () => {
+    const currentPlayer = players.find(p => p.isCurrentPlayer);
+    
+    // 記錄優惠券挑戰結果（如果有結果的話）
+    if (currentPlayer && couponChallengeResult) {
+      const challengeTypeName = couponType === 'gas_station' ? '加油站挑戰' : 
+                               couponType === 'road_construction' ? '道路施工挑戰' : 
+                               couponType === 'property' ? '房地產挑戰' : '優惠券挑戰';
+      
+      recordGameAction(
+        currentPlayer.id,
+        currentPlayer.name,
+        'challenge',
+        `${challengeTypeName}${couponChallengeResult === 'success' ? '成功' : '失敗'}`,
+        {
+          challengeType: 'coupon',
+          couponType: couponType,
+          correct: couponChallengeResult === 'success',
+          location: currentPlayer.locationName,
+          timestamp: new Date().toISOString()
+        }
+      );
+    }
+    
     setSelectedCouponChallengeType(null);
     setCouponChallengeQuestion('');
     setCouponPlayerAnswer('');
     setCouponChallengeResult(null);
     setShowCouponChallengePanel(false);
     
-    const currentPlayer = players.find(p => p.isCurrentPlayer);
     if (currentPlayer) {
       // 加油站挑戰完成後暫停一次
       if (couponType === 'gas_station') {
@@ -2477,7 +2601,11 @@ const Monopoly: React.FC = () => {
                 audioManager.play(AudioType.THEME_SELECTION, 0.3);
                 setShowGameOver(false);
                 navigate('/Scoresummary', { 
-                  state: { players: players } 
+                  state: { 
+                    players: players,
+                    gameId: gameHistory.gameId,
+                    gameHistory: gameHistory
+                  } 
                 });
               }}
             >

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../style/ScoreSummary.css';
 
@@ -9,6 +9,38 @@ interface PlayerRecord {
   locationName: string;
   action: string;
   details?: string;
+}
+
+interface GameAction {
+  _id?: string;
+  actionType: 'dice_roll' | 'move' | 'challenge' | 'bankruptcy' | 'shortcut' | 'victory';
+  playerId: number;
+  playerName: string;
+  description: string;
+  details?: any;
+  timestamp: Date;
+}
+
+interface GameHistory {
+  _id?: string;
+  gameId: string;
+  gameName: string;
+  players: Array<{
+    id: number;
+    name: string;
+    userName?: string;
+    finalScore?: number;
+    finalRound?: number;
+  }>;
+  actions: GameAction[];
+  startTime: Date;
+  endTime?: Date;
+  winner?: {
+    playerId: number;
+    playerName: string;
+    reason: string;
+  };
+  gameStatus: 'in_progress' | 'completed' | 'abandoned';
 }
 
 interface Player {
@@ -31,6 +63,37 @@ const ScoreSummary: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const players = location.state?.players || [];
+  const gameId = location.state?.gameId;
+  const _frontendGameHistory = location.state?.gameHistory;
+  
+  const [dbGameHistory, setDbGameHistory] = useState<GameHistory | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  // 從資料庫讀取遊戲歷史
+  useEffect(() => {
+    const fetchGameHistory = async () => {
+      if (!gameId) return;
+      
+      setLoading(true);
+      try {
+        const response = await fetch(`http://127.0.0.1:2083/api/v1/game-history/${gameId}`);
+        if (response.ok) {
+          const result = await response.json();
+          if (result.code === 200) {
+            setDbGameHistory(result.body);
+          }
+        } else {
+          console.error('讀取遊戲歷史失敗:', await response.text());
+        }
+      } catch (error) {
+        console.error('讀取遊戲歷史時發生錯誤:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGameHistory();
+  }, [gameId]);
 
   // 計算玩家排名
   const getPlayerRanking = () => {
@@ -74,48 +137,60 @@ const ScoreSummary: React.FC = () => {
           </div>
         </div>
 
-        {/* 玩家排名 */}
+        {/* 玩家排名和挑戰記錄 */}
         <div className="player-rankings">
-          {getPlayerRanking().map((player, index) => (
-            <div 
-              key={player.id} 
-              className={`player-rank ${index === 0 ? 'winner' : ''}`}
-            >
-              <div className="rank-avatar">
-                {player.avatarImage ? (
-                  <img 
-                    src={player.avatarImage} 
-                    alt={player.name}
-                    className="avatar-image"
-                  />
-                ) : (
-                  <span className="avatar-emoji">{player.avatar}</span>
+          {getPlayerRanking().map((player, index) => {
+            // 獲取該玩家的挑戰記錄
+            const playerActions = dbGameHistory?.actions.filter(action => action.playerId === player.id) || [];
+            
+            return (
+              <div key={player.id} className="player-section">
+                {/* 玩家排名信息 */}
+                <div className={`player-rank ${index === 0 ? 'winner' : ''}`}>
+                  <div className="rank-avatar">
+                    {player.avatarImage ? (
+                      <img 
+                        src={player.avatarImage} 
+                        alt={player.name}
+                        className="avatar-image"
+                      />
+                    ) : (
+                      <span className="avatar-emoji">{player.avatar}</span>
+                    )}
+                    {index === 0 && <div className="crown">👑</div>}
+                  </div>
+                  <div className="rank-info">
+                    <div className="player-name">{player.name}</div>
+                    <div className="rank-position">第{index + 1}名</div>
+                  </div>
+                </div>
+
+                {/* 該玩家的挑戰記錄 */}
+                {playerActions.length > 0 && (
+                  <div className="player-challenge-records">
+                    <div className="player-records-header">
+                      <span className="player-name">{player.name} 的挑戰記錄</span>
+                      <span className="record-count">({playerActions.length} 個動作)</span>
+                    </div>
+                    <div className="player-actions-list">
+                      {playerActions.map((action, actionIndex) => (
+                        <div key={action._id || actionIndex} className={`player-action-item ${action.actionType}`}>
+                          <div className="action-time">
+                            {new Date(action.timestamp).toLocaleTimeString()}
+                          </div>
+                          <div className="action-description">
+                            {action.description}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
-                {index === 0 && <div className="crown">👑</div>}
               </div>
-              <div className="rank-info">
-                <div className="player-name">{player.name}</div>
-                <div className="rank-position">第{index + 1}名</div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        {/* 遊戲紀錄 */}
-        <div className="game-records">
-          {players.map((player: Player) => (
-            <div key={player.id} className="player-record-panel">
-              <div className="record-header">遊戲紀錄</div>
-              <div className="record-list">
-                {player.records.slice(-3).reverse().map((record: PlayerRecord) => (
-                  <div key={record.id} className="record-item">
-                    -{record.details}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
 
         {/* 結束按鈕 */}
         <div className="summary-footer">
