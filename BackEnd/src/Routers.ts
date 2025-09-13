@@ -20,6 +20,10 @@ import { ChatChooseRoute } from "./routers/ChatChooseRoute";
 import { ScenarioRoute } from "./routers/ScenarioRoute";
 import { VocabProgressRoute } from "./routers/VocabProgressRoute";
 import { VocabularyPictureRoute } from "./routers/VocabularyPictureRoute";
+import { MapBoardRoute } from "./routers/MapBoardRoute";
+import { MapNodeRoute } from "./routers/MapNodeRoute";
+import { MapEdgeRoute } from "./routers/MapEdgeRoute";
+import { GameLogicRoute } from "./routers/GameLogicRoute";
 
 export const router: Array<Route> = [
     new PageRoute(),new UserRoute()
@@ -42,4 +46,8 @@ export const router: Array<Route> = [
     ,new ScenarioRoute()
     ,new VocabProgressRoute()
     ,new VocabularyPictureRoute()
+    ,new MapBoardRoute()
+    ,new MapNodeRoute()
+    ,new MapEdgeRoute()
+    ,new GameLogicRoute()
 ];

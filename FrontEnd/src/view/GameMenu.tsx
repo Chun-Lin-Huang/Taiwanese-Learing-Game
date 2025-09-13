@@ -28,7 +28,7 @@ const GameMenu: React.FC = () => {
             type="button"
             className="gm-back"
             aria-label="返回"
-            onClick={() => window.history.back()}
+            onClick={() => navigate("/Learn")}
           >
             <img src={backIcon} alt="返回" />
           </button>

@@ -8,7 +8,7 @@ const vocabPictureSchema = new Schema<VocabularyPicture>(
     imageSize: { type: Number, required: true },
     imageType: { type: String, required: true },
     image: { type: Buffer, required: true },
-    vocId: { type: Schema.Types.ObjectId, ref: "VocabularyCards", required: true, index: true },
+    vocId: { type: Schema.Types.Mixed, required: true, index: true }, // 支援 ObjectId 和 String
   },
   { collection: "VocabularyPicture", timestamps: true }
 );
