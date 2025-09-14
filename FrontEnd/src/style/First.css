@@ -14,7 +14,7 @@
 
   /* 設定頁面背景 - 現在應該是純色或純棋盤格圖，不包含小熊和 Welcome 文字 */
   
-   background-image: url('../assets/背景小熊.png'); 
+   background-image: url('../assets/bear.png'); 
   /* background-size: cover; */
   /* background-position: center; */
   /* background-repeat: no-repeat; */
@@ -34,9 +34,25 @@
   height: auto;
   /* 應用往上移的動畫 */
   animation: slideInUp 1s ease-out forwards;
-  animation-delay: 1s; /* 讓 Welcome 文字在頁面載入後延遲 0.5 秒才開始動畫 */
+  animation-delay: 0.5s; /* 讓 Welcome 文字在頁面載入後延遲 0.5 秒才開始動畫 */
 }
 
+.welcome-text{
+
+font-size: 200px;
+color:#BCA88D ;
+  max-width: 70%;
+  height: auto;
+  animation: slideInUp 1s ease-out forwards;
+  animation-delay: 0.5s; 
+transform: translateY(250px);
+
+text-shadow:
+     -5px -5px 0px #857b6f,  /* 左上角描邊 */
+    5px -5px 0px #857b6f,   /* 右上角描邊 */
+    -5px 5px 0px #857b6f,   /* 左下角描邊 */
+    5px 3px 0px #857b6f;    /* 右下角描邊 */
+}
 /* 定義 slideInUp 動畫 */
 @keyframes slideInUp {
   from {

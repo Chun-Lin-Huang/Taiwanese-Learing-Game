@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../style/Welcome.css";
-import backgroundImage from "../assets/背景.png";
+//import backgroundImage from "../assets/背景.png";
 import bearImage from "../assets/bear.png";
 
 const Welcome: React.FC = () => {
@@ -10,9 +10,7 @@ const Welcome: React.FC = () => {
   return (
     <section
       id="hero"
-      style={{
-        backgroundImage: `url(${backgroundImage})`,
-      }}
+     
     >
       <div className="hero-container">
         <h1 className="hero-title">歡迎</h1>

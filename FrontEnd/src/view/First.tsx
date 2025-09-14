@@ -2,12 +2,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../style/First.css"; // 確保這個 CSS 文件正確引入
-import "../Main.css";
+import "../App.css";
 import "../Login.css"
 
 
 
-import welcomeText from "../assets/歡迎.png"; 
+//import welcomeText from "../assets/歡迎.png"; 
 const First: React.FC = () => {
   const navigate = useNavigate();
 
@@ -19,11 +19,12 @@ const First: React.FC = () => {
    
     <div id="login-success-page" onClick={handleEnterHome}>
       
-      <img
-        src={welcomeText}
-        alt="Welcome"
-        className="welcome-text-image" // 給 Welcome 文字一個獨立的類名
-      />
+      <p
+        
+        className="welcome-text" // 給 Welcome 文字一個獨立的類名
+      >
+        Welcome 
+        </p>
     </div>
   );
 };
