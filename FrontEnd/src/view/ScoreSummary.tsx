@@ -65,6 +65,7 @@ const ScoreSummary: React.FC = () => {
   const players = location.state?.players || [];
   const gameId = location.state?.gameId;
   const _frontendGameHistory = location.state?.gameHistory;
+  const winner = location.state?.winner;
   
   const [dbGameHistory, setDbGameHistory] = useState<GameHistory | null>(null);
   const [loading, setLoading] = useState(false);
@@ -98,7 +99,11 @@ const ScoreSummary: React.FC = () => {
   // 計算玩家排名
   const getPlayerRanking = () => {
     return [...players].sort((a, b) => {
-      // 破產的玩家排在最後
+      // 勝利者排在第1名
+      if (winner && a.id === winner.id && b.id !== winner.id) return -1;
+      if (winner && b.id === winner.id && a.id !== winner.id) return 1;
+      
+      // 破產的玩家排在最後（除了勝利者）
       if (a.status === '破產' && b.status !== '破產') return 1;
       if (b.status === '破產' && a.status !== '破產') return -1;
       

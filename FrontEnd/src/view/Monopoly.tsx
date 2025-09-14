@@ -128,6 +128,7 @@ const Monopoly: React.FC = () => {
     const audioManager = AudioManager.getInstance();
     const [showGameOver, setShowGameOver] = useState(false);
     const [winner, setWinner] = useState<Player | null>(null);
+    const [winnerReason, setWinnerReason] = useState<string>('');
     const [showGameHistory, setShowGameHistory] = useState(false);
     const [showLocationDetail, setShowLocationDetail] = useState(false);
     const [currentLocationDetail, setCurrentLocationDetail] = useState<Property | null>(null);
@@ -309,6 +310,42 @@ const Monopoly: React.FC = () => {
 
     initializeMap();
   }, []);
+
+  // 地圖載入後更新玩家的起始位置名稱
+  useEffect(() => {
+    const updateStartLocationNames = async () => {
+      if (!mapBoard || !isMapLoaded) return;
+      
+      try {
+        // 獲取起始點的路名
+        const startResult = await MapApiService.getNodeById('S0', mapBoard._id);
+        if (startResult.code === 200 && startResult.body) {
+          const startLocationName = startResult.body.name;
+          
+          // 更新所有玩家的起始位置名稱
+          setPlayers(prev => prev.map(player => 
+            player.location === 'S0' && player.locationName === 'S0'
+              ? {
+                  ...player,
+                  locationName: startLocationName,
+                  records: player.records.map(record => 
+                    record.location === 'S0' && record.locationName === 'S0'
+                      ? { ...record, locationName: startLocationName }
+                      : record
+                  )
+                }
+              : player
+          ));
+          
+          console.log('起始點路名已更新為:', startLocationName);
+        }
+      } catch (error) {
+        console.warn('無法獲取起始點路名:', error);
+      }
+    };
+
+    updateStartLocationNames();
+  }, [mapBoard, isMapLoaded]);
 
   // 初始化玩家數據的函數
   const initializePlayers = (playerNames: string[]): Player[] => {
@@ -627,8 +664,8 @@ const Monopoly: React.FC = () => {
             if (player.id === currentPlayer.id) {
               const updatedPlayer = {
                 ...player,
-                locationName: new_position,
-                location: position_info.node_id, // 使用節點ID作為位置
+                location: new_position, // 使用位置代碼
+                locationName: position_info.name, // 使用位置名稱
                 record: `${position_info.name} - 移動完成`
               };
               console.log(`${player.name} 位置更新:`, {
@@ -661,6 +698,7 @@ const Monopoly: React.FC = () => {
             // 檢查是否獲勝（經過起點3次）
             if (newCount >= 3) {
               setWinner(currentPlayer);
+              setWinnerReason('經過起點3次');
       recordGameAction(
         currentPlayer.id,
         currentPlayer.name,
@@ -988,15 +1026,43 @@ const Monopoly: React.FC = () => {
         record: '遊戲結束 - 破產'
       });
       
-      // 切換到下一玩家
-      switchToNextPlayer();
+      // 找到剩餘玩家中表現最好的作為贏家（按骰子點數總和排序）
+      const remainingPlayers = players.filter(p => p.id !== currentPlayer.id && p.status !== '破產');
+      const winnerPlayer = remainingPlayers.length > 0 
+        ? remainingPlayers.reduce((best, current) => 
+            current.diceSum > best.diceSum ? current : best
+          )
+        : null;
+      
+      // 設置獲勝者（如果還有其他玩家）
+      if (winnerPlayer) {
+        setWinner(winnerPlayer);
+        setWinnerReason('其他玩家破產');
+        recordGameAction(
+          winnerPlayer.id,
+          winnerPlayer.name,
+          'victory',
+          `${winnerPlayer.name} 因其他玩家破產而獲勝！`,
+          { reason: '其他玩家破產' }
+        );
+      } else {
+        setWinner(null);
+        setWinnerReason('');
+      }
+      
+      setShowGameOver(true);
+      
+      // 結束遊戲並保存到資料庫
+      if (winnerPlayer) {
+        await endGameInDatabase({
+          playerId: winnerPlayer.id,
+          playerName: winnerPlayer.name,
+          reason: '其他玩家破產'
+        });
+      } else {
+        await endGameInDatabase();
+      }
     }
-    // 破產時不設置獲勝者，直接顯示遊戲結束
-    setWinner(null);
-    setShowGameOver(true);
-    
-    // 結束遊戲並保存到資料庫（無獲勝者）
-    await endGameInDatabase();
   };
 
 
@@ -1196,6 +1262,7 @@ const Monopoly: React.FC = () => {
       // 檢查是否獲勝（經過起點3次）
       if (newCount >= 3) {
         setWinner(player);
+        setWinnerReason('經過起點3次');
         recordGameAction(
           player.id,
           player.name,
@@ -2940,7 +3007,9 @@ const Monopoly: React.FC = () => {
             </h2>
             {winner && (
               <p className="winner-message">
-                {winner.name} 經過起點3次，恭喜獲勝！🎉
+                {winner.name} 恭喜獲勝！🎉
+                {winnerReason === '經過起點3次' && ' 經過起點3次'}
+                {winnerReason === '其他玩家破產' && ' 因其他玩家破產'}
               </p>
             )}
             <button 
@@ -2952,7 +3021,8 @@ const Monopoly: React.FC = () => {
                   state: { 
                     players: players,
                     gameId: gameHistory.gameId,
-                    gameHistory: gameHistory
+                    gameHistory: gameHistory,
+                    winner: winner
                   } 
                 });
               }}
