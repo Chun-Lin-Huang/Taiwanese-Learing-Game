@@ -457,7 +457,7 @@ const Monopoly: React.FC = () => {
         };
 
         try {
-          await asyncPostGameHistory('http://127.0.0.1:2083/api/v1/game-history/create', gameData);
+          await asyncPostGameHistory('http://127.0.0.1:2083/api/v1/monopoly-history/create', gameData);
           console.log('遊戲記錄已創建到資料庫');
         } catch (error: any) {
           console.error('創建遊戲記錄失敗:', error.message);
@@ -483,7 +483,7 @@ const Monopoly: React.FC = () => {
         };
 
         try {
-          await asyncPostGameHistory(`http://127.0.0.1:2083/api/v1/game-history/${gameHistory.gameId}/action`, actionData);
+          await asyncPostGameHistory(`http://127.0.0.1:2083/api/v1/monopoly-history/${gameHistory.gameId}/action`, actionData);
           // 成功保存
         } catch (error: any) {
           console.error('保存遊戲動作失敗:', error.message);
@@ -506,7 +506,7 @@ const Monopoly: React.FC = () => {
       }));
 
       try {
-        await asyncPostGameHistory(`http://127.0.0.1:2083/api/v1/game-history/${gameHistory.gameId}/end`, {
+        await asyncPostGameHistory(`http://127.0.0.1:2083/api/v1/monopoly-history/${gameHistory.gameId}/end`, {
           winner,
           finalPlayers
         });

@@ -77,7 +77,7 @@ const ScoreSummary: React.FC = () => {
       
       setLoading(true);
       try {
-        const response = await fetch(`http://127.0.0.1:2083/api/v1/game-history/${gameId}`);
+        const response = await fetch(`http://127.0.0.1:2083/api/v1/monopoly-history/${gameId}`);
         if (response.ok) {
           const result = await response.json();
           if (result.code === 200) {

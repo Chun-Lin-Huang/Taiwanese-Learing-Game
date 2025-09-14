@@ -24,7 +24,7 @@ import { MapBoardRoute } from "./routers/MapBoardRoute";
 import { MapNodeRoute } from "./routers/MapNodeRoute";
 import { MapEdgeRoute } from "./routers/MapEdgeRoute";
 import { GameLogicRoute } from "./routers/GameLogicRoute";
-import { GameHistoryRoute } from "./routers/GameHistoryRoute";
+import { MonopolyHistoryRoute } from "./routers/MonopolyHistoryRoute";
 import { CardRoute } from "./routers/CardRoute";
 import { CardUseRoute } from "./routers/CardUseRoute";
 
@@ -53,7 +53,7 @@ export const router: Array<Route> = [
     ,new MapNodeRoute()
     ,new MapEdgeRoute()
     ,new GameLogicRoute()
-    ,new GameHistoryRoute()
+    ,new MonopolyHistoryRoute()
     ,new CardRoute()
     ,new CardUseRoute()
 ];
