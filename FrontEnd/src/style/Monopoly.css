@@ -258,9 +258,10 @@
   
   /* 玩家資訊面板 */
   .player-info-panel {
-    position: absolute;
-    bottom: 120px;
+    position: fixed;
+    top: 50%;
     left: 70px;
+    transform: translateY(-50%);
     width: 300px;
     height: 500px;
     background: #FFFBD3;
@@ -699,7 +700,8 @@
     .player-info-panel {
       width: 250px;
       left: 20px;
-      bottom: 100px;
+      top: 50%;
+      transform: translateY(-50%);
     }
     
     .dice-area {
@@ -822,6 +824,44 @@
     gap: 15px;
   }
   
+  /* 機會卡面板中的 QR 掃描器按鈕樣式 - 黑色樣式，避免與背景融合 */
+  .header-right .qr-scanner-button {
+    position: static !important; /* 覆蓋掉全域的絕對定位，讓它在 flex 容器中正常排列 */
+    transform: none !important;  /* 覆蓋掉全域的 transform，讓它不被垂直置中 */
+    background: #333333;
+    border: 2px solid #555555;
+    border-radius: 8px;
+    color: white;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 44px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .header-right .qr-scanner-button:hover {
+    background: #444444;
+    border-color: #666666;
+    transform: scale(1.05) !important; /* 保持縮放效果，但不再有 translateY(-50%) */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+  
+  .header-right .qr-scanner-button:active {
+    transform: scale(0.95) !important; /* 保持縮放效果，但不再有 translateY(-50%) */
+    background: #222222;
+  }
+  
+  .header-right .qr-scanner-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    filter: brightness(0) invert(1); /* 白色圖標 */
+  }
+  
   .countdown-timer {
     background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
     color: white;
@@ -848,7 +888,7 @@
   .location-title {
     font-size: 24px;
     font-weight: 700;
-    color: #2c3e50;
+    color: #000000;
     margin: 0;
   }
   
@@ -924,6 +964,15 @@
     color: #666;
     margin-bottom: 10px;
     line-height: 1.5;
+  }
+  
+  /* 機會卡提示樣式 */
+  .chance-hint {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 15px;
+    text-align: left;
+    font-weight: 500;
   }
   
   .challenge-reward, .chance-effect {
@@ -1463,20 +1512,27 @@
     padding: 0;
     min-width: 550px; /* 調整最小寬度 */
     max-width: 600px; /* 調整最大寬度 */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     animation: slideInRight 0.3s ease-out;
-    position: relative;
-    top: 100px; /* 調整y軸位置，可以修改這個數值 */
-    left: 500px; /* 調整x軸位置，可以修改這個數值 */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     min-height: 500px; /* 改為最小高度 */
     max-height: 80vh; /* 最大高度為視窗高度的80% */
     overflow-y: auto; /* 改為可滾動 */
+    z-index: 1000; /* 確保在其他元素之上 */
   }
+
   
   .challenge-header {
     background: #736868; /* 深棕色標題背景 */
     padding: 12px 20px;
     border-bottom: 1px solid #736868;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .challenge-title {
@@ -1485,6 +1541,44 @@
     color: #f5f5dc; /* 淺色文字 */
     margin: 0;
     text-align: center;
+  }
+
+  /* QR 掃描器按鈕 */
+  .qr-scanner-button {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    color: #f5f5dc;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 44px;
+  }
+
+  .qr-scanner-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-50%) scale(1.05);
+  }
+
+  .qr-scanner-button:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+
+  /* QR 掃描器圖標 */
+  .qr-scanner-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    filter: brightness(0) invert(1); /* 將圖標變為白色 */
   }
   
   .challenge-content {
@@ -1861,13 +1955,13 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    transition: all 0.3s ease;
+    /* 移除 transition 動畫 */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
   
   .microphone-icon-large:hover {
     background: #a08660;
-    transform: scale(1.1);
+    /* 移除縮放動畫 */
   }
   
   .microphone-icon-large img {
@@ -1884,7 +1978,7 @@
     top: -10px;
     right: -10px;
     font-size: 16px;
-    animation: pulse 1s infinite;
+    /* 移除脈衝動畫 */
   }
   
   @keyframes pulse {
@@ -2222,7 +2316,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s ease;
+    /* 移除 transition 動畫 */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     z-index: 1001;
   }
@@ -2235,7 +2329,7 @@
   
   .microphone-icon:hover {
     background: #B19E86;
-    transform: scale(1.05);
+    /* 移除縮放動畫 */
   }
   
   /* 單字挑戰語音模式樣式 */

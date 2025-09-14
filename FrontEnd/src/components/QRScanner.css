@@ -1,0 +1,191 @@
+/* QR 掃描器覆蓋層 */
+.qr-scanner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+/* QR 掃描器模態框 */
+.qr-scanner-modal {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* 掃描器標題 */
+.qr-scanner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: #736868;
+  color: white;
+}
+
+.qr-scanner-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.qr-scanner-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.qr-scanner-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* 掃描器內容 */
+.qr-scanner-content {
+  padding: 20px;
+}
+
+/* 視頻容器 */
+.qr-scanner-video-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  background: #f0f0f0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.qr-scanner-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 掃描框覆蓋層 */
+.qr-scanner-overlay-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+/* 掃描框角落 */
+.qr-scanner-corner {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border: 3px solid #4CAF50;
+}
+
+.qr-scanner-corner.tl {
+  top: 20%;
+  left: 20%;
+  border-right: none;
+  border-bottom: none;
+}
+
+.qr-scanner-corner.tr {
+  top: 20%;
+  right: 20%;
+  border-left: none;
+  border-bottom: none;
+}
+
+.qr-scanner-corner.bl {
+  bottom: 20%;
+  left: 20%;
+  border-right: none;
+  border-top: none;
+}
+
+.qr-scanner-corner.br {
+  bottom: 20%;
+  right: 20%;
+  border-left: none;
+  border-top: none;
+}
+
+/* 掃描指示 */
+.qr-scanner-instructions {
+  text-align: center;
+  color: #666;
+}
+
+.qr-scanner-instructions p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.scanning-indicator {
+  color: #4CAF50;
+  font-weight: 600;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* 錯誤狀態 */
+.qr-scanner-error {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.qr-scanner-error p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+/* 按鈕樣式 */
+.qr-scanner-btn {
+  background: #736868;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 16px;
+  transition: background-color 0.2s;
+}
+
+.qr-scanner-btn:hover {
+  background: #5a5252;
+}
+
+/* 響應式設計 */
+@media (max-width: 600px) {
+  .qr-scanner-modal {
+    width: 95%;
+    margin: 20px;
+  }
+  
+  .qr-scanner-header {
+    padding: 12px 16px;
+  }
+  
+  .qr-scanner-content {
+    padding: 16px;
+  }
+}

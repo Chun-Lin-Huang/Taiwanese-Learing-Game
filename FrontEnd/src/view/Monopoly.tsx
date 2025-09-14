@@ -3,12 +3,14 @@ import { useNavigate, useLocation } from "react-router-dom";
 import '../style/Monopoly.css';
 import "../App.css";
 import BackIcon from "../assets/Back.svg";
+import QRScanIcon from "../assets/QR-scan.png";
 import { AudioManager, AudioType } from '../config/audioConfig';
 import AudioControls from '../components/AudioControls';
 import '../style/AudioControls.css';
 import { MapApiService, type MapBoard } from '../services/mapApi';
 import { api } from '../enum/api';
 import { asyncGet, asyncPost } from '../utils/fetch';
+import QRScanner from '../components/QRScanner';
 
 // 專門用於遊戲歷史的 POST 函數，允許 409 錯誤
 const asyncPostGameHistory = async (url: string, data: any) => {
@@ -170,7 +172,7 @@ const Monopoly: React.FC = () => {
   // 一般挑戰對話相關狀態
   const [challengeSessionId] = useState<string | null>(null);
   const [challengeMessages, setChallengeMessages] = useState<Array<{type: 'incoming' | 'outgoing', sender: string, content: string}>>([]);
-  const [challengeIsProcessing] = useState(false);
+  // const [challengeIsProcessing] = useState(false); // 未使用
   
   // 17挑戰成功後的特殊移動規則
   const [o17ChallengeSuccessPlayers, setO17ChallengeSuccessPlayers] = useState<{[playerId: number]: boolean}>({});
@@ -201,6 +203,10 @@ const Monopoly: React.FC = () => {
   const [showSkipAlert, setShowSkipAlert] = useState(false);
   const [skipAlertMessage, setSkipAlertMessage] = useState('');
   // 移除未使用的 playerGameStarted 狀態（現在由 API 處理）
+
+  // QR 掃描器狀態
+  const [showQRScanner, setShowQRScanner] = useState(false);
+  const [, setQrScanResult] = useState<string>('');
 
   // 遊戲歷程狀態
   const [gameHistory, setGameHistory] = useState<GameHistory>({
@@ -1048,6 +1054,29 @@ const Monopoly: React.FC = () => {
     } catch (error) {
       console.error('啟動挑戰情境對話錯誤:', error);
     }
+  };
+
+  // QR 掃描器處理函數
+  const handleQRScanSuccess = (result: string) => {
+    console.log('QR Code 掃描結果:', result);
+    setQrScanResult(result);
+    
+    // 這裡可以根據掃描結果進行相應的處理
+    // 例如：顯示掃描結果、觸發特定遊戲邏輯等
+    if (currentPlayer) {
+      recordGameAction(
+        currentPlayer.id,
+        currentPlayer.name,
+        'challenge',
+        `掃描 QR Code: ${result}`,
+        { qrResult: result, type: 'qr_scan' }
+      );
+    }
+  };
+
+  const handleQRScanError = (error: string) => {
+    console.error('QR Code 掃描錯誤:', error);
+    // 可以在這裡顯示錯誤提示
   };
 
   // 處理玩家答案提交
@@ -2194,7 +2223,13 @@ const Monopoly: React.FC = () => {
                    currentChallenge?.type === 'action' ? '動作挑戰' : 
                    '挑戰'}
                 </h2>
-             
+                <button 
+                  className="qr-scanner-button"
+                  onClick={() => setShowQRScanner(true)}
+                  title="掃描 QR Code"
+                >
+                  <img src={QRScanIcon} alt="QR 掃描" className="qr-scanner-icon" />
+                </button>
               </div>
               <div className="challenge-content">
                 <div className="challenge-question">
@@ -2355,6 +2390,13 @@ const Monopoly: React.FC = () => {
         <div className="challenge-panel-side">
           <div className="challenge-header">
             <h2 className="challenge-title">情境挑戰</h2>
+            <button 
+              className="qr-scanner-button"
+              onClick={() => setShowQRScanner(true)}
+              title="掃描 QR Code"
+            >
+              <img src={QRScanIcon} alt="QR 掃描" className="qr-scanner-icon" />
+            </button>
           </div>
           <div className="challenge-content">
             <div className="challenge-question">
@@ -2629,21 +2671,38 @@ const Monopoly: React.FC = () => {
             <div className="location-header">
               <h2 className="location-title">{currentLocationDetail.name}</h2>
               <div className="header-right">
-                <button 
-                  className="close-button"
-                  onClick={() => {
-                    audioManager.play(AudioType.THEME_SELECTION, 0.3);
-                    setShowLocationDetail(false);
-                  }}
-                >
-                  ✕
-                </button>
+                {/* 機會卡時顯示 QR 掃描器按鈕代替關閉按鈕 */}
+                {(currentLocationDetail.chance || currentLocationDetail.type === 'reward') ? (
+                  <button 
+                    className="qr-scanner-button"
+                    onClick={() => setShowQRScanner(true)}
+                    title="掃描 QR Code"
+                  >
+                    <img src={QRScanIcon} alt="QR 掃描" className="qr-scanner-icon" />
+                  </button>
+                ) : (
+                  <button 
+                    className="close-button"
+                    onClick={() => {
+                      audioManager.play(AudioType.THEME_SELECTION, 0.3);
+                      setShowLocationDetail(false);
+                    }}
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
             </div>
             
             <div className="location-info">
-              <div className="location-type">{currentLocationDetail.type}</div>
               <div className="location-description">{currentLocationDetail.description}</div>
+              
+              {/* 機會卡提示 - 移到跳過按鈕上方 */}
+              {(currentLocationDetail.chance || currentLocationDetail.type === 'reward') && (
+                <div className="chance-hint">
+                  請抽取一張實體機會卡
+                </div>
+              )}
               
               {/* 跳過按鈕 - 所有格子都有 */}
               <button 
@@ -2685,13 +2744,6 @@ const Monopoly: React.FC = () => {
                 </div>
               )}
               
-              {(currentLocationDetail.chance || currentLocationDetail.type === 'reward') && (
-                <div className="chance-details">
-                  <div className="chance-type">{currentLocationDetail.chance?.type || currentLocationDetail.type}</div>
-                  <div className="chance-title">機會卡</div>
-                  <div className="chance-content">請抽取一張實體機會卡</div>
-                </div>
-              )}
               
               {currentLocationDetail.shortcut && (
                 <div className="shortcut-details">
@@ -2974,6 +3026,14 @@ const Monopoly: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* QR 掃描器 */}
+      <QRScanner
+        isVisible={showQRScanner}
+        onScanSuccess={handleQRScanSuccess}
+        onScanError={handleQRScanError}
+        onClose={() => setShowQRScanner(false)}
+      />
     </div>
   );
 };
