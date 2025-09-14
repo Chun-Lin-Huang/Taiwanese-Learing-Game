@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import "../style/StoryDetailPage.css";
+import "../style/ThemeSelectionPage.css";
 
 import backIcon from "../assets/back.svg";
 
@@ -84,10 +85,14 @@ const StoryDetailPage: React.FC = () => {
 
   const Header = (
     <header className="story-header">
+      <button 
+        className="back-button" 
+        aria-label="Go back" 
+        onClick={() => navigate(-1)}
+      >
+        <img src={backIcon} alt="Back" />
+      </button>
       <div className="header-container">
-        <button className="back-button" aria-label="Go back" onClick={() => navigate(-1)}>
-          <img src={backIcon} alt="Back" />
-        </button>
         <h1 className="story-title">{loading ? "載入中…" : `《${pageTitle}》`}</h1>
       </div>
     </header>

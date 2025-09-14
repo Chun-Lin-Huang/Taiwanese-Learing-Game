@@ -91,7 +91,7 @@
 .character-area {
   position: absolute;
   left: -6%;
-  top: 30%;
+  top: 20%;
   width: 60%;
   display: flex;
   flex-direction: column;
@@ -304,7 +304,7 @@
 
 /* ============ RWD 微調 ============ */
 @media (max-width: 1200px) {
-  .character-area { left: -4%; top: 30%; width: 56%; }
+  .character-area { left: -4%; top: 20%; width: 56%; }
   .chat-area { left: 38%; width: 58%; }
 }
 @media (max-width: 960px) {
