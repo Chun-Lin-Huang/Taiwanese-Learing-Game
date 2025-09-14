@@ -2572,3 +2572,312 @@
   display: inline-block;
   margin-top: 5px;
 }
+
+/* 卡片處理結果樣式 */
+.card-processing-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+}
+
+.card-processing-content {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.card-processing-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.card-processing-content p {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.card-result-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+}
+
+.card-result-content {
+  background: #f5f5dc; /* 淺米色背景 */
+  border-radius: 16px;
+  max-width: 600px;
+  width: 95vw;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  border: 2px solid #736868; /* 與挑戰框一致的深棕色邊框 */
+}
+
+.card-result-header {
+  background: #736868; /* 與挑戰框一致的深棕色背景 */
+  color: white;
+  padding: 16px 20px;
+  text-align: center;
+  position: relative;
+  border-bottom: 2px solid #736868;
+}
+
+.card-result-header.success {
+  background: #736868; /* 與挑戰框一致的深棕色 */
+  color: white;
+}
+
+.card-result-header.error {
+  background: #736868; /* 與挑戰框一致的深棕色 */
+  color: white;
+}
+
+.card-result-header h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.card-result-body {
+  padding: 32px 24px;
+  background: #f5f5dc; /* 淺米色背景 */
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.card-result-body p {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  line-height: 1.4;
+  color: #736868; /* 與挑戰框一致的深棕色文字 */
+  font-weight: 500;
+}
+
+.card-result-body p:last-child {
+  margin-bottom: 0;
+}
+
+.card-result-body strong {
+  color: #654321;
+  font-weight: 600;
+}
+
+.card-result-body em {
+  color: #8b7355;
+  font-style: italic;
+}
+
+/* 卡片裝飾元素 */
+.card-result-body::before {
+  content: "🎲";
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 20px;
+  opacity: 0.6;
+}
+
+.card-result-body::after {
+  content: "⭐";
+  position: absolute;
+  bottom: 12px;
+  left: 16px;
+  font-size: 18px;
+  opacity: 0.6;
+}
+
+.card-result-footer {
+  padding: 16px 20px;
+  text-align: center;
+  border-top: 2px solid #736868;
+  background: #f5f5dc;
+}
+
+.card-result-close-btn {
+  background: #736868;
+  color: white;
+  border: 2px solid #736868;
+  border-radius: 8px;
+  padding: 14px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.5px;
+}
+
+.card-result-close-btn:hover {
+  background: #8b7355;
+  border-color: #736868;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(115, 104, 104, 0.3);
+}
+
+.card-result-close-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(115, 104, 104, 0.3);
+}
+
+/* 玩家選擇界面樣式 */
+.player-selector-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1002;
+}
+
+.player-selector-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90vw;
+  max-height: 80vh;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.player-selector-header {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.player-selector-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.player-selector-close-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.player-selector-close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.player-selector-body {
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.selector-description {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+}
+
+.player-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.player-select-btn {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.player-select-btn:hover {
+  border-color: #667eea;
+  background: #f8f9ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.player-select-btn:active {
+  transform: translateY(0);
+}
+
+.player-avatar {
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.player-avatar-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e0e0e0;
+}
+
+.player-info {
+  flex: 1;
+}
+
+.player-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.player-position {
+  font-size: 14px;
+  color: #666;
+}

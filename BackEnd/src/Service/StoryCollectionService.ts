@@ -11,7 +11,7 @@ export class StoryCollectionService {
 
   /** 查詢使用者的收藏 */
   async getByUser(userId: string): Promise<resp<any[]>> {
-    const col = await StoryCollectionModel.findOne({ userId }).lean();
+    const col = await StoryCollectionModel.findOne({ user_id: userId }).lean();
     if (!col) return { code: 200, message: "no collection", body: [] };
 
     const stories = col.storyNames.map((s) => ({
@@ -27,18 +27,17 @@ export class StoryCollectionService {
     const storyDoc = await StoryNameModel.findById(storyNameId).lean();
     if (!storyDoc) return { code: 404, message: "story not found", body: null };
 
-    let col = await StoryCollectionModel.findOne({ userId });
+    let col = await StoryCollectionModel.findOne({ user_id: userId });
 
     if (!col) {
       col = new StoryCollectionModel({
-        userId,
+        user_id: userId,
         storyNames: [
           {
             _id: storyDoc._id,
             name: storyDoc.name,
             imageFilename: storyDoc.imageFilename,
             imageSize: storyDoc.imageSize,
-            imageUrl: this.makeImageUrl(String(storyDoc._id)),
           },
         ],
       });
@@ -52,7 +51,6 @@ export class StoryCollectionService {
           name: storyDoc.name,
           imageFilename: storyDoc.imageFilename,
           imageSize: storyDoc.imageSize,
-          imageUrl: this.makeImageUrl(String(storyDoc._id)),
         });
       }
     }
@@ -63,7 +61,7 @@ export class StoryCollectionService {
 
   /** 移除收藏故事 */
   async removeStory(userId: string, storyNameId: string): Promise<resp<any>> {
-    const col = await StoryCollectionModel.findOne({ userId });
+    const col = await StoryCollectionModel.findOne({ user_id: userId });
     if (!col) return { code: 404, message: "collection not found", body: null };
 
     col.storyNames = col.storyNames.filter(

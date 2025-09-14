@@ -143,6 +143,19 @@ const ScoreSummary: React.FC = () => {
             // 獲取該玩家的挑戰記錄
             const playerActions = dbGameHistory?.actions.filter(action => action.playerId === player.id) || [];
             
+            // 統計挑戰成功/失敗次數
+            const challengeActions = playerActions.filter(action => action.actionType === 'challenge');
+            const successCount = challengeActions.filter(action => 
+              action.description.includes('成功') || 
+              action.description.includes('挑戰成功') ||
+              action.description.includes('答對了')
+            ).length;
+            const failureCount = challengeActions.filter(action => 
+              action.description.includes('失敗') || 
+              action.description.includes('挑戰失敗') ||
+              action.description.includes('答錯了')
+            ).length;
+            
             return (
               <div key={player.id} className="player-section">
                 {/* 玩家頭像和名字 - 在框框外 */}
@@ -161,6 +174,17 @@ const ScoreSummary: React.FC = () => {
                   </div>
                   <div className="player-name">{player.name}</div>
                   <div className="rank-position">第{index + 1}名</div>
+                  {/* 挑戰統計 */}
+                  <div className="challenge-stats">
+                    <div className="stat-item success">
+                      <span className="stat-label">挑戰成功:</span>
+                      <span className="stat-value">{successCount}</span>
+                    </div>
+                    <div className="stat-item failure">
+                      <span className="stat-label">挑戰失敗:</span>
+                      <span className="stat-value">{failureCount}</span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* 該玩家的挑戰記錄 - 在框框內，可滑動 */}

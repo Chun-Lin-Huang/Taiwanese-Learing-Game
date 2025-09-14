@@ -12,7 +12,7 @@ const CreateRoom: React.FC = () => {
 
   const handleConfirm = () => {
     if (!players) return;
-    navigate(`/rooms/lobby?players=${players}`);
+    navigate(`/lobby?players=${players}`);
   };
 
   return (
@@ -30,7 +30,7 @@ const CreateRoom: React.FC = () => {
             type="button"
             className="cr-back"
             aria-label="返回"
-            onClick={() => window.history.back()}
+            onClick={() => navigate("/Learn")}
           >
             <img src={backIcon} alt="返回" />
           </button>

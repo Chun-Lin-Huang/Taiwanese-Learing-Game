@@ -29,7 +29,9 @@
   .summary-header {
     display: flex;
     align-items: center;
+    justify-content: center;
     margin-bottom: 30px;
+    position: relative;
   }
   
   .back-button {
@@ -41,11 +43,14 @@
     height: 40px;
     font-size: 20px;
     cursor: pointer;
-    margin-right: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: background-color 0.2s ease; /* 添加平滑過渡效果 */
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
   }
   
   /* 添加圓圈背景和淺白色 hover 效果 */
@@ -69,15 +74,17 @@
     font-size: 20px;
   }
   
-  /* 玩家排名容器 - 平行排列 */
+  /* 玩家排名容器 - 水平平行排列 */
   .player-rankings-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
     gap: 30px;
     margin-bottom: 30px;
     max-width: 1400px;
     margin-left: auto;
     margin-right: auto;
+    align-items: flex-start; /* 確保頂部對齊 */
   }
 
   .player-section {
@@ -85,8 +92,9 @@
     flex-direction: column;
     align-items: center;
     gap: 15px;
-    height: 100%;
-    justify-content: flex-start;
+    flex: 1; /* 讓兩個卡片平均分配空間 */
+    max-width: 500px; /* 限制最大寬度 */
+    min-width: 350px; /* 確保最小寬度 */
   }
 
   /* 玩家頭像和名字 - 在框框外 */
@@ -169,6 +177,63 @@
     font-size: 16px;
     color: #666;
     font-weight: 500;
+  }
+
+  /* 挑戰統計樣式 */
+  .challenge-stats {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-width: 220px; /* 增加最小寬度 */
+    width: 220px; /* 固定寬度 */
+    white-space: nowrap; /* 防止換行 */
+  }
+
+  .stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    flex: 1;
+    min-width: 90px; /* 增加最小寬度 */
+    white-space: nowrap; /* 防止文字換行 */
+  }
+
+  .stat-item.success {
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+  }
+
+  .stat-item.failure {
+    background: rgba(244, 67, 54, 0.1);
+    border: 1px solid rgba(244, 67, 54, 0.3);
+  }
+
+  .stat-label {
+    color: #555;
+    font-weight: 500;
+  }
+
+  .stat-value {
+    font-weight: 600;
+    font-size: 16px;
+  }
+
+  .stat-item.success .stat-value {
+    color: #4CAF50;
+  }
+
+  .stat-item.failure .stat-value {
+    color: #F44336;
   }
 
   /* 遊戲記錄樣式 - 框框內，可滑動 */
@@ -354,9 +419,13 @@
   /* 響應式設計 */
   @media (max-width: 1024px) {
     .player-rankings-container {
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 25px;
       max-width: 1100px;
+    }
+    
+    .player-section {
+      max-width: 450px;
+      min-width: 320px;
     }
     
     .player-game-record {
@@ -372,9 +441,19 @@
     }
     
     .player-rankings-container {
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      flex-direction: column; /* 在小螢幕上改為垂直排列 */
       gap: 20px;
       max-width: 700px;
+    }
+    
+    .player-section {
+      max-width: 100%;
+      min-width: 300px;
+    }
+    
+    .challenge-stats {
+      width: 200px; /* 在小螢幕上稍微縮小 */
+      min-width: 200px;
     }
     
     .player-rank-header.winner {

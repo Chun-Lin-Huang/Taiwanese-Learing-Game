@@ -3,7 +3,6 @@ import "../style/LearningMode.css";
 import "../style/GameSelection.css";
 import "../style/Home.css";
 import "../App.css";
-import bellIcon from "../assets/icon-bell.png";
 import gearIcon from "../assets/icon-gear.png";
 import userIcon from "../assets/icon-user.png";
 import { useNavigate } from "react-router-dom";
@@ -24,7 +23,7 @@ const cards = [
   { title: "情境\n對話", path: "/Home" },
   { title: "互動\n遊戲", path: "/GameSelection2" },
   { title: "台語\n故事集", path: "/StoryModePage" },
-  { title: "大富翁", path: "/SuperMonopoly" },
+  { title: "超級\n大富翁", path: "/SuperMonopoly" },
   { title: "台語\n辭典", path: "/DictionaryPage" },
 ];
 
@@ -212,8 +211,8 @@ export default function LearningMode() {
       <header className="selection-header">
         <p className="greeting-title">{greetingName}</p>
         <div className="nav-actions">
-          <button className="nav-button" onClick={() => navigate("/NotificationPage")}>
-            <img src={bellIcon} alt="通知" className="nav-icon" />
+          <button className="nav-button" style={{ visibility: 'hidden' }}>
+            <img src={gearIcon} alt="通知" className="nav-icon" />
             <span className="nav-label">通知</span>
           </button>
           <button className="nav-button" onClick={() => navigate("/SettingsPage")}>

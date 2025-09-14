@@ -21,7 +21,6 @@ import StoryDetailPage from "./view/StoryDetailPage";
 
 // 王跌跌區
 import InstructionsPage from "./view/InstructionsPage";
-import NotificationPage from "./view/NotificationPage";
 import SettingsPage from "./view/SettingsPage";
 import ProfileEditPage from "./view/ProfileEditPage";
 import ResponsePage from "./view/ResponsePage";
@@ -35,9 +34,7 @@ import First from "./view/First";
 import Welcome from "./view/Welcome";
 
 // 大富翁區
-import SuperMonopoly from "./view/GameMenu";
 import CreateRoom from "./view/CreateRoom";
-import JoinRoom from "./view/JoinRoom";
 import RoomLobby from "./view/RoomLobby";
 import Monopoly from "./view/Monopoly";
 import ScoreSummary from "./view/ScoreSummary";
@@ -89,7 +86,6 @@ function AppRoutes() {
       <Route path="/LoveStoryPage" element={<LoveStoryPage />} />
 
       {/* 王跌跌區 */}
-      <Route path="/NotificationPage" element={<NotificationPage />} />
       <Route path="/SettingsPage" element={<SettingsPage />} />
       <Route path="/ResponsePage" element={<ResponsePage />} />
       <Route path="/profileedit" element={<ProfileEditPage />} />
@@ -105,10 +101,8 @@ function AppRoutes() {
       <Route path="/favorites" element={<FavoriteCollectionPage />} />
 
       {/* 大富翁 */}
-      <Route path="/SuperMonopoly" element={<SuperMonopoly />} />
-      <Route path="/rooms/create" element={<CreateRoom />} />
-      <Route path="/rooms/join" element={<JoinRoom />} />
-      <Route path="/rooms/lobby" element={<RoomLobby />} />
+      <Route path="/SuperMonopoly" element={<CreateRoom />} />
+      <Route path="/lobby" element={<RoomLobby />} />
       <Route path="/game" element={<Monopoly />} />
       <Route path="/Scoresummary" element={<ScoreSummary />} />
 

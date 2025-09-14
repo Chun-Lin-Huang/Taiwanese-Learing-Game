@@ -11,6 +11,8 @@ import { MapApiService, type MapBoard } from '../services/mapApi';
 import { api } from '../enum/api';
 import { asyncGet, asyncPost } from '../utils/fetch';
 import QRScanner from '../components/QRScanner';
+import { CardApiService } from '../services/cardApi';
+import type { Card, CardUseResponse } from '../interfaces/Card';
 
 // 專門用於遊戲歷史的 POST 函數，允許 409 錯誤
 const asyncPostGameHistory = async (url: string, data: any) => {
@@ -147,7 +149,7 @@ const Monopoly: React.FC = () => {
   const [showCouponChallengePanel, setShowCouponChallengePanel] = useState(false);
   const [selectedCouponChallengeType, setSelectedCouponChallengeType] = useState<string | null>(null);
   const [couponChallengeQuestion, setCouponChallengeQuestion] = useState<string>('');
-  const [couponPlayerAnswer, setCouponPlayerAnswer] = useState<string>('');
+  const [, setCouponPlayerAnswer] = useState<string>('');
   const [couponChallengeResult, setCouponChallengeResult] = useState<'success' | 'failure' | null>(null);
   
   const [showWordCard, setShowWordCard] = useState(false);
@@ -160,6 +162,7 @@ const Monopoly: React.FC = () => {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [wordCardSTTResult, setWordCardSTTResult] = useState<string>('');
   const [wordCardChallengeResult, setWordCardChallengeResult] = useState<'success' | 'failure' | null>(null);
+  const [wordCardChallengeSource, setWordCardChallengeSource] = useState<'coupon' | 'vocabulary_square' | null>(null);
   
   // 情境對話相關狀態
   const [scenarioSessionId, setScenarioSessionId] = useState<string | null>(null);
@@ -171,7 +174,7 @@ const Monopoly: React.FC = () => {
   
   // 一般挑戰對話相關狀態
   const [challengeSessionId] = useState<string | null>(null);
-  const [challengeMessages, setChallengeMessages] = useState<Array<{type: 'incoming' | 'outgoing', sender: string, content: string}>>([]);
+  const [, setChallengeMessages] = useState<Array<{type: 'incoming' | 'outgoing', sender: string, content: string}>>([]);
   // const [challengeIsProcessing] = useState(false); // 未使用
   
   // 17挑戰成功後的特殊移動規則
@@ -196,7 +199,7 @@ const Monopoly: React.FC = () => {
   const [playerShortcutPrivileges, setPlayerShortcutPrivileges] = useState<{[playerId: number]: {canUseShortcut: boolean, nextMoveToShortcut: boolean}}>({});
   
   // 暫停狀態
-  const [playerSkipped, setPlayerSkipped] = useState<boolean>(false);
+  const [playerSkipped, setPlayerSkipped] = useState<{[playerId: number]: boolean}>({});
   // 道路施工專用暫停狀態
   const [roadConstructionSkip, setRoadConstructionSkip] = useState<{[playerId: number]: boolean}>({});
   // 暫停提示視窗狀態
@@ -207,6 +210,14 @@ const Monopoly: React.FC = () => {
   // QR 掃描器狀態
   const [showQRScanner, setShowQRScanner] = useState(false);
   const [, setQrScanResult] = useState<string>('');
+  
+  // 卡片處理狀態
+  const [cardProcessing, setCardProcessing] = useState(false);
+  const [cardResult, setCardResult] = useState<CardUseResponse | null>(null);
+  
+  // 玩家選擇狀態（用於交換位置卡片）
+  const [showPlayerSelector, setShowPlayerSelector] = useState(false);
+  const [pendingSwapCard, setPendingSwapCard] = useState<CardUseResponse | null>(null);
 
   // 遊戲歷程狀態
   const [gameHistory, setGameHistory] = useState<GameHistory>({
@@ -566,7 +577,7 @@ const Monopoly: React.FC = () => {
       const moveRequest = {
         board_id: mapBoard._id,
         player_id: currentPlayer.id.toString(),
-        current_position: currentPlayer.locationName,
+        current_position: currentPlayer.location, // 使用 location 而不是 locationName
         dice_value: value,
         // 檢查是否有17挑戰成功記錄
         o17_challenge_success: o17ChallengeSuccessPlayers[currentPlayer.id] || false
@@ -744,24 +755,26 @@ const Monopoly: React.FC = () => {
         setCouponType('gas_station');
         setShowCouponPanel(true);
     } else if (positionInfo.type === 'stop') {
-        // stop 類型格子直接暫停一回合，不顯示優惠券
+        // stop 類型格子（道路施工）- 提示下一輪會暫停
         const currentPlayer = players.find(p => p.isCurrentPlayer);
         if (currentPlayer) {
+          // 設置道路施工暫停狀態
           setRoadConstructionSkip(prev => ({
             ...prev,
             [currentPlayer.id]: true
           }));
           
+          // 記錄遊戲動作
           recordGameAction(
             currentPlayer.id,
             currentPlayer.name,
             'move',
-            `${currentPlayer.name} 在${positionInfo.name}暫停一回合`,
-            { location: currentPlayer.location, skipped: true, positionType: 'stop' }
+            `${currentPlayer.name} 停在${positionInfo.name}，下一輪會暫停一次`,
+            { location: currentPlayer.location, roadConstructionSkip: true, positionType: 'stop' }
           );
           
-          // 顯示暫停提示
-          setSkipAlertMessage(`${currentPlayer.name} 在${positionInfo.name}暫停一回合`);
+          // 顯示提示：下一輪會暫停一次
+          setSkipAlertMessage(`${currentPlayer.name} 停在${positionInfo.name}，下一輪會暫停一次`);
           setShowSkipAlert(true);
           
           // 直接切換到下一位玩家
@@ -775,6 +788,7 @@ const Monopoly: React.FC = () => {
       if (positionInfo.challenge?.type === 'vocabulary' || positionInfo.type === 'vocabulary') {
           // 來學單字格子觸發單字卡片
           setIsDrawingCard(true);
+          setWordCardChallengeSource('vocabulary_square'); // 標記為來學單字格子
           
           // 抽卡片動畫效果
         setTimeout(async () => {
@@ -877,17 +891,39 @@ const Monopoly: React.FC = () => {
         playersInCurrentRound
       });
       
-      // 如果當前玩家被暫停，跳過一次
-      if (playerSkipped) {
-        setPlayerSkipped(false); // 重置暫停狀態
-        return prevPlayers.map((player, index) => ({
-          ...player,
-          isCurrentPlayer: index === nextIndex
-        }));
+      // 檢查下一個玩家是否有懲罰卡暫停狀態
+      const nextPlayer = prevPlayers[nextIndex];
+      if (nextPlayer && playerSkipped[nextPlayer.id]) {
+        // 清除該玩家的暫停狀態
+        setPlayerSkipped(prev => {
+          const newState = { ...prev };
+          delete newState[nextPlayer.id];
+          return newState;
+        });
+        
+        // 顯示暫停提示
+        setSkipAlertMessage(`${nextPlayer.name} 因懲罰卡暫停一回合，換下一位玩家`);
+        setShowSkipAlert(true);
+        
+        // 記錄跳過動作
+        recordGameAction(
+          nextPlayer.id,
+          nextPlayer.name,
+          'move',
+          `${nextPlayer.name} 因懲罰卡暫停，本次輪到被跳過`,
+          { skipped: true, cardSkip: true }
+        );
+        
+        // 跳過這個玩家，到下下一個
+        nextIndex = (nextIndex + 1) % prevPlayers.length;
+        
+        // 延遲後關閉提示並繼續
+        setTimeout(() => {
+          setShowSkipAlert(false);
+        }, 2000);
       }
       
       // 檢查下一個玩家是否有道路施工暫停狀態
-      const nextPlayer = prevPlayers[nextIndex];
       if (nextPlayer && roadConstructionSkip[nextPlayer.id]) {
         // 顯示暫停提示視窗
         setSkipAlertMessage(`${nextPlayer.name} 因道路施工暫停一回合，換下一位玩家`);
@@ -1057,26 +1093,370 @@ const Monopoly: React.FC = () => {
   };
 
   // QR 掃描器處理函數
-  const handleQRScanSuccess = (result: string) => {
+  const handleQRScanSuccess = async (result: string) => {
     console.log('QR Code 掃描結果:', result);
-    setQrScanResult(result);
+    console.log('掃描結果長度:', result.length);
+    console.log('掃描結果類型:', typeof result);
+    console.log('掃描結果字符碼:', result.split('').map(c => c.charCodeAt(0)));
     
-    // 這裡可以根據掃描結果進行相應的處理
-    // 例如：顯示掃描結果、觸發特定遊戲邏輯等
-    if (currentPlayer) {
-      recordGameAction(
-        currentPlayer.id,
-        currentPlayer.name,
-        'challenge',
-        `掃描 QR Code: ${result}`,
-        { qrResult: result, type: 'qr_scan' }
-      );
+    setQrScanResult(result);
+    setCardProcessing(true);
+    setCardResult(null);
+    
+    try {
+      // 清理掃描結果，移除可能的空白字符
+      const cleanCode = result.trim();
+      console.log('清理後的代碼:', cleanCode);
+      
+      // 1. 獲取卡片資訊
+      const card: Card = await CardApiService.getCardByCode(cleanCode);
+      console.log('獲取到卡片:', card);
+      
+      // 2. 使用卡片
+      const cardUseRequest = {
+        game_id: gameHistory.gameId,
+        player_id: currentPlayer?.id.toString() || '1',
+        card_code: cleanCode,
+        current_position: currentPlayer?.location || 'S0'
+      };
+      
+      const cardUseResponse: CardUseResponse = await CardApiService.useCard(cardUseRequest);
+      console.log('卡片使用結果:', cardUseResponse);
+      
+      setCardResult(cardUseResponse);
+      
+      // 3. 記錄遊戲動作
+      if (currentPlayer) {
+        recordGameAction(
+          currentPlayer.id,
+          currentPlayer.name,
+          'challenge',
+          `使用卡片: ${card.description}`,
+          { 
+            cardCode: cleanCode, 
+            cardType: card.type,
+            actionType: cardUseResponse.action_type,
+            type: 'card_use' 
+          }
+        );
+      }
+      
+      // 4. 根據卡片效果執行相應動作
+      await executeCardEffect(cardUseResponse);
+      
+    } catch (error) {
+      console.error('處理卡片時發生錯誤:', error);
+      setCardResult({
+        success: false,
+        action_type: 'move',
+        value: 0,
+        description: '卡片處理失敗',
+        message: `錯誤: ${error instanceof Error ? error.message : '未知錯誤'}`
+      });
+    } finally {
+      setCardProcessing(false);
     }
   };
 
   const handleQRScanError = (error: string) => {
     console.error('QR Code 掃描錯誤:', error);
     // 可以在這裡顯示錯誤提示
+  };
+
+  // 根據卡片類型獲取標題
+  const getCardTitle = (cardType?: string) => {
+    switch (cardType) {
+      case 'reward':
+        return '獎勵卡';
+      case 'penalty':
+        return '懲罰卡';
+      case 'chance':
+        return '機會卡';
+      default:
+        return '機會卡';
+    }
+  };
+
+  // 處理經過起點的通用函數
+  const handlePassedStart = (player: Player) => {
+    const currentPlayerId = player.id;
+    setPlayersPassedStart(prev => {
+      const newCount = (prev[currentPlayerId] || 0) + 1;
+      console.log(`${player.name} 經過起點，第 ${newCount} 次`);
+      
+      // 顯示經過起點慶祝視窗
+      setPassedStartMessage(`${player.name} 經過起點！第 ${newCount} 次`);
+      setShowPassedStartCelebration(true);
+      
+      // 3秒後自動關閉慶祝視窗
+      setTimeout(() => {
+        setShowPassedStartCelebration(false);
+      }, 3000);
+      
+      // 檢查是否獲勝（經過起點3次）
+      if (newCount >= 3) {
+        setWinner(player);
+        recordGameAction(
+          player.id,
+          player.name,
+          'victory',
+          `${player.name} 經過起點3次，獲得勝利！`,
+          { winner: true, passedStartCount: newCount }
+        );
+        
+        setTimeout(async () => {
+          setShowGameOver(true);
+          // 結束遊戲並保存到資料庫
+          await endGameInDatabase({
+            playerId: player.id,
+            playerName: player.name,
+            reason: '經過起點3次'
+          });
+        }, 1000);
+      }
+      
+      return {
+        ...prev,
+        [currentPlayerId]: newCount
+      };
+    });
+  };
+
+  // 處理玩家選擇（用於交換位置卡片）
+  const handlePlayerSelect = async (selectedPlayerId: number) => {
+    if (!pendingSwapCard || !currentPlayer) {
+      console.error('沒有待處理的交換卡片或當前玩家');
+      return;
+    }
+
+    try {
+      setCardProcessing(true);
+      
+      // 調用交換位置 API
+      const swapResponse = await CardApiService.swapPositions(
+        gameHistory.gameId,
+        currentPlayer.id.toString(),
+        selectedPlayerId.toString()
+      );
+      
+      console.log('位置交換結果:', swapResponse);
+      
+      if (swapResponse.success) {
+        // 直接交換兩個玩家的位置和位置名稱
+        setPlayers(prev => {
+          const selectedPlayer = prev.find(p => p.id === selectedPlayerId);
+          console.log('交換前的位置:');
+          console.log(`當前玩家 (${currentPlayer.name}): ${currentPlayer.location} (${currentPlayer.locationName})`);
+          console.log(`被選玩家 (${selectedPlayer?.name}): ${selectedPlayer?.location} (${selectedPlayer?.locationName})`);
+          
+          const updatedPlayers = prev.map(player => {
+            if (player.id === currentPlayer.id) {
+              // 當前玩家獲得被選擇玩家的位置
+              const newPlayer = { 
+                ...player, 
+                location: selectedPlayer?.location || player.location,
+                locationName: selectedPlayer?.locationName || player.locationName
+              };
+              console.log(`當前玩家新位置: ${newPlayer.location} (${newPlayer.locationName})`);
+              return newPlayer;
+            } else if (player.id === selectedPlayerId) {
+              // 被選擇的玩家獲得當前玩家的位置
+              const newPlayer = { 
+                ...player, 
+                location: currentPlayer.location,
+                locationName: currentPlayer.locationName
+              };
+              console.log(`被選玩家新位置: ${newPlayer.location} (${newPlayer.locationName})`);
+              return newPlayer;
+            }
+            return player;
+          });
+          
+          console.log('交換後的位置:');
+          updatedPlayers.forEach(player => {
+            console.log(`${player.name}: ${player.location} (${player.locationName})`);
+          });
+          
+          return updatedPlayers;
+        });
+        
+        // 記錄遊戲動作
+        const selectedPlayer = players.find(p => p.id === selectedPlayerId);
+        if (selectedPlayer) {
+          recordGameAction(
+            currentPlayer.id,
+            currentPlayer.name,
+            'challenge',
+            `與 ${selectedPlayer.name} 交換位置`,
+            { 
+              cardType: 'swap',
+              targetPlayerId: selectedPlayerId,
+              type: 'position_swap' 
+            }
+          );
+        }
+        
+        setCardResult({
+          success: true,
+          action_type: 'swap',
+          value: 'position_swap',
+          description: '交換位置卡片',
+          message: `與 ${selectedPlayer?.name} 交換位置成功`,
+          target_player_id: selectedPlayerId.toString()
+        });
+      } else {
+        setCardResult({
+          success: false,
+          action_type: 'swap',
+          value: 'position_swap',
+          description: '交換位置卡片',
+          message: swapResponse.message || '位置交換失敗'
+        });
+      }
+      
+    } catch (error) {
+      console.error('位置交換失敗:', error);
+      setCardResult({
+        success: false,
+        action_type: 'swap',
+        value: 'position_swap',
+        description: '交換位置卡片',
+        message: `位置交換失敗: ${error instanceof Error ? error.message : '未知錯誤'}`
+      });
+    } finally {
+      setCardProcessing(false);
+      setShowPlayerSelector(false);
+      setPendingSwapCard(null);
+    }
+  };
+
+  // 執行卡片效果
+  const executeCardEffect = async (cardResponse: CardUseResponse) => {
+    if (!cardResponse.success) {
+      console.log('卡片執行失敗:', cardResponse.message);
+      return;
+    }
+
+    // 更新玩家位置的通用函數
+    const updatePlayerPosition = async (newPosition: string) => {
+      if (!currentPlayer || !mapBoard) return;
+      
+      try {
+        // 獲取新位置的位置資訊
+        const positionResult = await MapApiService.getNodeById(newPosition, mapBoard._id);
+        if (positionResult.code === 200 && positionResult.body) {
+          const positionInfo = positionResult.body;
+          
+          // 更新玩家位置和位置名稱
+          setPlayers(prev => prev.map(player => 
+            player.id === currentPlayer.id 
+              ? { 
+                  ...player, 
+                  location: newPosition,
+                  locationName: positionInfo.name
+                }
+              : player
+          ));
+          
+          console.log(`玩家位置已更新: ${newPosition} (${positionInfo.name})`);
+          
+          // 檢查是否到達起點
+          if (positionInfo.type === 'start') {
+            console.log(`${currentPlayer.name} 使用卡片到達起點！`);
+            handlePassedStart(currentPlayer);
+          }
+        } else {
+          // 如果無法獲取位置資訊，檢查是否為有效的位置代碼
+          // 對於卡片移動，如果位置代碼不存在，我們需要找到最近的有效位置
+          console.warn(`位置 ${newPosition} 不存在於地圖中，嘗試找到替代位置`);
+          
+          // 嘗試獲取地圖中的所有節點來找到最近的位置
+          const allNodesResult = await MapApiService.getNodesByBoardId(mapBoard._id);
+          if (allNodesResult.code === 200 && allNodesResult.body && allNodesResult.body.length > 0) {
+            // 找到第一個有效位置作為替代
+            const firstNode = allNodesResult.body[0];
+            setPlayers(prev => prev.map(player => 
+              player.id === currentPlayer.id 
+                ? { 
+                    ...player, 
+                    location: firstNode.node_id,
+                    locationName: firstNode.name
+                  }
+                : player
+            ));
+            console.log(`使用替代位置: ${firstNode.node_id} (${firstNode.name})`);
+          } else {
+            // 如果無法獲取任何節點，保持原位置
+            console.error('無法獲取地圖節點，保持原位置');
+          }
+        }
+      } catch (error) {
+        console.error('獲取位置資訊失敗:', error);
+        // 如果發生錯誤，保持原位置不變
+        console.error('卡片移動失敗，保持原位置');
+      }
+    };
+
+    switch (cardResponse.action_type) {
+      case 'move':
+        if (cardResponse.new_position && currentPlayer) {
+          console.log(`移動到新位置: ${cardResponse.new_position}`);
+          await updatePlayerPosition(cardResponse.new_position);
+          // 播放移動音效
+          audioManager.play(AudioType.THEME_SELECTION, 0.5);
+        }
+        break;
+        
+      case 'teleport':
+        if (cardResponse.new_position && currentPlayer) {
+          console.log(`傳送到位置: ${cardResponse.new_position}`);
+          await updatePlayerPosition(cardResponse.new_position);
+          // 播放傳送音效
+          audioManager.play(AudioType.THEME_SELECTION, 0.5);
+        }
+        break;
+        
+      case 'skip':
+        console.log('跳過回合');
+        // 設置玩家暫停狀態，下次輪到該玩家時不能骰骰子
+        if (currentPlayer) {
+          setPlayerSkipped(prev => ({
+            ...prev,
+            [currentPlayer.id]: true
+          }));
+          // 記錄遊戲動作
+          recordGameAction(
+            currentPlayer.id,
+            currentPlayer.name,
+            'challenge',
+            `${currentPlayer.name} 使用懲罰卡，下次輪到時不能骰骰子`,
+            { 
+              cardType: 'penalty', 
+              action: 'skip_turn',
+              location: currentPlayer.locationName,
+              timestamp: new Date().toISOString()
+            }
+          );
+        }
+        // 不立即切換玩家，讓玩家在下一輪輪到時才被暫停
+        break;
+        
+      case 'swap':
+        console.log('需要選擇目標玩家進行位置交換');
+        // 顯示玩家選擇界面
+        setPendingSwapCard(cardResponse);
+        setShowPlayerSelector(true);
+        break;
+        
+      case 'money':
+      case 'item':
+        console.log(`卡片效果: ${cardResponse.description}`);
+        // 金錢和道具卡片只顯示訊息，不執行特殊動作
+        break;
+        
+      default:
+        console.log('未知的卡片動作類型:', cardResponse.action_type);
+    }
   };
 
   // 處理玩家答案提交
@@ -1439,7 +1819,7 @@ const Monopoly: React.FC = () => {
               currentPlayer.id,
               currentPlayer.name,
               'challenge',
-              `單字挑戰${isCorrect ? '成功' : '失敗'}: ${currentWordCard.han} (${currentWordCard.ch})`,
+              `${wordCardChallengeSource === 'coupon' ? '單字大單挑' : '來學單字'}${isCorrect ? '成功' : '失敗'}${wordCardChallengeSource === 'coupon' ? (isCorrect ? '！折抵50元' : '！請支付原價') : '！'}: ${currentWordCard.han} (${currentWordCard.ch})`,
               {
                 challengeType: 'vocabulary',
                 word: currentWordCard.han,
@@ -1743,89 +2123,7 @@ const Monopoly: React.FC = () => {
     }
   };
 
-  // 處理情境對話提交 (未使用)
-  const _handleScenarioSubmit = async () => {
-    if (!scenarioSessionId || !scenarioPlayerInput.trim() || scenarioIsProcessing) {
-      return;
-    }
-    
-    const userInput = scenarioPlayerInput.trim();
-    setScenarioPlayerInput('');
-    setScenarioIsProcessing(true);
-    
-    // 添加用戶訊息
-    setScenarioMessages(prev => {
-      const newMessages = [...prev, { type: 'outgoing' as const, sender: '你', content: userInput }];
-      console.log('添加用戶消息後的消息數量:', newMessages.length);
-      console.log('用戶輸入:', userInput);
-      return newMessages;
-    });
-    
-    try {
-      // 發送情境對話回合
-      const result = await asyncPost(api.scenarioTurnText, {
-        session_id: scenarioSessionId,
-        text: userInput
-      });
-      
-      if (result.code === 200 && result.body) {
-        // 添加 NPC 回應
-        setScenarioMessages(prev => {
-          const newMessages = [...prev, { 
-            type: 'incoming' as const, 
-            sender: '小熊', 
-            content: result.body.npc_text 
-          }];
-          
-          // 在更新消息後計算對話次數
-          const conversationCount = newMessages.length;
-          
-          // 成功條件：對話次數達到3次（簡單判斷）
-          const isSuccess = conversationCount >= 3;
-          console.log('情境挑戰結果判斷:', { 
-            conversationCount, 
-            turn: result.body.turn || 0, 
-            score: result.body.score || 0, 
-            isSuccess,
-            messages: newMessages.length,
-            previousLength: prev.length,
-            newMessageAdded: result.body.npc_text
-          });
-          
-          // 詳細調試：顯示所有消息內容
-          console.log('所有對話消息:', newMessages.map((msg, index) => ({
-            index,
-            type: msg.type,
-            sender: msg.sender,
-            content: msg.content
-          })));
-          
-          if (isSuccess) {
-            setCouponChallengeResult('success');
-            console.log('🎉 情境挑戰成功！');
-          }
-          
-          return newMessages;
-        });
-      } else {
-        console.error('情境對話回合失敗:', result.message);
-        setScenarioMessages(prev => [...prev, { 
-          type: 'incoming', 
-          sender: '系統', 
-          content: '對話處理失敗，請重試' 
-        }]);
-      }
-    } catch (error) {
-      console.error('情境對話提交錯誤:', error);
-      setScenarioMessages(prev => [...prev, { 
-        type: 'incoming', 
-        sender: '系統', 
-        content: '網路錯誤，請重試' 
-      }]);
-    } finally {
-      setScenarioIsProcessing(false);
-    }
-  };
+  // 處理情境對話提交 (未使用 - 已刪除)
 
   // 處理優惠券挑戰答案提交 (未使用 - 已廢棄)
 
@@ -1863,7 +2161,10 @@ const Monopoly: React.FC = () => {
     if (currentPlayer) {
       // 加油站挑戰完成後暫停一次
       if (couponType === 'gas_station') {
-        setPlayerSkipped(true);
+        setPlayerSkipped(prev => ({
+          ...prev,
+          [currentPlayer.id]: true
+        }));
         recordGameAction(
           currentPlayer.id,
           currentPlayer.name,
@@ -1883,6 +2184,7 @@ const Monopoly: React.FC = () => {
   const handleWordChallenge = () => {
     setShowCouponPanel(false);
     setIsDrawingCard(true);
+    setWordCardChallengeSource('coupon'); // 標記為優惠券挑戰
     
     // 抽卡片動畫效果
     setTimeout(async () => {
@@ -1952,6 +2254,7 @@ const Monopoly: React.FC = () => {
     // 重置 STT 相關狀態
     setWordCardSTTResult('');
     setWordCardChallengeResult(null);
+    setWordCardChallengeSource(null); // 重置挑戰來源
     setIsRecording(false);
     setIsProcessing(false);
     if (mediaRecorder) {
@@ -2390,13 +2693,6 @@ const Monopoly: React.FC = () => {
         <div className="challenge-panel-side">
           <div className="challenge-header">
             <h2 className="challenge-title">情境挑戰</h2>
-            <button 
-              className="qr-scanner-button"
-              onClick={() => setShowQRScanner(true)}
-              title="掃描 QR Code"
-            >
-              <img src={QRScanIcon} alt="QR 掃描" className="qr-scanner-icon" />
-            </button>
           </div>
           <div className="challenge-content">
             <div className="challenge-question">
@@ -2582,7 +2878,10 @@ const Monopoly: React.FC = () => {
               {/* 顯示挑戰結果 */}
               {wordCardChallengeResult && (
                 <div className={`challenge-result ${wordCardChallengeResult}`}>
-                  {wordCardChallengeResult === 'success' ? '挑戰成功！' : '挑戰失敗！'}
+                  {wordCardChallengeResult === 'success' 
+                    ? (wordCardChallengeSource === 'coupon' ? '挑戰成功！折抵50元' : '挑戰成功！')
+                    : (wordCardChallengeSource === 'coupon' ? '挑戰失敗！請支付原價' : '挑戰失敗！')
+                  }
                 </div>
               )}
               
@@ -2872,7 +3171,10 @@ const Monopoly: React.FC = () => {
                       const currentPlayer = players.find(p => p.isCurrentPlayer);
                       if (currentPlayer) {
                         // 加油站使用原有的暫停邏輯
-                        setPlayerSkipped(true);
+                        setPlayerSkipped(prev => ({
+                          ...prev,
+                          [currentPlayer.id]: true
+                        }));
                         recordGameAction(
                           currentPlayer.id,
                           currentPlayer.name,
@@ -3034,6 +3336,125 @@ const Monopoly: React.FC = () => {
         onScanError={handleQRScanError}
         onClose={() => setShowQRScanner(false)}
       />
+
+      {/* 卡片處理結果顯示 */}
+      {cardProcessing && (
+        <div className="card-processing-overlay">
+          <div className="card-processing-content">
+            <div className="card-processing-spinner"></div>
+            <p>正在處理卡片...</p>
+          </div>
+        </div>
+      )}
+
+      {cardResult && (
+        <div className="card-result-overlay">
+          <div className="card-result-content">
+            <div className={`card-result-header ${cardResult.success ? 'success' : 'error'}`}>
+              <h3>{getCardTitle(cardResult.card_type)}</h3>
+            </div>
+            <div className="card-result-body">
+              {cardResult.success ? (
+                <>
+                  <p style={{ fontSize: '18px', marginBottom: '12px', fontWeight: '600' }}>
+                    {cardResult.action_type === 'move' && cardResult.value && (
+                      <>
+                        {cardResult.value as number > 0 ? '前進' : '後退'} {Math.abs(cardResult.value as number)} 格
+                      </>
+                    )}
+                    {cardResult.action_type === 'teleport' && (
+                      <>傳送到指定位置</>
+                    )}
+                    {cardResult.action_type === 'skip' && (
+                      <>跳過一回合</>
+                    )}
+                    {cardResult.action_type === 'swap' && (
+                      <>與玩家交換位置</>
+                    )}
+                    {cardResult.action_type === 'money' && (
+                      <>獲得金錢獎勵</>
+                    )}
+                    {cardResult.action_type === 'item' && (
+                      <>獲得道具</>
+                    )}
+                  </p>
+                  {cardResult.new_position && (
+                    <p style={{ fontSize: '16px', color: '#8b7355' }}>
+                      新位置: {cardResult.new_position}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p style={{ fontSize: '18px', marginBottom: '12px', fontWeight: '600' }}>
+                    卡片使用失敗
+                  </p>
+                  <p style={{ fontSize: '16px', color: '#8b7355' }}>
+                    {cardResult.message}
+                  </p>
+                </>
+              )}
+            </div>
+            <div className="card-result-footer">
+              <button 
+                className="card-result-close-btn"
+                onClick={() => setCardResult(null)}
+              >
+                確定
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 玩家選擇界面（用於交換位置卡片） */}
+      {showPlayerSelector && (
+        <div className="player-selector-overlay">
+          <div className="player-selector-content">
+            <div className="player-selector-header">
+              <h3>選擇交換位置的玩家</h3>
+              <button 
+                className="player-selector-close-btn"
+                onClick={() => {
+                  setShowPlayerSelector(false);
+                  setPendingSwapCard(null);
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="player-selector-body">
+              <p className="selector-description">
+                請選擇要與您交換位置的玩家：
+              </p>
+              <div className="player-list">
+                {players
+                  .filter(player => player.id !== currentPlayer?.id) // 排除當前玩家
+                  .map(player => (
+                    <button
+                      key={player.id}
+                      className="player-select-btn"
+                      onClick={() => handlePlayerSelect(player.id)}
+                    >
+                      <div className="player-avatar">
+                        <img 
+                          src={player.avatarImage || player.avatar} 
+                          alt={player.name}
+                          className="player-avatar-img"
+                        />
+                      </div>
+                      <div className="player-info">
+                        <div className="player-name">{player.name}</div>
+                        <div className="player-position">位置: {player.locationName}</div>
+                      </div>
+                    </button>
+                  ))
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

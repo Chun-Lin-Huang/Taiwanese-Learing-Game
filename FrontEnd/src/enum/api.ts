@@ -33,7 +33,6 @@ export enum api {
     scenarioVoiceTurn = "http://127.0.0.1:2083/api/v1/scenario/voice_turn",
     vocabProgress = "http://127.0.0.1:2083/api/v1/vocab-progress",
     vocabProgressUpdate = "http://127.0.0.1:2083/api/v1/vocab-progress/update",
-    vocabProgressAll = "http://127.0.0.1:2083/api/v1/vocab-progress/all",
     vocabularyPicturesByCategory = "http://127.0.0.1:2083/api/v1/vocabulary-pictures/by-category",
     vocabularyPictureStream = "http://127.0.0.1:2083/api/v1/vocabulary-pictures/stream",
     vocabularyPictureByCard = "http://127.0.0.1:2083/api/v1/vocabulary-pictures/by-card",
@@ -45,5 +44,9 @@ export enum api {
     mapEdgeFindByBoardId = "http://127.0.0.1:2083/api/v1/map-edge/findByBoardId",
     mapEdgeFindFromNode = "http://127.0.0.1:2083/api/v1/map-edge/findFromNode",
     gameMove = "http://127.0.0.1:2083/api/v1/game/move",
-    gameMapInfo = "http://127.0.0.1:2083/api/v1/game/mapInfo"
+    gameMapInfo = "http://127.0.0.1:2083/api/v1/game/mapInfo",
+    // 卡片相關 API
+    cardByCode = "http://127.0.0.1:2083/api/v1/cards",
+    cardUse = "http://127.0.0.1:2083/api/v1/game/use-card",
+    cardSwapPositions = "http://127.0.0.1:2083/api/v1/game/swap-positions"
 }

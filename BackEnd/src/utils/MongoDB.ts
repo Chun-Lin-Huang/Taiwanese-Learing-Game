@@ -1,6 +1,9 @@
-import { Schema, model, connect, Mongoose } from 'mongoose';
+import mongoose, { Schema, model, connect, Mongoose } from 'mongoose';
 import { logger } from '../middlewares/log';
 import { MongoInfo } from '../interfaces/MongoInfo';
+
+// 設定 strictQuery 為 false
+mongoose.set('strictQuery', false);
 export class MongoDB {
     
     DB: Mongoose | void | undefined

@@ -25,6 +25,8 @@ import { MapNodeRoute } from "./routers/MapNodeRoute";
 import { MapEdgeRoute } from "./routers/MapEdgeRoute";
 import { GameLogicRoute } from "./routers/GameLogicRoute";
 import { GameHistoryRoute } from "./routers/GameHistoryRoute";
+import { CardRoute } from "./routers/CardRoute";
+import { CardUseRoute } from "./routers/CardUseRoute";
 
 export const router: Array<Route> = [
     new PageRoute(),new UserRoute()
@@ -52,4 +54,6 @@ export const router: Array<Route> = [
     ,new MapEdgeRoute()
     ,new GameLogicRoute()
     ,new GameHistoryRoute()
+    ,new CardRoute()
+    ,new CardUseRoute()
 ];

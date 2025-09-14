@@ -19,10 +19,4 @@ export class VocabProgressController {
     return res.status(out.code).send(out);
   }
 
-  /** GET /api/v1/vocab-progress/all/:userId */
-  public async getAllByUser(req: Request, res: Response) {
-    const { userId } = req.params as { userId: string };
-    const out = await this.service.getAllProgressByUser(userId);
-    return res.status(out.code).send(out);
-  }
 }
