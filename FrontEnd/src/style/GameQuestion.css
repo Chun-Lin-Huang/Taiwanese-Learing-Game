@@ -67,13 +67,12 @@
     align-items: center;
     justify-content: center;
     padding: 0;
-    transition: background-color 0.2s ease;
-    /* 添加過渡效果 */
+    transition: background-color 0.2s ease; /* 添加平滑過渡效果 */
 }
 
+/* 添加圓圈背景和淺白色 hover 效果 */
 .back-button:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-    /* 鼠標懸停效果 */
+    background-color: rgba(255, 255, 255, 0.2); /* 很淺的白色背景 */
 }
 
 .back-button img {

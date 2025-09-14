@@ -45,12 +45,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
+    transition: background-color 0.2s ease; /* 添加平滑過渡效果 */
   }
   
+  /* 添加圓圈背景和淺白色 hover 效果 */
   .back-button:hover {
-    background: #555;
-    transform: scale(1.05);
+    background-color: rgba(255, 255, 255, 0.2); /* 很淺的白色背景 */
   }
   
   .summary-title {
@@ -69,48 +69,41 @@
     font-size: 20px;
   }
   
-  /* 玩家排名 */
-  .player-rankings {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 30px;
+  /* 玩家排名容器 - 平行排列 */
+  .player-rankings-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     gap: 30px;
+    margin-bottom: 30px;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .player-section {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  }
-
-  .player-section .player-rank {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 15px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #e9ecef;
-  }
-  
-  .player-rank {
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: relative;
+    gap: 15px;
+    height: 100%;
+    justify-content: flex-start;
+  }
+
+  /* 玩家頭像和名字 - 在框框外 */
+  .player-rank-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
     transition: all 0.3s ease;
   }
-  
-  .player-rank:hover {
+
+  .player-rank-header.winner {
     transform: translateY(-5px);
   }
-  
-  .player-rank.winner {
-    transform: translateY(-10px);
-  }
-  
-  .player-rank.winner:hover {
-    transform: translateY(-15px);
+
+  .player-rank-header.winner:hover {
+    transform: translateY(-8px);
   }
   
   .rank-avatar {
@@ -122,7 +115,7 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    border: 3px solid #938DD8;
+    border: 3px solid #E6E6FA;
     object-fit: cover;
     transition: all 0.3s ease;
   }
@@ -134,14 +127,14 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    border: 3px solid #ddd;
+    border: 3px solid #E6E6FA;
     font-size: 40px;
     background: #f8f8f8;
     transition: all 0.3s ease;
   }
   
-  .player-rank.winner .avatar-image,
-  .player-rank.winner .avatar-emoji {
+  .player-rank-header.winner .avatar-image,
+  .player-rank-header.winner .avatar-emoji {
     border: 3px solid #FFD700;
     box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
   }
@@ -164,109 +157,117 @@
     }
   }
   
-  .rank-info {
-    text-align: center;
-    margin-left: 15px;
-  }
-  
   .player-name {
     font-weight: bold;
-    font-size: 16px;
+    font-size: 18px;
     color: #333;
     margin-bottom: 5px;
+    margin-top: 10px;
   }
   
   .rank-position {
-    font-size: 14px;
-    color: #666;
-  }
-
-  /* 玩家挑戰記錄 */
-  .player-challenge-records {
-    margin-top: 15px;
-  }
-
-  .player-records-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    padding: 10px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border-left: 4px solid #007bff;
-  }
-
-  .player-records-header .player-name {
     font-size: 16px;
-    font-weight: bold;
-    color: #495057;
-    margin-bottom: 0;
+    color: #666;
+    font-weight: 500;
   }
 
-  .player-records-header .record-count {
-    font-size: 12px;
-    color: #6c757d;
-    background: #e9ecef;
-    padding: 4px 8px;
+  /* 遊戲記錄樣式 - 框框內，可滑動 */
+  .player-game-record {
+    background: #FFF8DC;
     border-radius: 12px;
+    padding: 20px;
+    border: 2px solid #E6E6FA;
+    width: 100%;
+    max-width: 500px;
+    height: 500px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .record-title {
+    font-weight: bold;
+    font-size: 16px;
+    color: #2E4A6B;
+    margin-bottom: 10px;
+    text-align: center;
+    background: #B0E0E6;
+    padding: 8px;
+    border-radius: 8px;
   }
 
   .player-actions-list {
-    max-height: 300px;
+    flex: 1;
     overflow-y: auto;
     padding-right: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
 
-  .player-action-item {
-    background: #ffffff;
+  /* 自定義滾動條 */
+  .player-actions-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .player-actions-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  .player-actions-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+  }
+
+  .player-actions-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
+
+  .record-item {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.5;
+    padding: 18px 15px;
+    background: rgba(255, 255, 255, 0.8);
     border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 8px;
-    border-left: 4px solid #6c757d;
+    border-left: 4px solid #ddd;
     transition: all 0.3s ease;
+    margin-bottom: 8px;
+    width: 100%;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
   }
 
-  .player-action-item:hover {
-    background: #f8f9fa;
-    transform: translateX(3px);
+  .record-item:hover {
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateX(2px);
   }
 
-  .player-action-item.dice_roll {
+  .record-item.dice_roll {
     border-left-color: #6f42c1;
   }
 
-  .player-action-item.move {
+  .record-item.move {
     border-left-color: #007bff;
   }
 
-  .player-action-item.challenge {
+  .record-item.challenge {
     border-left-color: #28a745;
   }
 
-  .player-action-item.bankruptcy {
+  .record-item.bankruptcy {
     border-left-color: #dc3545;
   }
 
-  .player-action-item.shortcut {
+  .record-item.shortcut {
     border-left-color: #ffc107;
   }
 
-  .player-action-item.victory {
+  .record-item.victory {
     border-left-color: #fd7e14;
     background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-  }
-
-  .player-action-item .action-time {
-    font-size: 0.8em;
-    color: #6c757d;
-    margin-bottom: 4px;
-  }
-
-  .player-action-item .action-description {
-    color: #212529;
-    margin-bottom: 4px;
-    font-size: 14px;
   }
 
   
@@ -351,6 +352,18 @@
   }
   
   /* 響應式設計 */
+  @media (max-width: 1024px) {
+    .player-rankings-container {
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 25px;
+      max-width: 1100px;
+    }
+    
+    .player-game-record {
+      max-width: 450px;
+    }
+  }
+
   @media (max-width: 768px) {
     .score-summary-content {
       width: 95%;
@@ -358,21 +371,23 @@
       margin: 10px;
     }
     
-    .player-rankings {
-      flex-direction: column;
-      gap: 15px;
+    .player-rankings-container {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      max-width: 700px;
     }
     
-    .player-rank.winner {
+    .player-rank-header.winner {
       transform: none;
     }
     
-    .game-records {
-      flex-direction: column;
+    .player-rank-header.winner:hover {
+      transform: translateY(-3px);
     }
     
-    .player-record-panel {
-      min-width: auto;
+    .player-game-record {
+      max-width: 100%;
+      height: 400px;
     }
     
     .title-text {
@@ -380,19 +395,50 @@
     }
   }
   
+  @media (max-width: 600px) {
+    .player-rankings-container {
+      grid-template-columns: 1fr;
+      gap: 20px;
+      max-width: 400px;
+    }
+  }
+
   @media (max-width: 480px) {
     .score-summary-content {
       padding: 15px;
     }
     
+    .player-rankings-container {
+      gap: 15px;
+      max-width: 350px;
+    }
+    
     .avatar-image {
-      width: 50px;
-      height: 50px;
+      width: 70px;
+      height: 70px;
+    }
+    
+    .avatar-emoji {
+      width: 70px;
+      height: 70px;
+      font-size: 35px;
     }
     
     .crown {
       font-size: 16px;
       top: -8px;
+    }
+    
+    .player-name {
+      font-size: 16px;
+    }
+    
+    .rank-position {
+      font-size: 14px;
+    }
+    
+    .player-game-record {
+      height: 350px;
     }
     
     .end-game-button {

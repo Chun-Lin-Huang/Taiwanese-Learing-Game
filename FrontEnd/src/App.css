@@ -76,7 +76,8 @@ body, html {
   display: none !important;
 }
 
-.back-button {
+/* 全局返回按鈕樣式 - 只適用於沒有特定樣式的頁面 */
+.app-container .back-button {
   position: absolute;
   left: 5vw; /* 從 70px 改為視窗寬度的 5% */
   top: 50%;
@@ -95,12 +96,14 @@ body, html {
   align-items: center;
   justify-content: center;
   padding: 0;
-  transition: background-color 0.3s;
+  transition: background-color 0.2s ease; /* 添加平滑過渡效果 */
 }
-.back-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+
+/* 添加圓圈背景和淺白色 hover 效果 */
+.app-container .back-button:hover {
+  background-color: rgba(255, 255, 255, 0.2); /* 很淺的白色背景 */
 }
-.back-button img {
+.app-container .back-button img {
   width: 60%; /* 圖片寬度佔按鈕的 60% */
   height: 60%; /* 圖片高度佔按鈕的 60% */
   object-fit: contain; /* 確保圖片縮放時不會被裁切 */

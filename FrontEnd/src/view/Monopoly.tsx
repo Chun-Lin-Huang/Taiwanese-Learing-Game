@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import '../style/Monopoly.css';
 import "../App.css";
@@ -7,6 +7,38 @@ import { AudioManager, AudioType } from '../config/audioConfig';
 import AudioControls from '../components/AudioControls';
 import '../style/AudioControls.css';
 import { MapApiService, type MapBoard } from '../services/mapApi';
+import { api } from '../enum/api';
+import { asyncGet, asyncPost } from '../utils/fetch';
+
+// 專門用於遊戲歷史的 POST 函數，允許 409 錯誤
+const asyncPostGameHistory = async (url: string, data: any) => {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: data ? JSON.stringify(data) : undefined,
+  });
+
+  const text = await res.text();
+  let json: any;
+  try { 
+    json = text ? JSON.parse(text) : {}; 
+  } catch { 
+    json = { raw: text }; 
+  }
+
+  // 409 錯誤視為成功（遊戲已存在）
+  if (res.status === 409) {
+    return json;
+  }
+
+  if (!res.ok) {
+    const msg = json?.message || json?.error || json?.raw || res.statusText;
+    throw new Error(`HTTP ${res.status} ${msg}`);
+  }
+  return json;
+};
 
 interface PlayerRecord {
   id: number;
@@ -133,6 +165,7 @@ const Monopoly: React.FC = () => {
   const [scenarioPlayerInput, setScenarioPlayerInput] = useState<string>('');
   const [scenarioIsProcessing, setScenarioIsProcessing] = useState(false);
   const [scenarioTopics, setScenarioTopics] = useState<Array<{_id: string, name: string}>>([]);
+  const [currentSelectedTopic, setCurrentSelectedTopic] = useState<{_id: string, name: string} | null>(null);
   
   // 一般挑戰對話相關狀態
   const [challengeSessionId] = useState<string | null>(null);
@@ -171,7 +204,7 @@ const Monopoly: React.FC = () => {
 
   // 遊戲歷程狀態
   const [gameHistory, setGameHistory] = useState<GameHistory>({
-    gameId: `game_${Date.now()}`,
+    gameId: `game_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     startTime: new Date(),
     actions: [],
     players: []
@@ -179,13 +212,13 @@ const Monopoly: React.FC = () => {
   
   // 遊戲是否已在資料庫中創建
   const [isGameCreatedInDB, setIsGameCreatedInDB] = useState(false);
+  const isCreatingGameRef = useRef(false);
 
   // 載入情境主題
   useEffect(() => {
     const loadScenarioTopics = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:2083/api/v1/chat-choose/list');
-        const result = await response.json();
+        const result = await asyncGet(api.chatChooseList);
         if (result.code === 200 && result.body) {
           setScenarioTopics(result.body);
         }
@@ -201,8 +234,7 @@ const Monopoly: React.FC = () => {
   useEffect(() => {
     const loadThemes = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:2083/api/v1/vocab-categories/list');
-        const result = await response.json();
+        const result = await asyncGet(api.vocabCategoriesList);
         
         if (result.code === 200 && result.body) {
           // 只顯示指定的主題：交通工具和職業與社會角色
@@ -354,7 +386,10 @@ const Monopoly: React.FC = () => {
     }));
 
     // 如果遊戲還沒有在資料庫中創建，先創建遊戲
-    if (!isGameCreatedInDB) {
+    if (!isGameCreatedInDB && !isCreatingGameRef.current) {
+      // 設置創建標誌防止重複創建
+      isCreatingGameRef.current = true;
+      setIsGameCreatedInDB(true);
       try {
         const gameData = {
           gameId: gameHistory.gameId,
@@ -367,19 +402,14 @@ const Monopoly: React.FC = () => {
           }))
         };
 
-        const response = await fetch('http://127.0.0.1:2083/api/v1/game-history/create', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(gameData),
-        });
-
-        if (response.ok) {
-          setIsGameCreatedInDB(true);
+        try {
+          await asyncPostGameHistory('http://127.0.0.1:2083/api/v1/game-history/create', gameData);
           console.log('遊戲記錄已創建到資料庫');
-        } else {
-          console.error('創建遊戲記錄失敗:', await response.text());
+        } catch (error: any) {
+          console.error('創建遊戲記錄失敗:', error.message);
+          // 如果創建失敗，重置狀態以便重試
+          setIsGameCreatedInDB(false);
+          isCreatingGameRef.current = false;
         }
       } catch (error) {
         console.error('創建遊戲記錄時發生錯誤:', error);
@@ -398,16 +428,11 @@ const Monopoly: React.FC = () => {
           timestamp: newAction.timestamp.toISOString()
         };
 
-        const response = await fetch(`http://127.0.0.1:2083/api/v1/game-history/${gameHistory.gameId}/action`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(actionData),
-        });
-
-        if (!response.ok) {
-          console.error('保存遊戲動作失敗:', await response.text());
+        try {
+          await asyncPostGameHistory(`http://127.0.0.1:2083/api/v1/game-history/${gameHistory.gameId}/action`, actionData);
+          // 成功保存
+        } catch (error: any) {
+          console.error('保存遊戲動作失敗:', error.message);
         }
       } catch (error) {
         console.error('保存遊戲動作時發生錯誤:', error);
@@ -426,21 +451,14 @@ const Monopoly: React.FC = () => {
         finalRound: p.round
       }));
 
-      const response = await fetch(`http://127.0.0.1:2083/api/v1/game-history/${gameHistory.gameId}/end`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      try {
+        await asyncPostGameHistory(`http://127.0.0.1:2083/api/v1/game-history/${gameHistory.gameId}/end`, {
           winner,
           finalPlayers
-        }),
-      });
-
-      if (response.ok) {
+        });
         console.log('遊戲結束記錄已保存到資料庫');
-      } else {
-        console.error('保存遊戲結束記錄失敗:', await response.text());
+      } catch (error: any) {
+        console.error('保存遊戲結束記錄失敗:', error.message);
       }
     } catch (error) {
       console.error('保存遊戲結束記錄時發生錯誤:', error);
@@ -763,8 +781,7 @@ const Monopoly: React.FC = () => {
               : '6894ec12e4c25617b65cd248'; // 預設使用交通工具
             
             // 使用原本的 API 獲取單字卡片
-            const response = await fetch(`http://127.0.0.1:2083/api/v1/vocab-cards/by-category/${categoryId}`);
-            const result = await response.json();
+            const result = await asyncGet(`${api.vocabCardsByCategory}/${categoryId}`);
             
             if (result.code === 200 && result.body && result.body.length > 0) {
               const randomIndex = Math.floor(Math.random() * result.body.length);
@@ -774,8 +791,7 @@ const Monopoly: React.FC = () => {
               
               // 獲取對應的圖片
               try {
-                const imageResponse = await fetch(`http://127.0.0.1:2083/api/v1/vocabulary-pictures/by-card/${selectedCard._id}`);
-                const imageResult = await imageResponse.json();
+                const imageResult = await asyncGet(`${api.vocabularyPictureByCard}/${selectedCard._id}`);
                 
                 if (imageResult.code === 200 && imageResult.body) {
                   selectedCard.image = imageResult.body.imageUrl;
@@ -981,8 +997,7 @@ const Monopoly: React.FC = () => {
       console.log('啟動挑戰情境對話，遊戲主題:', gameTheme);
       
       // 獲取情境主題列表
-      const response = await fetch('http://127.0.0.1:2083/api/v1/chat-choose/list');
-      const result = await response.json();
+      const result = await asyncGet(api.chatChooseList);
       
       if (result.code === 200 && result.body) {
         // 根據遊戲主題選擇對應的情境主題
@@ -997,21 +1012,16 @@ const Monopoly: React.FC = () => {
         if (selectedTopic) {
           console.log('選擇的挑戰情境主題:', selectedTopic.name, '遊戲主題:', gameTheme);
           
+          // 保存選中的主題到狀態中
+          setCurrentSelectedTopic(selectedTopic);
+          
           const userId = localStorage.getItem('userId') || 'default_user';
           
           // 開始挑戰情境對話（使用情境挑戰的邏輯）
-          const response = await fetch('http://127.0.0.1:2083/api/v1/scenario/start', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              chatChooseId: selectedTopic._id,
-              userId: userId
-            })
+          const startResult = await asyncPost(api.scenarioStart, {
+            chatChooseId: selectedTopic._id,
+            userId: userId
           });
-          
-          const startResult = await response.json();
           
           if (startResult.code === 200 && startResult.body) {
             console.log('設置 scenarioSessionId:', startResult.body.session_id);
@@ -1221,8 +1231,8 @@ const Monopoly: React.FC = () => {
         formData.append('audio', audioBlob, 'recording.webm');
         formData.append('session_id', scenarioSessionId);
         formData.append('user_id', localStorage.getItem('userId') || 'default_user');
-        formData.append('chat_choose_id', 'default_chat_choose'); // 使用預設值
-        formData.append('title', '台語語音對話');
+        formData.append('chat_choose_id', currentSelectedTopic?._id || 'default_chat_choose'); // 使用選擇的主題ID
+        formData.append('title', currentSelectedTopic?.name || '台語情境挑戰'); // 使用主題名稱
         
         console.log('發送情境對話 STT 請求到:', 'http://localhost:5050/process_audio');
         
@@ -1243,61 +1253,57 @@ const Monopoly: React.FC = () => {
         console.log('情境對話 STT 響應結果:', result);
         
         if (result.success) {
-          // 一次性添加用戶語音辨識結果和AI回應
-          setScenarioMessages(prev => {
-            const newMessages = [...prev];
-            
-            // 添加用戶的語音辨識結果
-            if (result.transcription) {
-              console.log('用戶語音辨識結果:', result.transcription);
-              newMessages.push({ 
-                type: 'outgoing' as const, 
-                sender: '你', 
-                content: result.transcription 
-              });
-            }
-            
-            // 添加AI回應
-            if (result.ai_response) {
-              console.log('AI 回應:', result.ai_response);
-              newMessages.push({ 
-                type: 'incoming' as const, 
-                sender: '小熊', 
-                content: result.ai_response 
-              });
-            }
-            
-            // 在更新消息後計算對話次數
-            const conversationCount = newMessages.length;
-            console.log('語音輸入後的消息數量:', conversationCount);
-            
-            return newMessages;
-          });
+          // 先顯示用戶語音辨識結果
+          if (result.transcription) {
+            console.log('用戶語音辨識結果:', result.transcription);
+            setScenarioMessages(prev => [...prev, { 
+              type: 'outgoing' as const, 
+              sender: '你', 
+              content: result.transcription 
+            }]);
+          }
+          
+          // 然後顯示AI回應
+          if (result.ai_response) {
+            console.log('AI 回應:', result.ai_response);
+            setScenarioMessages(prev => [...prev, { 
+              type: 'incoming' as const, 
+              sender: '小熊', 
+              content: result.ai_response 
+            }]);
+          }
           
           // 播放 TTS 音頻
           if (result.ai_response && result.audio_url) {
             console.log('播放 TTS 音頻:', result.audio_url);
+            console.log('AI 回應內容:', result.ai_response);
+            console.log('音頻 URL 有效性檢查:', result.audio_url);
+            
             const audio = new Audio(result.audio_url);
+            audio.addEventListener('loadstart', () => console.log('TTS 音頻開始載入'));
+            audio.addEventListener('canplay', () => console.log('TTS 音頻可以播放'));
+            audio.addEventListener('error', (e) => console.error('TTS 音頻載入錯誤:', e));
+            audio.addEventListener('ended', () => console.log('TTS 音頻播放結束'));
+            
             audio.play().catch(error => {
               console.error('TTS 音頻播放失敗:', error);
+            });
+          } else {
+            console.warn('TTS 音頻播放條件不滿足:', {
+              hasAIResponse: !!result.ai_response,
+              hasAudioUrl: !!result.audio_url,
+              aiResponse: result.ai_response,
+              audioUrl: result.audio_url
             });
           }
           
           // 使用現有的 scenario API 保存對話記錄
           if (result.transcription) {
             try {
-              const turnResult = await fetch('http://127.0.0.1:2083/api/v1/scenario/turn_text', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  session_id: scenarioSessionId,
-                  text: result.transcription
-                })
+              const turnResponse = await asyncPost(api.scenarioTurnText, {
+                session_id: scenarioSessionId,
+                text: result.transcription
               });
-              
-              const turnResponse = await turnResult.json();
               console.log('情境對話回合結果:', turnResponse);
               console.log('回合詳細資訊:', { 
                 finished: turnResponse?.body?.finished, 
@@ -1305,20 +1311,20 @@ const Monopoly: React.FC = () => {
                 score: turnResponse?.body?.score 
               });
               
-              // 注意：這裡我們已經在 setScenarioMessages 中正確計算了對話次數
-              // 我們需要等待狀態更新後再檢查成功條件
+              // 等待狀態更新後檢查成功條件
               // 使用 setTimeout 確保狀態已更新
               setTimeout(() => {
                 setScenarioMessages(currentMessages => {
-                  const conversationCount = currentMessages.length;
-                  const isSuccess = conversationCount >= 3;
+                  // 只計算用戶發送的消息數量（type: 'outgoing'）
+                  const userMessageCount = currentMessages.filter(msg => msg.type === 'outgoing').length;
+                  const isSuccess = userMessageCount >= 3;
                   
                   console.log('情境挑戰結果判斷 (語音輸入):', { 
-                    conversationCount, 
+                    userMessageCount, 
+                    totalMessages: currentMessages.length,
                     turn: turnResponse.body.turn || 0, 
                     score: turnResponse.body.score || 0, 
-                    isSuccess,
-                    messages: currentMessages.length
+                    isSuccess
                   });
                   
                   if (isSuccess) {
@@ -1337,14 +1343,14 @@ const Monopoly: React.FC = () => {
                     
                     // 記錄遊戲動作（只有成功時才記錄）
                     if (currentPlayer) {
-                      recordGameAction(
-                        currentPlayer.id,
-                        currentPlayer.name,
-                        'challenge',
-                        `${currentPlayer.name} 情境挑戰: 成功`,
-                        { 
-                          challengeType: 'scenario',
-                          conversationCount: conversationCount,
+                        recordGameAction(
+                          currentPlayer.id,
+                          currentPlayer.name,
+                          'challenge',
+                          `${currentPlayer.name} 情境挑戰: 成功`,
+                          { 
+                            challengeType: 'scenario',
+                            userMessageCount: userMessageCount,
                           location: currentPlayer.locationName,
                           timestamp: new Date().toISOString(),
                           correct: true
@@ -1425,8 +1431,8 @@ const Monopoly: React.FC = () => {
         formData.append('audio', audioBlob, 'recording.webm');
         formData.append('session_id', challengeSessionId);
         formData.append('user_id', localStorage.getItem('userId') || 'default_user');
-        formData.append('chat_choose_id', 'challenge_scenario');
-        formData.append('title', '台語挑戰對話');
+        formData.append('chat_choose_id', currentSelectedTopic?._id || 'challenge_scenario'); // 使用選擇的主題ID
+        formData.append('title', currentSelectedTopic?.name || '台語挑戰對話'); // 使用主題名稱
         
         console.log('發送挑戰對話 STT 請求到:', 'http://localhost:5050/process_audio');
         
@@ -1479,18 +1485,10 @@ const Monopoly: React.FC = () => {
           // 使用現有的 scenario API 保存對話記錄
           if (result.transcription) {
             try {
-              const turnResult = await fetch('http://127.0.0.1:2083/api/v1/scenario/turn_text', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  session_id: challengeSessionId,
-                  text: result.transcription
-                })
+              const turnResponse = await asyncPost(api.scenarioTurnText, {
+                session_id: challengeSessionId,
+                text: result.transcription
               });
-              
-              const turnResponse = await turnResult.json();
               console.log('挑戰對話回合結果:', turnResponse);
               
               // 前端判斷成功條件：對話3次就算成功
@@ -1692,21 +1690,16 @@ const Monopoly: React.FC = () => {
       const selectedTopic = filteredTopics[Math.floor(Math.random() * filteredTopics.length)];
       console.log('選擇的情境主題:', selectedTopic.name, '遊戲主題:', gameTheme);
       
+      // 保存選中的主題到狀態中
+      setCurrentSelectedTopic(selectedTopic);
+      
       const userId = localStorage.getItem('userId') || 'default_user';
       
       // 開始情境對話
-      const response = await fetch('http://127.0.0.1:2083/api/v1/scenario/start', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          chatChooseId: selectedTopic._id,
-          userId: userId
-        })
+      const result = await asyncPost(api.scenarioStart, {
+        chatChooseId: selectedTopic._id,
+        userId: userId
       });
-      
-      const result = await response.json();
       
       if (result.code === 200 && result.body) {
         setScenarioSessionId(result.body.session_id);
@@ -1741,18 +1734,10 @@ const Monopoly: React.FC = () => {
     
     try {
       // 發送情境對話回合
-      const response = await fetch('http://127.0.0.1:2083/api/v1/scenario/turn_text', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          session_id: scenarioSessionId,
-          text: userInput
-        })
+      const result = await asyncPost(api.scenarioTurnText, {
+        session_id: scenarioSessionId,
+        text: userInput
       });
-      
-      const result = await response.json();
       
       if (result.code === 200 && result.body) {
         // 添加 NPC 回應
@@ -1881,8 +1866,7 @@ const Monopoly: React.FC = () => {
           : '6894ec12e4c25617b65cd248'; // 預設使用交通工具
         
         // 使用原本的 API 獲取單字卡片
-        const response = await fetch(`http://127.0.0.1:2083/api/v1/vocab-cards/by-category/${categoryId}`);
-        const result = await response.json();
+        const result = await asyncGet(`${api.vocabCardsByCategory}/${categoryId}`);
         
         if (result.code === 200 && result.body && result.body.length > 0) {
           const randomIndex = Math.floor(Math.random() * result.body.length);
@@ -1890,8 +1874,7 @@ const Monopoly: React.FC = () => {
           
           // 獲取對應的圖片
           try {
-            const imageResponse = await fetch(`http://127.0.0.1:2083/api/v1/vocabulary-pictures/by-card/${selectedCard._id}`);
-            const imageResult = await imageResponse.json();
+            const imageResult = await asyncGet(`${api.vocabularyPictureByCard}/${selectedCard._id}`);
             
             if (imageResult.code === 200 && imageResult.body) {
               selectedCard.image = imageResult.body.imageUrl;
@@ -1997,10 +1980,22 @@ const Monopoly: React.FC = () => {
               )}
             </div>
             
-            <button 
+            <button
               className="start-game-button"
               onClick={() => {
                 if (selectedTheme) {
+                  // 生成新的遊戲ID
+                  const newGameId = `game_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                  setGameHistory(prev => ({
+                    ...prev,
+                    gameId: newGameId,
+                    startTime: new Date(),
+                    actions: [],
+                    players: []
+                  }));
+                  // 重置遊戲記錄創建狀態
+                  setIsGameCreatedInDB(false);
+                  isCreatingGameRef.current = false;
                   setGameTheme(selectedTheme);
                   setShowThemeSelection(false);
                   audioManager.play(AudioType.GAME_START, 0.5);
@@ -2055,7 +2050,7 @@ const Monopoly: React.FC = () => {
           aria-label="返回"
           onClick={() => {
             audioManager.play(AudioType.THEME_SELECTION, 0.3);
-            navigate("/Learn");
+            navigate("/SuperMonopoly");
           }}
         >
           <img src={BackIcon} alt="返回" />
@@ -2215,6 +2210,31 @@ const Monopoly: React.FC = () => {
                             <span className="message-content">{msg.content}</span>
                           </div>
                         ))}
+                        
+                        {/* 將成功消息和獎勵消息移到滾動容器內 */}
+                        {couponChallengeResult && (
+                          <>
+                            <div className={`scenario-message-bubble success-message`}>
+                              <span className="message-content">
+                                {couponChallengeResult === 'success' ? '🎉 挑戰成功！' : '❌ 挑戰失敗！'}
+                              </span>
+                            </div>
+                            {/* 火車挑戰特殊獎勵信息 */}
+                            {currentChallenge?.type === 'train' || currentChallenge?.type === 'transport' ? (
+                              <div className={`scenario-message-bubble reward-message`}>
+                                <span className="message-content">
+                                  {couponChallengeResult === 'success' ? '🚂 火車挑戰成功！下次按骰子將在捷徑路線移動！' : '🚂 火車挑戰失敗！本次不能使用捷徑'}
+                                </span>
+                              </div>
+                            ) : (
+                              <div className={`scenario-message-bubble reward-message`}>
+                                <span className="message-content">
+                                  {couponChallengeResult === 'success' ? '🎁 請抽取一張獎勵卡' : '⚠️ 請抽取一張懲罰卡'}
+                                </span>
+                              </div>
+                            )}
+                          </>
+                        )}
                     </div>
                   ) : (
                       <div className="question-bubble">
@@ -2226,24 +2246,6 @@ const Monopoly: React.FC = () => {
                     <div className="question-bubble">
                       {challengeQuestion}
                     </div>
-                  )}
-                  
-                  {couponChallengeResult && (
-                    <>
-                      <div className={`response-bubble ${couponChallengeResult}`}>
-                        {couponChallengeResult === 'success' ? '🎉 挑戰成功！' : '❌ 挑戰失敗！'}
-                      </div>
-                      {/* 火車挑戰特殊獎勵信息 */}
-                      {currentChallenge?.type === 'train' || currentChallenge?.type === 'transport' ? (
-                        <div className={`reward-bubble ${couponChallengeResult}`}>
-                          {couponChallengeResult === 'success' ? '🚂 火車挑戰成功！下次按骰子將在捷徑路線移動！' : '🚂 火車挑戰失敗！本次不能使用捷徑'}
-                        </div>
-                      ) : (
-                        <div className={`reward-bubble ${couponChallengeResult}`}>
-                          {couponChallengeResult === 'success' ? '🎁 請抽取一張獎勵卡' : '⚠️ 請抽取一張懲罰卡'}
-                        </div>
-                      )}
-                    </>
                   )}
                 </div>
                 
@@ -2368,6 +2370,28 @@ const Monopoly: React.FC = () => {
                         <span className="message-content">{msg.content}</span>
                       </div>
                     ))}
+                    
+                    {/* 將成功消息和獎勵消息移到滾動容器內 */}
+                    {couponChallengeResult && (
+                      <>
+                        <div className={`scenario-message-bubble success-message`}>
+                          <span className="message-content">
+                            {couponChallengeResult === 'success' ? '🎉 挑戰成功！' : '❌ 挑戰失敗！'}
+                          </span>
+                        </div>
+                        <div className={`scenario-message-bubble reward-message`}>
+                          <span className="message-content">
+                            {couponType === 'road_construction' ? (
+                              couponChallengeResult === 'success' ? '✅ 免於暫停一回合' : '⏸️ 暫停一回合'
+                            ) : couponType === 'gas_station' ? (
+                              couponChallengeResult === 'success' ? '⛽ 免費加油一次' : '💰 挑戰失敗請支付一百元'
+                            ) : (
+                              couponChallengeResult === 'success' ? '🏠 房地產減免100元' : '💰 挑戰失敗請付原價'
+                            )}
+                          </span>
+                        </div>
+                      </>
+                    )}
                 </div>
                 ) : (
                   <div className="question-bubble">
@@ -2378,23 +2402,6 @@ const Monopoly: React.FC = () => {
                 <div className="question-bubble">
                   {couponChallengeQuestion}
                 </div>
-              )}
-              
-              {couponChallengeResult && (
-                <>
-                  <div className={`response-bubble ${couponChallengeResult}`}>
-                    {couponChallengeResult === 'success' ? '🎉 挑戰成功！' : '❌ 挑戰失敗！'}
-                  </div>
-                  <div className={`reward-bubble ${couponChallengeResult}`}>
-                    {couponType === 'road_construction' ? (
-                      couponChallengeResult === 'success' ? '✅ 免於暫停一回合' : '⏸️ 暫停一回合'
-                    ) : couponType === 'gas_station' ? (
-                      couponChallengeResult === 'success' ? '⛽ 免費加油一次' : '💰 挑戰失敗請支付一百元'
-                    ) : (
-                      couponChallengeResult === 'success' ? '🏠 房地產減免100元' : '💰 挑戰失敗請付原價'
-                    )}
-                  </div>
-                </>
               )}
             </div>
             

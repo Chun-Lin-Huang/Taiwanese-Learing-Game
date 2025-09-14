@@ -88,40 +88,45 @@
 /* 座位列 */
 .rl-seats{
   display: flex;
-  justify-content: space-between;
-  gap: clamp(20px, 4vw, 38px);
+  justify-content: center;
+  gap: clamp(15px, 3vw, 25px);
   margin: 0 0 50px 0;
   flex-wrap: nowrap;
   padding: 0 20px;
   width: 100%;
-  max-width: 1000px;
+  max-width: 1400px;
   margin-left: auto;
   margin-right: auto;
 }
 .rl-seat{
   flex: 1;
   min-height: clamp(80px, 12vw, 120px);
+  max-width: 320px;
   background: var(--seat-bg);
   color: var(--text);
   font-family: 'Inter', sans-serif;
   font-weight: 800;
-  font-size: clamp(24px, 5vw, 44px);
+  font-size: clamp(20px, 4vw, 36px);
   border-radius: clamp(16px, 3vw, 28px);
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   border: 2px solid var(--seat-stroke);
   box-shadow: 0 8px 0 var(--seat-shadow);
-  padding: 10px;
+  padding: 15px 10px;
   box-sizing: border-box;
-  min-width: 0;
+  text-align: center;
 }
 
 /* 輸入組容器 */
 .rl-input-group {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0;
   width: 100%;
+  justify-content: center;
+  position: relative;
 }
 
 /* 玩家名稱輸入框 */
@@ -135,9 +140,11 @@
   font-size: clamp(20px, 4vw, 36px);
   color: var(--text);
   text-align: center;
-  padding: 0;
+  padding: 8px 50px 8px 12px; /* 右邊留出空間給放大鏡按鈕 */
   margin: 0;
   border-radius: clamp(16px, 3vw, 28px);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .rl-player-input::placeholder {
@@ -150,22 +157,30 @@
 
 /* 查找按鈕 */
 .rl-find-btn {
-  background: rgba(255, 255, 255, 0.8);
-  border: none;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(149, 107, 57, 0.3);
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 18px;
-  transition: background 0.2s;
-  flex-shrink: 0;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1;
 }
 
 .rl-find-btn:hover {
   background: rgba(255, 255, 255, 1);
+  border-color: rgba(149, 107, 57, 0.5);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  /* 移除 transform: scale(1.05); 避免上下動 */
 }
 
 .rl-find-btn:disabled {
@@ -176,10 +191,21 @@
 /* 使用者資訊 */
 .rl-user-info {
   font-size: clamp(12px, 2.5vw, 18px);
-  color: rgba(149, 107, 57, 0.8);
   margin-top: 4px;
   text-align: center;
   font-weight: 600;
+}
+
+/* 使用者驗證成功 */
+.rl-user-valid {
+  color: #2c5530;
+  font-weight: 700;
+}
+
+/* 使用者驗證失敗 */
+.rl-user-invalid {
+  color: #8b2635;
+  font-weight: 700;
 }
 
 /* 按鈕禁用狀態 */

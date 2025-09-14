@@ -90,16 +90,37 @@
     z-index: 1;
   }
   
-  .back-button {
+  /* 大富翁頁面專用的返回按鈕樣式 */
+  .monopoly-game .back-button,
+  .monopoly-container .back-button {
     cursor: pointer;
     padding: 10px;
     border-radius: 50%;
     background: rgba(175, 81, 81, 0.2);
-    transition: background 0.3s ease;
+    transition: background-color 0.2s ease; /* 添加平滑過渡效果 */
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
   }
   
-  .back-button:hover {
-    background: rgba(128, 50, 50, 0.885);
+  /* 添加圓圈背景和淺白色 hover 效果 */
+  .monopoly-game .back-button:hover,
+  .monopoly-container .back-button:hover {
+    background-color: rgba(255, 255, 255, 0.3); /* 很淺的白色背景 */
+  }
+  
+  .monopoly-game .back-button img,
+  .monopoly-container .back-button img {
+    width: 40px;
+    height: 40px;
   }
   
   .back-arrow {
@@ -1472,12 +1493,16 @@
     flex-direction: column;
     gap: 15px;
     background: #f5f5dc;
+    height: 400px; /* 設置固定高度 */
+    overflow: hidden; /* 防止內容溢出 */
   }
   
   .challenge-question {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    flex: 1; /* 佔滿可用空間 */
+    min-height: 0; /* 允許 flex 項目縮小 */
   }
   
   .question-bubble {
@@ -2052,9 +2077,32 @@
   
   /* 情境對話樣式 - 使用原本的配色 */
   .scenario-messages-container {
-    max-height: 200px;
+    flex: 1; /* 佔滿可用空間 */
     overflow-y: auto;
     margin-bottom: 10px;
+    min-height: 0; /* 允許 flex 項目縮小 */
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 8px;
+  }
+  
+  /* 自定義滾動條樣式 */
+  .scenario-messages-container::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .scenario-messages-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  .scenario-messages-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+  
+  .scenario-messages-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
   }
   
   .scenario-message-bubble {
@@ -2078,6 +2126,32 @@
     color: #212121;
     border: none;
     margin-right: auto;
+  }
+  
+  /* 成功消息樣式 - 右側對話框樣式 */
+  .scenario-message-bubble.success-message {
+    background: #90EE90; /* 淺綠色背景 */
+    color: #333; /* 深色文字 */
+    font-weight: bold;
+    margin: 8px 0;
+    margin-left: auto; /* 靠右對齊，像用戶消息 */
+    max-width: 80%; /* 限制寬度，像對話框 */
+    width: fit-content; /* 根據內容調整寬度 */
+    border-top-right-radius: 6px; /* 對話框小耳朵效果 */
+    text-align: right; /* 文字右對齊 */
+  }
+  
+  /* 獎勵消息樣式 - 右側對話框樣式 */
+  .scenario-messages-container .scenario-message-bubble.reward-message {
+    background: #FFB6C1 !important; /* 粉紅色背景 */
+    color: #333 !important; /* 深色文字 */
+    font-weight: bold !important;
+    margin: 8px 0 !important;
+    margin-left: auto !important; /* 靠右對齊，像用戶消息 */
+    max-width: 80% !important; /* 限制寬度，像對話框 */
+    width: fit-content !important; /* 根據內容調整寬度 */
+    border-top-right-radius: 6px !important; /* 對話框小耳朵效果 */
+    text-align: right !important; /* 文字右對齊 */
   }
   
   .message-content {

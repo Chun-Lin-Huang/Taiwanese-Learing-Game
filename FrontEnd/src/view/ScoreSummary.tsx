@@ -137,16 +137,16 @@ const ScoreSummary: React.FC = () => {
           </div>
         </div>
 
-        {/* 玩家排名和挑戰記錄 */}
-        <div className="player-rankings">
+        {/* 玩家排名 - 頭像和名字在框框外，記錄在下方 */}
+        <div className="player-rankings-container">
           {getPlayerRanking().map((player, index) => {
             // 獲取該玩家的挑戰記錄
             const playerActions = dbGameHistory?.actions.filter(action => action.playerId === player.id) || [];
             
             return (
               <div key={player.id} className="player-section">
-                {/* 玩家排名信息 */}
-                <div className={`player-rank ${index === 0 ? 'winner' : ''}`}>
+                {/* 玩家頭像和名字 - 在框框外 */}
+                <div className={`player-rank-header ${index === 0 ? 'winner' : ''}`}>
                   <div className="rank-avatar">
                     {player.avatarImage ? (
                       <img 
@@ -159,33 +159,25 @@ const ScoreSummary: React.FC = () => {
                     )}
                     {index === 0 && <div className="crown">👑</div>}
                   </div>
-                  <div className="rank-info">
-                    <div className="player-name">{player.name}</div>
-                    <div className="rank-position">第{index + 1}名</div>
-                  </div>
+                  <div className="player-name">{player.name}</div>
+                  <div className="rank-position">第{index + 1}名</div>
                 </div>
 
-                {/* 該玩家的挑戰記錄 */}
-                {playerActions.length > 0 && (
-                  <div className="player-challenge-records">
-                    <div className="player-records-header">
-                      <span className="player-name">{player.name} 的挑戰記錄</span>
-                      <span className="record-count">({playerActions.length} 個動作)</span>
-                    </div>
-                    <div className="player-actions-list">
-                      {playerActions.map((action, actionIndex) => (
-                        <div key={action._id || actionIndex} className={`player-action-item ${action.actionType}`}>
-                          <div className="action-time">
-                            {new Date(action.timestamp).toLocaleTimeString()}
-                          </div>
-                          <div className="action-description">
-                            {action.description}
-                          </div>
+                {/* 該玩家的挑戰記錄 - 在框框內，可滑動 */}
+                <div className="player-game-record">
+                  <div className="record-title">遊戲紀錄</div>
+                  <div className="player-actions-list">
+                    {playerActions.length > 0 ? (
+                      playerActions.map((action, actionIndex) => (
+                        <div key={action._id || actionIndex} className={`record-item ${action.actionType}`}>
+                          {action.description}
                         </div>
-                      ))}
-                    </div>
+                      ))
+                    ) : (
+                      <div className="record-item">-準備開始遊戲</div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
             );
           })}

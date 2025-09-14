@@ -313,13 +313,9 @@
   font-weight: 800;
   font-size: 44px;
   cursor: pointer;
-  transition: transform .06s ease, box-shadow .06s ease, filter .15s ease;
+  /* 移除 transition 動畫效果 */
 }
-.cr-confirm:hover{ filter: brightness(1.04); }
-.cr-confirm:active{
-  transform: translateY(3px);
-  box-shadow: 0 4px 0 var(--cta-shadow);
-}
+/* 移除 hover 和 active 動畫效果 */
 .cr-confirm:disabled{
   cursor: not-allowed;
   filter: grayscale(.25) brightness(.93);

@@ -24,6 +24,15 @@ export class GameHistoryService {
         out.code = 400; out.message = "invalid boardId"; return out;
       }
 
+      // 先檢查遊戲是否已存在
+      const existingGame = await GameHistoryModel.findOne({ gameId: gameData.gameId });
+      if (existingGame) {
+        out.code = 200;
+        out.message = "game already exists, returning existing game";
+        out.body = existingGame.toObject() as unknown as GameHistory;
+        return out;
+      }
+
       const gameHistory = await GameHistoryModel.create({
         gameId: gameData.gameId,
         gameName: gameData.gameName,
@@ -39,9 +48,6 @@ export class GameHistoryService {
       out.body = gameHistory.toObject() as unknown as GameHistory;
       return out;
     } catch (error: any) {
-      if (error.code === 11000) {
-        out.code = 409; out.message = "game already exists"; return out;
-      }
       out.code = 500; out.message = "server error"; return out;
     }
   }
