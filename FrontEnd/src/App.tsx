@@ -1,6 +1,7 @@
 // App.tsx
 import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // 遊戲區
 import Home from "./view/Home";
