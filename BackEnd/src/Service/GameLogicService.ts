@@ -37,20 +37,20 @@ export class GameLogicService {
       console.log('開始計算移動，參數:', { current_position, dice_value, edges_count: edges.length, o17_challenge_success });
       
       let moveResult;
-      // 檢查是否有O17挑戰成功記錄，如果有則計算兩條路徑：正常路徑和D5路徑
+      // 檢查是否有O17挑戰成功記錄，如果有則計算兩條路徑：正常路徑和鐵路路徑
       if (o17_challenge_success) {
-        console.log('O17挑戰成功，計算正常路徑和D5路徑選項');
+        console.log('O17挑戰成功，計算正常路徑和鐵路路徑選項');
         const normalPath = this.calculateMoveWithPath(edges, dice_value, current_position);
-        const d5Path = this.calculateMoveToD5(edges, dice_value, current_position);
+        const railwayPath = this.calculateRailwayPath(edges, dice_value, current_position);
         
         // 返回兩條路徑選項
         moveResult = {
           newPosition: normalPath?.newPosition || current_position,
           path: normalPath?.path || [current_position],
-          alternativePath: d5Path ? {
-            new_position: d5Path.newPosition, // 轉換屬性名
-            path: d5Path.path
-          } : null // D5路徑選項
+          alternativePath: railwayPath ? {
+            new_position: railwayPath.newPosition, // 轉換屬性名
+            path: railwayPath.path
+          } : null // 鐵路路徑選項
         };
       } else {
         moveResult = this.calculateMoveWithPath(edges, dice_value, current_position);
@@ -100,7 +100,7 @@ export class GameLogicService {
         passed_start: passedStart,
         round_completed: passedStart,
         can_use_shortcut: canUseShortcut,
-        alternative_path: (moveResult as any).alternativePath // 包含D5路徑選項
+        alternative_path: (moveResult as any).alternativePath // 包含鐵路路徑選項
       };
       return out;
     } catch {
@@ -108,18 +108,18 @@ export class GameLogicService {
     }
   }
 
-  /** 計算到D5的路徑（O17挑戰成功後的特殊路徑） */
-  private calculateMoveToD5(edges: any[], diceValue: number, currentPosition: string): { newPosition: string; path: string[] } | null {
+  /** 計算鐵路路徑（O17挑戰成功後的特殊路徑） */
+  private calculateRailwayPath(edges: any[], diceValue: number, currentPosition: string): { newPosition: string; path: string[] } | null {
     try {
-      console.log('計算到D5的特殊路徑:', { currentPosition, diceValue });
+      console.log('計算鐵路特殊路徑:', { currentPosition, diceValue });
       
-      // 從當前位置開始，按照骰子值移動，但目標是D5
+      // 從當前位置開始，按照骰子值移動，但目標是火車站前街
       let currentPos = currentPosition;
       const path: string[] = [currentPosition];
       
-      // 第一步：移動到D5
-      const d5Edge = edges.find(edge => edge.from === currentPosition && edge.to === 'D5');
-      if (!d5Edge) {
+      // 第一步：移動到D5（幸福大道）
+      const railwayEdge = edges.find(edge => edge.from === currentPosition && edge.to === 'D5');
+      if (!railwayEdge) {
         console.log('找不到從當前位置到D5的連接');
         return null;
       }
@@ -152,10 +152,10 @@ export class GameLogicService {
         console.log(`移動到: ${currentPos}`);
       }
       
-      console.log('D5路徑計算完成，最終位置:', currentPos, '路徑:', path);
+      console.log('鐵路路徑計算完成，最終位置:', currentPos, '路徑:', path);
       return { newPosition: currentPos, path };
     } catch (error) {
-      console.error('D5路徑計算錯誤:', error);
+      console.error('鐵路路徑計算錯誤:', error);
       return null;
     }
   }
@@ -189,21 +189,21 @@ export class GameLogicService {
           currentPos = normalEdges[0].to;
           console.log(`使用 normal 連接: ${normalEdges[0].from} → ${currentPos}`);
         } else {
-          // 如果沒有 normal 連接，處理 choice 類型的連接
-          const choiceEdges = outgoingEdges.filter(edge => edge.type === 'choice');
-          if (choiceEdges.length > 0) {
-            // 對於 choice 類型，優先選擇通往正常路徑的連接（不是 D 開頭的）
-            const normalPathEdge = choiceEdges.find(edge => !edge.to.startsWith('D'));
+          // 如果沒有 normal 連接，處理 conditional 類型的連接
+          const conditionalEdges = outgoingEdges.filter(edge => edge.type === 'conditional');
+          if (conditionalEdges.length > 0) {
+            // 對於 conditional 類型，優先選擇通往正常路徑的連接（不是 D 開頭的）
+            const normalPathEdge = conditionalEdges.find(edge => !edge.to.startsWith('D'));
             if (normalPathEdge) {
               currentPos = normalPathEdge.to;
-              console.log(`使用 choice 正常路徑連接: ${normalPathEdge.from} → ${currentPos}`);
+              console.log(`使用 conditional 正常路徑連接: ${normalPathEdge.from} → ${currentPos}`);
             } else {
-              // 如果沒有正常路徑，使用第一個 choice 連接
-              currentPos = choiceEdges[0].to;
-              console.log(`使用 choice 連接: ${choiceEdges[0].from} → ${currentPos}`);
+              // 如果沒有正常路徑，使用第一個 conditional 連接
+              currentPos = conditionalEdges[0].to;
+              console.log(`使用 conditional 連接: ${conditionalEdges[0].from} → ${currentPos}`);
             }
           } else {
-            // 如果沒有 choice 連接，使用其他類型的連接
+            // 如果沒有 conditional 連接，使用其他類型的連接
             currentPos = outgoingEdges[0].to;
             console.log(`使用其他連接: ${outgoingEdges[0].from} → ${currentPos}`);
           }

@@ -34,84 +34,90 @@ async function initMapData() {
       { node_id: "S0", board_id: board._id.toString(), name: "START", type: "start", description: "遊戲起始點" },
       
       // 外圈節點 (1-36)
-      { node_id: "01", board_id: board._id.toString(), name: "來學單字", type: "challenge", description: "單字學習挑戰", 
+      { node_id: "00", board_id: board._id.toString(), name: "來學單字", type: "challenge", description: "單字學習挑戰", 
         challenge: { type: "vocabulary", title: "單字挑戰", content: "學習新的台語單字", reward: "抽取單字卡片" }},
-      { node_id: "02", board_id: board._id.toString(), name: "文化路", type: "property", description: "文化地產" },
-      { node_id: "03", board_id: board._id.toString(), name: "光明大道", type: "property", description: "光明地產" },
-      { node_id: "04", board_id: board._id.toString(), name: "致用街", type: "property", description: "致用地產" },
-      { node_id: "05", board_id: board._id.toString(), name: "凱旋大道", type: "property", description: "凱旋地產" },
-      { node_id: "06", board_id: board._id.toString(), name: "挑戰", type: "challenge", description: "情境挑戰", 
+      { node_id: "01", board_id: board._id.toString(), name: "文化路", type: "property", description: "文化地產" },
+      { node_id: "02", board_id: board._id.toString(), name: "光明大道", type: "property", description: "光明地產" },
+      { node_id: "03", board_id: board._id.toString(), name: "致用街", type: "property", description: "致用地產" },
+      { node_id: "04", board_id: board._id.toString(), name: "凱旋大道", type: "property", description: "凱旋地產" },
+      { node_id: "05", board_id: board._id.toString(), name: "挑戰", type: "challenge", description: "情境挑戰", 
         challenge: { type: "story", title: "情境挑戰", content: "完成故事情境挑戰", reward: "抽取情境卡片" }},
-      { node_id: "07", board_id: board._id.toString(), name: "四維路", type: "property", description: "四維地產" },
-      { node_id: "08", board_id: board._id.toString(), name: "機會卡", type: "chance", description: "機會卡", 
+      { node_id: "06", board_id: board._id.toString(), name: "四維路", type: "property", description: "四維地產" },
+      { node_id: "07", board_id: board._id.toString(), name: "機會卡", type: "chance", description: "機會卡", 
         chance: { type: "positive", title: "機會卡", content: "獲得意外獎勵", effect: "+150分" }},
-      { node_id: "09", board_id: board._id.toString(), name: "加油站", type: "special", description: "支付100元", 
+      { node_id: "08", board_id: board._id.toString(), name: "加油站", type: "special", description: "支付100元", 
         challenge: { type: "action", title: "加油站", content: "支付100元過路費", reward: "-100分" }},
       
       // 底部 (10-18)
-      { node_id: "10", board_id: board._id.toString(), name: "光復路", type: "property", description: "光復地產" },
-      { node_id: "11", board_id: board._id.toString(), name: "勝利路", type: "property", description: "勝利地產" },
-      { node_id: "12", board_id: board._id.toString(), name: "機會卡", type: "chance", description: "機會卡", 
+      { node_id: "09", board_id: board._id.toString(), name: "光復路", type: "property", description: "光復地產" },
+      { node_id: "10", board_id: board._id.toString(), name: "勝利路", type: "property", description: "勝利地產" },
+      { node_id: "11", board_id: board._id.toString(), name: "機會卡", type: "chance", description: "機會卡", 
         chance: { type: "positive", title: "機會卡", content: "獲得意外獎勵", effect: "+150分" }},
-      { node_id: "13", board_id: board._id.toString(), name: "學園路", type: "property", description: "學園地產" },
-      { node_id: "14", board_id: board._id.toString(), name: "火車站前街", type: "property", description: "火車站地產" },
-      { node_id: "15", board_id: board._id.toString(), name: "來學單字", type: "challenge", description: "單字學習挑戰", 
+      { node_id: "12", board_id: board._id.toString(), name: "學園路", type: "property", description: "學園地產" },
+      { node_id: "13", board_id: board._id.toString(), name: "火車站前街", type: "property", description: "火車站地產" },
+      { node_id: "14", board_id: board._id.toString(), name: "來學單字", type: "challenge", description: "單字學習挑戰", 
         challenge: { type: "vocabulary", title: "單字挑戰", content: "學習新的台語單字", reward: "抽取單字卡片" }},
-      { node_id: "16", board_id: board._id.toString(), name: "總站廣場", type: "property", description: "總站地產" },
-      { node_id: "17", board_id: board._id.toString(), name: "和平路", type: "property", description: "和平地產" },
-      { node_id: "18", board_id: board._id.toString(), name: "火車挑戰", type: "challenge", description: "完成挑戰可以搭火車", 
+      { node_id: "15", board_id: board._id.toString(), name: "總站廣場", type: "property", description: "總站地產" },
+      { node_id: "16", board_id: board._id.toString(), name: "和平路", type: "property", description: "和平地產" },
+      { node_id: "17", board_id: board._id.toString(), name: "火車挑戰", type: "challenge", description: "完成挑戰可以搭火車", 
         challenge: { type: "train", title: "火車挑戰", content: "完成挑戰可以搭火車", reward: "免費移動" }},
       
       // 左側 (19-27)
-      { node_id: "19", board_id: board._id.toString(), name: "書香街", type: "property", description: "書香地產" },
-      { node_id: "20", board_id: board._id.toString(), name: "港口路", type: "property", description: "港口地產" },
-      { node_id: "21", board_id: board._id.toString(), name: "中正街", type: "property", description: "中正地產" },
-      { node_id: "22", board_id: board._id.toString(), name: "機會卡", type: "chance", description: "機會卡", 
+      { node_id: "18", board_id: board._id.toString(), name: "書香街", type: "property", description: "書香地產" },
+      { node_id: "19", board_id: board._id.toString(), name: "港口路", type: "property", description: "港口地產" },
+      { node_id: "20", board_id: board._id.toString(), name: "中正街", type: "property", description: "中正地產" },
+      { node_id: "21", board_id: board._id.toString(), name: "機會卡", type: "chance", description: "機會卡", 
         chance: { type: "neutral", title: "機會卡", content: "隨機事件", effect: "隨機獎勵/懲罰" }},
-      { node_id: "23", board_id: board._id.toString(), name: "健康路", type: "property", description: "健康地產" },
-      { node_id: "24", board_id: board._id.toString(), name: "海山街", type: "property", description: "海山地產" },
-      { node_id: "25", board_id: board._id.toString(), name: "來學單字", type: "challenge", description: "單字學習挑戰", 
+      { node_id: "22", board_id: board._id.toString(), name: "健康路", type: "property", description: "健康地產" },
+      { node_id: "23", board_id: board._id.toString(), name: "海山街", type: "property", description: "海山地產" },
+      { node_id: "24", board_id: board._id.toString(), name: "來學單字", type: "challenge", description: "單字學習挑戰", 
         challenge: { type: "vocabulary", title: "單字挑戰", content: "學習新的台語單字", reward: "抽取單字卡片" }},
-      { node_id: "26", board_id: board._id.toString(), name: "二聖路", type: "property", description: "二聖地產" },
-      { node_id: "27", board_id: board._id.toString(), name: "道路施工", type: "special", description: "道路施工，暫時停用", 
+      { node_id: "25", board_id: board._id.toString(), name: "二聖路", type: "property", description: "二聖地產" },
+      { node_id: "26", board_id: board._id.toString(), name: "道路施工", type: "special", description: "道路施工，暫時停用", 
         challenge: { type: "action", title: "道路施工", content: "道路施工，停一回合", reward: "停一回合" }},
       
       // 頂部 (28-36)
-      { node_id: "28", board_id: board._id.toString(), name: "椰林大道", type: "property", description: "椰林地產" },
-      { node_id: "29", board_id: board._id.toString(), name: "六合街", type: "property", description: "六合地產" },
-      { node_id: "30", board_id: board._id.toString(), name: "挑戰", type: "challenge", description: "情境挑戰", 
+      { node_id: "27", board_id: board._id.toString(), name: "椰林大道", type: "property", description: "椰林地產" },
+      { node_id: "28", board_id: board._id.toString(), name: "六合街", type: "property", description: "六合地產" },
+      { node_id: "29", board_id: board._id.toString(), name: "挑戰", type: "challenge", description: "情境挑戰", 
         challenge: { type: "story", title: "情境挑戰", content: "完成故事情境挑戰", reward: "+200分" }},
-      { node_id: "31", board_id: board._id.toString(), name: "中山街", type: "property", description: "中山地產" },
-      { node_id: "32", board_id: board._id.toString(), name: "八德路", type: "property", description: "八德地產" },
-      { node_id: "33", board_id: board._id.toString(), name: "飛機場路", type: "property", description: "飛機場地產" },
-      { node_id: "34", board_id: board._id.toString(), name: "機會卡", type: "chance", description: "機會卡", 
+      { node_id: "30", board_id: board._id.toString(), name: "中山街", type: "property", description: "中山地產" },
+      { node_id: "31", board_id: board._id.toString(), name: "八德路", type: "property", description: "八德地產" },
+      { node_id: "32", board_id: board._id.toString(), name: "飛機場路", type: "property", description: "飛機場地產" },
+      { node_id: "33", board_id: board._id.toString(), name: "機會卡", type: "chance", description: "機會卡", 
         chance: { type: "positive", title: "機會卡", content: "獲得意外獎勵", effect: "+150分" }},
-      { node_id: "35", board_id: board._id.toString(), name: "成功街", type: "property", description: "成功地產" },
-      { node_id: "36", board_id: board._id.toString(), name: "建國路", type: "property", description: "建國地產" },
+      { node_id: "34", board_id: board._id.toString(), name: "成功街", type: "property", description: "成功地產" },
       
-      // 內圈捷徑 (37-42)
-      { node_id: "37", board_id: board._id.toString(), name: "來學單字", type: "challenge", description: "捷徑單字挑戰", 
+      // D系列節點（鐵路路徑）
+      { node_id: "D5", board_id: board._id.toString(), name: "幸福大道", type: "property", description: "鐵路地產" },
+      { node_id: "D4", board_id: board._id.toString(), name: "來學單字", type: "challenge", description: "單字學習挑戰",
         challenge: { type: "vocabulary", title: "單字挑戰", content: "學習新的台語單字", reward: "抽取單字卡片" }},
-      { node_id: "38", board_id: board._id.toString(), name: "建國路", type: "property", description: "建國地產" },
-      { node_id: "39", board_id: board._id.toString(), name: "挑戰", type: "challenge", description: "捷徑挑戰", 
-        challenge: { type: "action", title: "捷徑挑戰", content: "完成挑戰可以繼續", reward: "繼續前進" }},
-      { node_id: "40", board_id: board._id.toString(), name: "中央商圈", type: "property", description: "中央地產" },
-      { node_id: "41", board_id: board._id.toString(), name: "新生街", type: "property", description: "新生地產" },
-      { node_id: "42", board_id: board._id.toString(), name: "幸福大道", type: "property", description: "幸福地產" }
+      { node_id: "D3", board_id: board._id.toString(), name: "建國路", type: "property", description: "鐵路地產" },
+      { node_id: "D2", board_id: board._id.toString(), name: "挑戰", type: "challenge", description: "情境挑戰",
+        challenge: { type: "story", title: "情境挑戰", content: "完成故事情境挑戰", reward: "+200分" }},
+      { node_id: "D1", board_id: board._id.toString(), name: "中央商圈", type: "property", description: "鐵路地產" },
+      { node_id: "D0", board_id: board._id.toString(), name: "新生街", type: "property", description: "鐵路地產" },
     ];
 
-    // 刪除現有節點
-    await MapNodeModel.deleteMany({ board_id: board._id.toString() });
-    console.log('已清除現有節點');
-
-    // 創建新節點
-    const nodes = await MapNodeModel.insertMany(nodesData);
-    console.log(`創建了 ${nodes.length} 個節點`);
+    // 檢查並創建缺失的節點（不刪除現有節點）
+    const existingNodes = await MapNodeModel.find({ board_id: board._id.toString() }).lean();
+    const existingNodeIds = existingNodes.map((node: any) => node.node_id);
+    
+    // 只創建不存在的節點
+    const nodesToCreate = nodesData.filter(node => !existingNodeIds.includes(node.node_id));
+    
+    if (nodesToCreate.length > 0) {
+      const newNodes = await MapNodeModel.insertMany(nodesToCreate);
+      console.log(`創建了 ${newNodes.length} 個新節點`);
+    } else {
+      console.log('所有節點都已存在，無需創建新節點');
+    }
 
     // 3. 創建連接資料
     const edgesData = [
       // 外圈連接 (S0 -> 01 -> 02 -> ... -> 36 -> S0)
-      { from: "S0", to: "01", board_id: board._id.toString(), type: "normal" },
+      { from: "S0", to: "00", board_id: board._id.toString(), type: "normal" },
+      { from: "00", to: "01", board_id: board._id.toString(), type: "normal" },
       { from: "01", to: "02", board_id: board._id.toString(), type: "normal" },
       { from: "02", to: "03", board_id: board._id.toString(), type: "normal" },
       { from: "03", to: "04", board_id: board._id.toString(), type: "normal" },
@@ -145,20 +151,18 @@ async function initMapData() {
       { from: "31", to: "32", board_id: board._id.toString(), type: "normal" },
       { from: "32", to: "33", board_id: board._id.toString(), type: "normal" },
       { from: "33", to: "34", board_id: board._id.toString(), type: "normal" },
-      { from: "34", to: "35", board_id: board._id.toString(), type: "normal" },
-      { from: "35", to: "36", board_id: board._id.toString(), type: "normal" },
-      { from: "36", to: "S0", board_id: board._id.toString(), type: "normal" },
+      { from: "34", to: "S0", board_id: board._id.toString(), type: "normal" },
       
-      // 捷徑連接 (33 -> 37)
-      { from: "33", to: "37", board_id: board._id.toString(), type: "shortcut" },
+      // 火車挑戰特殊連接 (17 -> D5) - 挑戰成功後可選擇鐵路路徑到D5
+      { from: "17", to: "D5", board_id: board._id.toString(), type: "conditional", condition: { required_challenge: "train" } },
       
-      // 內圈連接 (37 -> 38 -> ... -> 42 -> S0)
-      { from: "37", to: "38", board_id: board._id.toString(), type: "normal" },
-      { from: "38", to: "39", board_id: board._id.toString(), type: "normal" },
-      { from: "39", to: "40", board_id: board._id.toString(), type: "normal" },
-      { from: "40", to: "41", board_id: board._id.toString(), type: "normal" },
-      { from: "41", to: "42", board_id: board._id.toString(), type: "normal" },
-      { from: "42", to: "S0", board_id: board._id.toString(), type: "normal" }
+      // D系列鐵路路徑連接 D4 -> D3 -> D2 -> D1 -> D0 -> S0 -> 00 -> 01
+      { from: "D5", to: "D4", board_id: board._id.toString(), type: "normal" },
+      { from: "D4", to: "D3", board_id: board._id.toString(), type: "normal" },
+      { from: "D3", to: "D2", board_id: board._id.toString(), type: "normal" },
+      { from: "D2", to: "D1", board_id: board._id.toString(), type: "normal" },
+      { from: "D1", to: "D0", board_id: board._id.toString(), type: "normal" },
+      { from: "D0", to: "S0", board_id: board._id.toString(), type: "normal" },
     ];
 
     // 刪除現有連接
