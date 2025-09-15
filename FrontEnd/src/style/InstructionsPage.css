@@ -59,6 +59,15 @@
   border-radius: inherit;
 }
 
+/* 影片自適應外框 */
+.card-placeholder video {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: inherit;
+  max-height: 400px; /* 限制影片高度 */
+}
+
 /* 文字描述自適應 */
 .content-description {
   font-family: 'Inter', sans-serif;
