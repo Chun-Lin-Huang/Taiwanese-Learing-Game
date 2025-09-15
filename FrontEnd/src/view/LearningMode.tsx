@@ -8,6 +8,12 @@ import userIcon from "../assets/icon-user.png";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import overview from "../assets/圖片總覽示意.png";
+import playFromImage from "../assets/點圖片播放示意圖.png";
+import front from "../assets/單字卡正面.png";
+import back from "../assets/單字卡背面.png";
+import playButton from "../assets/播放鍵示意.png";
+import favorite from "../assets/收藏鍵示意.png";
 
 // 本次登入「不再顯示」的 sessionStorage key
 const HIDE_GUIDE_KEY = 'hide_vocab_guide_this_session';
@@ -312,7 +318,7 @@ function VocabGuideModal({
               使用者可點擊感興趣的圖片，進入該圖片的單字學習頁面。
             </p>
             <div className="guide-img">
-              <img src="/mock/guide/overview.jpg" alt="圖片總覽示意" />
+              <img src={overview} alt="圖片總覽示意" />
             </div>
           </section>
 
@@ -320,7 +326,7 @@ function VocabGuideModal({
             <h3 className="guide-heading">二、圖片點擊快速學習</h3>
             <p className="guide-text">直接點擊圖片本身，即可播放該圖片對應單字的發音。</p>
             <div className="guide-img">
-              <img src="/mock/guide/play-from-image.jpg" alt="點圖片播放發音示意" />
+              <img src={playFromImage} alt="點圖片播放發音示意" />
             </div>
           </section>
 
@@ -341,13 +347,13 @@ function VocabGuideModal({
               <div className="guide-pane">
                 <div className="guide-pane-title">正面</div>
                 <div className="guide-img">
-                  <img src="/mock/guide/front.jpg" alt="單字卡正面示意" />
+                  <img src={front} alt="單字卡正面示意" />
                 </div>
               </div>
               <div className="guide-pane">
                 <div className="guide-pane-title">反面</div>
                 <div className="guide-img">
-                  <img src="/mock/guide/back.jpg" alt="單字卡反面示意" />
+                  <img src={back} alt="單字卡反面示意" />
                 </div>
               </div>
             </div>
@@ -357,7 +363,7 @@ function VocabGuideModal({
             <h3 className="guide-heading">四、播放發音</h3>
             <p className="guide-text">單字卡正、反兩面皆有播放鍵，可點擊播放正確發音。</p>
             <div className="guide-img">
-              <img src="/mock/guide/play-button.jpg" alt="播放鍵示意" />
+              <img src={playButton} alt="播放鍵示意" />
             </div>
           </section>
 
@@ -367,7 +373,7 @@ function VocabGuideModal({
               點擊收藏鍵可將單字卡加入收藏集，之後可在「收藏集」中快速複習已收藏的單字。
             </p>
             <div className="guide-img">
-              <img src="/mock/guide/favorite.jpg" alt="收藏鍵示意" />
+              <img src={favorite} alt="收藏鍵示意" />
             </div>
           </section>
         </div>

@@ -278,7 +278,7 @@
   align-items: center;
   text-align: center;
   width: 100%;
-  max-width: 380px;
+  max-width: 650px;
 }
 .guide-pane-title {
   font-size: 28px;
@@ -288,8 +288,8 @@
 }
 .guide-img {
   width: 100%;
-  max-width: 320px;
-  max-height: 420px;
+  max-width: 600px;
+  max-height: 400px;
   overflow: hidden;
   border-radius: 12px;
   border: 2px solid #ddd;
