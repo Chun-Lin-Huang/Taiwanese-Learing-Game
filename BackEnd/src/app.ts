@@ -16,11 +16,44 @@ export const DB = new MongoDB({
   dbName:process.env.DBNAME as string
 });
 
-// 確保從環境變數中讀取前端的 origin URL
-const frontendOrigin = process.env.FRONTEND_URL || "http://localhost:5173"; // 默認使用 http://localhost:5173
+// 支持多個前端來源，包括外部 IP 訪問
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "http://gai-bot.com",
+  "https://gai-bot.com",
+  "http://www.gai-bot.com",
+  "https://www.gai-bot.com",
+  "http://163.13.202.125:5173",  // 添加服務器IP
+  "https://163.13.202.125:5173",
+  "http://163.13.202.125",       // 添加服務器IP (無端口)
+  "https://163.13.202.125",
+  process.env.FRONTEND_URL
+].filter((origin): origin is string => Boolean(origin));
 
 app.use(cors({
-  origin: frontendOrigin, // 設置具體的前端 URL，而不是 '*'
+  origin: function (origin, callback) {
+    // 允許沒有 origin 的請求（如移動應用、Postman等）
+    if (!origin) return callback(null, true);
+    
+    // 檢查是否在允許列表中
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+    
+    // 允許所有本地開發環境
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, true);
+    }
+    
+    // 允許服務器IP的所有端口
+    if (origin.includes('163.13.202.125')) {
+      return callback(null, true);
+    }
+    
+    // 其他情況拒絕
+    return callback(new Error('Not allowed by CORS'));
+  },
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   preflightContinue: false,
   optionsSuccessStatus: 200,
@@ -36,6 +69,6 @@ for (const route of router) {
   app.use(route.getRouter());
 }
 
-server.listen(process.env.PORT, () => {
-  logger.info('listening on *:' + process.env.PORT);
+server.listen(process.env.PORT, '0.0.0.0', () => {
+  logger.info('listening on 0.0.0.0:' + process.env.PORT);
 });

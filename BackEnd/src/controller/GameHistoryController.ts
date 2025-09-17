@@ -14,7 +14,7 @@ export class MonopolyHistoryController {
    */
   public async createGame(req: Request, res: Response) {
     try {
-      const { gameId, gameName, boardId, players } = req.body;
+      const { gameId, gameName, roomCode, boardId, players } = req.body;
 
       if (!gameId || !gameName || !players) {
         return res.status(400).json({ 
@@ -33,6 +33,7 @@ export class MonopolyHistoryController {
       const result = await this.service.createGame({
         gameId,
         gameName,
+        roomCode,  // 新增：房間代碼
         boardId,
         players
       });

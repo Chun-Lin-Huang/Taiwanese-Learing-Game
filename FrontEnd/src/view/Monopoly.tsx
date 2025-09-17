@@ -10,6 +10,7 @@ import '../style/AudioControls.css';
 import { MapApiService, type MapBoard } from '../services/mapApi';
 import { api } from '../enum/api';
 import { asyncGet, asyncPost } from '../utils/fetch';
+import { API_BASE_URL } from '../config/apiConfig';
 import QRScanner from '../components/QRScanner';
 import { CardApiService } from '../services/cardApi';
 import type { Card, CardUseResponse } from '../interfaces/Card';
@@ -114,11 +115,17 @@ interface GameHistory {
   endTime?: Date;
   actions: GameAction[];
   players: Player[];
+  roomCode?: string; // 新增：房間代碼
 }
 
 const Monopoly: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    
+    // 從 location.state 獲取房號和其他資料
+    const roomCodeFromState = location.state?.roomCode;
+    // const playersFromState = location.state?.players;
+    // const userDataFromState = location.state?.userData;
     
     // 地圖資料狀態
     const [mapBoard, setMapBoard] = useState<MapBoard | null>(null);
@@ -168,8 +175,8 @@ const Monopoly: React.FC = () => {
   // 情境對話相關狀態
   const [scenarioSessionId, setScenarioSessionId] = useState<string | null>(null);
   const [scenarioMessages, setScenarioMessages] = useState<Array<{type: 'incoming' | 'outgoing', sender: string, content: string}>>([]);
-  const [scenarioPlayerInput, setScenarioPlayerInput] = useState<string>('');
-  const [scenarioIsProcessing, setScenarioIsProcessing] = useState(false);
+  const [, setScenarioPlayerInput] = useState<string>('');
+  const [, setScenarioIsProcessing] = useState(false);
   const [scenarioTopics, setScenarioTopics] = useState<Array<{_id: string, name: string}>>([]);
   const [currentSelectedTopic, setCurrentSelectedTopic] = useState<{_id: string, name: string} | null>(null);
   
@@ -225,12 +232,24 @@ const Monopoly: React.FC = () => {
     gameId: `game_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     startTime: new Date(),
     actions: [],
-    players: []
+    players: [],
+    roomCode: roomCodeFromState || '123456' // 使用從 state 獲取的房號，如果沒有則使用預設值
   });
   
   // 遊戲是否已在資料庫中創建
   const [isGameCreatedInDB, setIsGameCreatedInDB] = useState(false);
   const isCreatingGameRef = useRef(false);
+
+  // 當房號從 state 變化時，更新 gameHistory
+  useEffect(() => {
+    if (roomCodeFromState) {
+      setGameHistory(prev => ({
+        ...prev,
+        roomCode: roomCodeFromState
+      }));
+    }
+  }, [roomCodeFromState]);
+
 
   // 載入情境主題
   useEffect(() => {
@@ -457,7 +476,7 @@ const Monopoly: React.FC = () => {
         };
 
         try {
-          await asyncPostGameHistory('http://127.0.0.1:2083/api/v1/monopoly-history/create', gameData);
+          await asyncPostGameHistory(`${API_BASE_URL}/api/v1/monopoly-history/create`, gameData);
           console.log('遊戲記錄已創建到資料庫');
         } catch (error: any) {
           console.error('創建遊戲記錄失敗:', error.message);
@@ -483,7 +502,7 @@ const Monopoly: React.FC = () => {
         };
 
         try {
-          await asyncPostGameHistory(`http://127.0.0.1:2083/api/v1/monopoly-history/${gameHistory.gameId}/action`, actionData);
+          await asyncPostGameHistory(`${API_BASE_URL}/api/v1/monopoly-history/${gameHistory.gameId}/action`, actionData);
           // 成功保存
         } catch (error: any) {
           console.error('保存遊戲動作失敗:', error.message);
@@ -506,7 +525,7 @@ const Monopoly: React.FC = () => {
       }));
 
       try {
-        await asyncPostGameHistory(`http://127.0.0.1:2083/api/v1/monopoly-history/${gameHistory.gameId}/end`, {
+        await asyncPostGameHistory(`${API_BASE_URL}/api/v1/monopoly-history/${gameHistory.gameId}/end`, {
           winner,
           finalPlayers
         });
@@ -1712,9 +1731,9 @@ const Monopoly: React.FC = () => {
         formData.append('chat_choose_id', currentSelectedTopic?._id || 'default_chat_choose'); // 使用選擇的主題ID
         formData.append('title', currentSelectedTopic?.name || '台語情境挑戰'); // 使用主題名稱
         
-        console.log('發送情境對話 STT 請求到:', 'http://localhost:5050/process_audio');
+        console.log('發送情境對話 STT 請求到:', '/voice-service/process_audio');
         
-        const response = await fetch('http://localhost:5050/process_audio', {
+        const response = await fetch('/voice-service/process_audio', {
           method: 'POST',
           body: formData,
         });
@@ -1869,7 +1888,7 @@ const Monopoly: React.FC = () => {
         formData.append('skip_tts', 'true');
         formData.append('skip_db', 'true');
         
-        const response = await fetch('http://localhost:5050/process_audio', {
+        const response = await fetch('/voice-service/process_audio', {
           method: 'POST',
           body: formData,
         });
@@ -1916,9 +1935,9 @@ const Monopoly: React.FC = () => {
         formData.append('chat_choose_id', currentSelectedTopic?._id || 'challenge_scenario'); // 使用選擇的主題ID
         formData.append('title', currentSelectedTopic?.name || '台語挑戰對話'); // 使用主題名稱
         
-        console.log('發送挑戰對話 STT 請求到:', 'http://localhost:5050/process_audio');
+        console.log('發送挑戰對話 STT 請求到:', '/voice-service/process_audio');
         
-        const response = await fetch('http://localhost:5050/process_audio', {
+        const response = await fetch('/voice-service/process_audio', {
           method: 'POST',
           body: formData,
         });
@@ -2337,6 +2356,7 @@ const Monopoly: React.FC = () => {
   };
 
 
+
   // 如果地圖還沒載入，顯示載入畫面
   if (!isMapLoaded) {
     return (
@@ -2488,7 +2508,7 @@ const Monopoly: React.FC = () => {
             🔄 換人
           </button>
           <span className="room-label">房號：</span>
-          <div className="room-number">1234</div>
+          <div className="room-number">{gameHistory.roomCode || "載入中..."}</div>
         </div>
       </div>
 
@@ -3528,6 +3548,7 @@ const Monopoly: React.FC = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };

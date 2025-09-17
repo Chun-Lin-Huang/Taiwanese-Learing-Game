@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import backIcon from "../assets/back.svg";
+import backIcon from "../assets/Back.svg";
 import favoriteActive from "../assets/red.svg";
 import storyFallback from "../assets/story.png";
 

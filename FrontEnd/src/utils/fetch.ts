@@ -125,6 +125,7 @@ export async function asyncPut(api: string, body: {} | FormData): Promise<any> {
     };
   }
 }
+
 export function asyncPatch(url: string, body: {} | FormData) {
   return send("PATCH", url, body);
 }

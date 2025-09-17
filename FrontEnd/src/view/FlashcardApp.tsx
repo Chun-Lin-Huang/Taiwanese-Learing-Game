@@ -5,7 +5,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import "../style/FlashcardApp.css";
 
-import backIcon from "../assets/back.svg";
+import backIcon from "../assets/Back.svg";
 import volumeIcon from "../assets/volume up.svg";
 import leftArrow from "../assets/left.svg";
 import rightArrow from "../assets/right.svg";

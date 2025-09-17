@@ -1,4 +1,5 @@
 // Moedict API 服務
+import { VOICE_SERVICE_URL } from '../config/apiConfig';
 export interface MoedictResponse {
   t: string; // 詞條
   h: Array<{
@@ -24,7 +25,7 @@ export interface SearchResult {
 
 // 台語語音服務
 export class TaiwaneseTTSService {
-  private baseUrl = 'http://localhost:5050';
+  private baseUrl = VOICE_SERVICE_URL;
 
   /**
    * 使用台語TTS服務生成語音

@@ -11,7 +11,9 @@ export class MongoDB {
 
     constructor(info: MongoInfo) {
 
-        const url = `mongodb://${info.name}:${encodeURIComponent(info.password)}@${info.host}:${info.port}/${info.dbName}`;
+        const url = info.name && info.password 
+            ? `mongodb://${info.name}:${encodeURIComponent(info.password)}@${info.host}:${info.port}/${info.dbName}`
+            : `mongodb://${info.host}:${info.port}/${info.dbName}`;
 
         this.init(url).then(() => {
 

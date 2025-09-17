@@ -95,11 +95,25 @@ async function fetchVocabDetailBestEffort(id: string): Promise<VocabMini | null>
   }
 }
 
-/** 括號變細（支援全形/半形） */
-const wrapParens = (s: string) =>
-  (s || "")
+/** 
+ * 將字串中的括號用 span 包裹，同時對內容進行 HTML 跳脫以防止 XSS。
+ * @param s 原始字串
+ * @returns 包含安全 HTML 的字串
+ */
+const wrapParens = (s: string): string => {
+  if (!s) return "";
+
+  // 1. 先進行 HTML 跳脫，防止 XSS
+  // 建立一個暫時的 div 元素，利用 textContent 的特性來進行跳脫
+  const sanitizer = document.createElement('div');
+  sanitizer.textContent = s;
+  const sanitizedText = sanitizer.innerHTML;
+
+  // 2. 對已經安全的文字進行樣式包裹
+  return sanitizedText
     .replace(/\((.*?)\)/g, '<span class="thin-text">($1)</span>')
     .replace(/（(.*?)）/g, '<span class="thin-text">（$1）</span>');
+};
 
 const FavoriteCollectionPage: React.FC = () => {
   const navigate = useNavigate();

@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../style/SearchPage.css";
 import "../App.css";
-import Back from "../assets/back.svg";
+import Back from "../assets/Back.svg";
 import InputBox from "../assets/InputBox.png";
-import SearchIcon from "../assets/Search.svg";
+import SearchIcon from "../assets/search.svg";
 import VolumeIcon from "../assets/Volume.png";
 import { moedictService, type SearchResult, audioService } from "../services/MoedictService";
 

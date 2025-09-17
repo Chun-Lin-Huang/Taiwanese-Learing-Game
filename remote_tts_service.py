@@ -107,7 +107,8 @@ class RemoteTtsService:
             with open(list_path, 'w', encoding='utf-8') as f:
                 for p in paths:
                     if p:
-                        f.write(f"file '{os.path.abspath(p).replace('\\\\','/')}'\n")
+                        abs_path = os.path.abspath(p).replace('\\', '/')
+                        f.write(f"file '{abs_path}'\n")
             cmd = [ffmpeg, '-y', '-f', 'concat', '-safe', '0', '-i', list_path, '-ac', '1', '-ar', '44100', '-c:a', 'pcm_s16le', out_path]
             subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             try:

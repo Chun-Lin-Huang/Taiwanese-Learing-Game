@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../style/ScoreSummary.css';
+import { API_BASE_URL } from '../config/apiConfig';
 
 interface PlayerRecord {
   id: number;
@@ -19,12 +20,14 @@ interface GameAction {
   description: string;
   details?: any;
   timestamp: Date;
+  roomCode?: string;  // 新增：房間代碼
 }
 
 interface GameHistory {
   _id?: string;
   gameId: string;
   gameName: string;
+  roomCode?: string;  // 新增：房間代碼
   players: Array<{
     id: number;
     name: string;
@@ -43,32 +46,38 @@ interface GameHistory {
   gameStatus: 'in_progress' | 'completed' | 'abandoned';
 }
 
-interface Player {
-  id: number;
-  name: string;
-  avatar: string;
-  avatarImage?: string;
-  round: number;
-  status: string;
-  location: number;
-  locationName: string;
-  record: string;
-  records: PlayerRecord[];
-  isCurrentPlayer: boolean;
-  score: number;
-  diceSum: number;
-}
+// interface Player {
+//   id: number;
+//   name: string;
+//   avatar: string;
+//   avatarImage?: string;
+//   round: number;
+//   status: string;
+//   location: number;
+//   locationName: string;
+//   record: string;
+//   records: PlayerRecord[];
+//   isCurrentPlayer: boolean;
+//   score: number;
+//   diceSum: number;
+// }
 
 const ScoreSummary: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const players = location.state?.players || [];
   const gameId = location.state?.gameId;
-  const _frontendGameHistory = location.state?.gameHistory;
+  const roomCode = location.state?.roomCode;  // 新增：房間代碼
+  // const _frontendGameHistory = location.state?.gameHistory;
   const winner = location.state?.winner;
   
+  // 調試信息
+  console.log('ScoreSummary: location.state:', location.state);
+  console.log('ScoreSummary: roomCode from state:', roomCode);
+  console.log('ScoreSummary: roomCode type:', typeof roomCode);
+  
   const [dbGameHistory, setDbGameHistory] = useState<GameHistory | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
 
   // 從資料庫讀取遊戲歷史
   useEffect(() => {
@@ -77,10 +86,13 @@ const ScoreSummary: React.FC = () => {
       
       setLoading(true);
       try {
-        const response = await fetch(`http://127.0.0.1:2083/api/v1/monopoly-history/${gameId}`);
+        const response = await fetch(`${API_BASE_URL}/api/v1/monopoly-history/${gameId}`);
         if (response.ok) {
           const result = await response.json();
+          console.log('ScoreSummary: API 回應:', result);
           if (result.code === 200) {
+            console.log('ScoreSummary: 遊戲歷史數據:', result.body);
+            console.log('ScoreSummary: 動作數量:', result.body?.actions?.length || 0);
             setDbGameHistory(result.body);
           }
         } else {
@@ -125,6 +137,22 @@ const ScoreSummary: React.FC = () => {
     });
   };
 
+  // 過濾遊戲動作（暫時不過濾房間，直接顯示所有動作）
+  const getFilteredActions = () => {
+    if (!dbGameHistory?.actions) {
+      console.log('ScoreSummary: 沒有遊戲歷史數據');
+      return [];
+    }
+    
+    console.log('ScoreSummary: 原始動作數量:', dbGameHistory.actions.length);
+    console.log('ScoreSummary: 房間代碼:', roomCode);
+    console.log('ScoreSummary: 原始動作:', dbGameHistory.actions);
+    
+    // 暫時不過濾房間，直接返回所有動作
+    console.log('ScoreSummary: 顯示所有動作（不過濾房間）');
+    return dbGameHistory.actions;
+  };
+
   return (
     <div className="score-summary-overlay">
       <div className="score-summary-content">
@@ -138,6 +166,7 @@ const ScoreSummary: React.FC = () => {
           </button>
           <div className="summary-title">
             <span className="title-text">成績總結</span>
+            {roomCode && <span className="room-code">房間: {roomCode}</span>}
             <span className="title-icon">📊</span>
           </div>
         </div>
@@ -145,8 +174,8 @@ const ScoreSummary: React.FC = () => {
         {/* 玩家排名 - 頭像和名字在框框外，記錄在下方 */}
         <div className="player-rankings-container">
           {getPlayerRanking().map((player, index) => {
-            // 獲取該玩家的挑戰記錄
-            const playerActions = dbGameHistory?.actions.filter(action => action.playerId === player.id) || [];
+            // 獲取該玩家的挑戰記錄（使用過濾後的動作）
+            const playerActions = getFilteredActions().filter(action => action.playerId === player.id);
             
             // 統計挑戰成功/失敗次數
             const challengeActions = playerActions.filter(action => action.actionType === 'challenge');

@@ -8,12 +8,14 @@ export interface GameAction {
   description: string;
   details?: any;
   timestamp: Date;
+  roomCode?: string;  // 新增：房間代碼
 }
 
 export interface MonopolyHistory {
   _id?: string;
   gameId: string;                    // 遊戲唯一識別碼
   gameName: string;                  // 遊戲名稱
+  roomCode?: string;                 // 新增：房間代碼
   boardId?: Types.ObjectId;          // 對應的地圖板ID（可選）
   players: Array<{                   // 參與遊戲的玩家
     id: number;

@@ -10,6 +10,7 @@ export class MonopolyHistoryService {
   async createGame(gameData: {
     gameId: string;
     gameName: string;
+    roomCode?: string;  // 新增：房間代碼
     boardId: string;
     players: Array<{
       id: number;
@@ -36,6 +37,7 @@ export class MonopolyHistoryService {
       const gameHistory = await MonopolyHistoryModel.create({
         gameId: gameData.gameId,
         gameName: gameData.gameName,
+        roomCode: gameData.roomCode,  // 新增：房間代碼
         boardId: gameData.boardId ? new Types.ObjectId(gameData.boardId) : undefined,
         players: gameData.players,
         actions: [],

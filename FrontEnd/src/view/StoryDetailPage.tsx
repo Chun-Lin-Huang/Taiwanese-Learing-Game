@@ -4,7 +4,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import "../style/StoryDetailPage.css";
 import "../style/ThemeSelectionPage.css";
 
-import backIcon from "../assets/back.svg";
+import backIcon from "../assets/Back.svg";
 
 import { api } from "../enum/api";
 import { asyncGet } from "../utils/fetch";

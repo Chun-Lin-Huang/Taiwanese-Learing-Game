@@ -8,11 +8,13 @@ interface GameActionDoc extends Document {
   description: string;
   details?: any;
   timestamp: Date;
+  roomCode?: string;  // 新增：房間代碼
 }
 
 interface MonopolyHistoryDoc extends Document {
   gameId: string;
   gameName: string;
+  roomCode?: string;  // 新增：房間代碼
   boardId: Schema.Types.ObjectId;
   players: Array<{
     id: number;
@@ -43,12 +45,14 @@ const GameActionSchema = new Schema<GameActionDoc>({
   playerName: { type: String, required: true },
   description: { type: String, required: true },
   details: { type: Schema.Types.Mixed },
-  timestamp: { type: Date, default: Date.now }
+  timestamp: { type: Date, default: Date.now },
+  roomCode: { type: String }  // 新增：房間代碼
 }, { _id: true });
 
 const MonopolyHistorySchema = new Schema<MonopolyHistoryDoc>({
   gameId: { type: String, required: true, unique: true, index: true },
   gameName: { type: String, required: true },
+  roomCode: { type: String },  // 新增：房間代碼
   boardId: { type: Schema.Types.ObjectId, required: false, ref: "MapBoard" },
   players: [{
     id: { type: Number, required: true },

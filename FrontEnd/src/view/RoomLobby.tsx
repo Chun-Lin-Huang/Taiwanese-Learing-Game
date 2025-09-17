@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -7,7 +7,7 @@ import backIcon from "../assets/Back.svg";
 import lobbyBg from "../assets/star.png"; 
 import "../style/RoomLobby.css";
 import { api } from "../enum/api";
-import { asyncGet } from "../utils/fetch";
+import { asyncGet, asyncPost, asyncPut } from "../utils/fetch";
 
 interface UserData {
   _id: string;
@@ -15,14 +15,32 @@ interface UserData {
   userName: string;
 }
 
+interface RoomData {
+  roomCode: string;
+  gameName: string;
+  maxPlayers: number;
+  currentPlayers: number;
+  players: Array<{
+    id: number;
+    name: string;
+    userName?: string;
+    isReady: boolean;
+  }>;
+  status: string;
+}
+
 const RoomLobby: React.FC = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
 
-  // 房號：若有 query 參數就用，否則示範用 1234
-  const roomCode = params.get("code") || "1234";
+  // 房號：從 URL 參數獲取
+  const roomCode = params.get("code");
   // 依照上一頁選擇的人數決定幾個座位，沒有的話示範 4 位
   const total = Number(params.get("players") || 4);
+
+  // 房間資料狀態
+  const [roomData, setRoomData] = useState<RoomData | null>(null);
+  const [loading, setLoading] = useState(false);
 
   // 玩家名稱狀態
   const [playerNames, setPlayerNames] = useState<string[]>(
@@ -43,6 +61,65 @@ const RoomLobby: React.FC = () => {
   const [userValidationStates, setUserValidationStates] = useState<boolean[]>(
     Array.from({ length: total }, () => false)
   );
+
+  // 載入房間資料
+  useEffect(() => {
+    if (roomCode) {
+      loadRoomData();
+    }
+  }, [roomCode]);
+
+  const loadRoomData = async () => {
+    if (!roomCode) return;
+    
+    setLoading(true);
+    try {
+      const response = await asyncGet(`${api.roomGetByCode}/${roomCode}`);
+      
+      if (response.code === 200 && response.body) {
+        setRoomData(response.body);
+        
+        // 更新玩家資料
+        const roomPlayers = response.body.players || [];
+        const newPlayerNames = Array.from({ length: total }, (_, i) => {
+          const roomPlayer = roomPlayers.find((p: any) => p.id === i + 1);
+          return roomPlayer ? roomPlayer.name : `玩家${i + 1}`;
+        });
+        setPlayerNames(newPlayerNames);
+
+        const newUserData = Array.from({ length: total }, (_, i) => {
+          const roomPlayer = roomPlayers.find((p: any) => p.id === i + 1);
+          return roomPlayer ? {
+            _id: roomPlayer.userName || '',
+            name: roomPlayer.name,
+            userName: roomPlayer.userName || ''
+          } : { _id: '', name: '', userName: '' };
+        });
+        setUserData(newUserData);
+
+        const newValidationStates = Array.from({ length: total }, (_, i) => {
+          const roomPlayer = roomPlayers.find((p: any) => p.id === i + 1);
+          return roomPlayer ? roomPlayer.isReady : false;
+        });
+        setUserValidationStates(newValidationStates);
+
+      } else {
+        toast.error("房間不存在或已過期", {
+          position: "top-center",
+          autoClose: 3000,
+        });
+        navigate("/SuperMonopoly");
+      }
+    } catch (error: any) {
+      console.error('載入房間資料失敗:', error);
+      toast.error("載入房間資料失敗", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // 更新玩家名稱
   const updatePlayerName = (index: number, name: string) => {
@@ -164,8 +241,15 @@ const RoomLobby: React.FC = () => {
   const canStartGame = allPlayersReady && allUsersValidated;
 
   // 開始遊戲
-  const startGame = () => {
-    if (canStartGame) {
+  const startGame = async () => {
+    if (!canStartGame || !roomCode) return;
+
+    try {
+      // 更新房間狀態為進行中
+      await asyncPut(`${api.roomUpdateStatus}/${roomCode}/status`, {
+        status: 'in_progress'
+      });
+
       // 使用 state 傳遞資料，不在 URL 中顯示
       navigate('/game', {
         state: {
@@ -173,6 +257,12 @@ const RoomLobby: React.FC = () => {
           players: playerNames,
           userData: userData // 傳遞使用者資料
         }
+      });
+    } catch (error: any) {
+      console.error('開始遊戲失敗:', error);
+      toast.error("開始遊戲失敗", {
+        position: "top-center",
+        autoClose: 3000,
       });
     }
   };
@@ -199,7 +289,7 @@ const RoomLobby: React.FC = () => {
 
           {/* 標題 + 房號 */}
           <h1 className="rl-title">房間號碼</h1>
-          <div className="rl-code">{roomCode}</div>
+          <div className="rl-code">{roomCode || "載入中..."}</div>
 
           {/* 提示文字 */}
           <p className="rl-hint">請輸入使用者名稱並點擊🔍驗證，所有玩家都驗證成功才能開始遊戲！</p>

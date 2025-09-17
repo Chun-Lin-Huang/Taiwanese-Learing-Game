@@ -27,6 +27,7 @@ import { GameLogicRoute } from "./routers/GameLogicRoute";
 import { MonopolyHistoryRoute } from "./routers/MonopolyHistoryRoute";
 import { CardRoute } from "./routers/CardRoute";
 import { CardUseRoute } from "./routers/CardUseRoute";
+import { RoomRoute } from "./routers/RoomRoute";
 
 export const router: Array<Route> = [
     new PageRoute(),new UserRoute()
@@ -56,4 +57,5 @@ export const router: Array<Route> = [
     ,new MonopolyHistoryRoute()
     ,new CardRoute()
     ,new CardUseRoute()
+    ,new RoomRoute()
 ];

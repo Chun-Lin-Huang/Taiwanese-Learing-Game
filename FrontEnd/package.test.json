@@ -1,0 +1,52 @@
+{
+  "name": "my-react-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest --watch",
+    "test:lazy-loading": "vitest run --reporter=verbose src/hooks/__tests__/ src/components/__tests__/LazyImage.test.tsx",
+    "test:integration": "vitest run --reporter=verbose src/view/__tests__/",
+    "test:performance": "vitest run --reporter=verbose src/test/performance.test.ts"
+  },
+  "dependencies": {
+    "@types/react-router-dom": "^5.3.3",
+    "axios": "^1.11.0",
+    "qr-scanner": "^1.4.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.7.1",
+    "react-toastify": "^11.0.5",
+    "swiper": "^11.2.10"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.30.1",
+    "@testing-library/jest-dom": "^6.1.4",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@testing-library/user-event": "^14.5.1",
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.6.0",
+    "@vitest/coverage-v8": "^1.0.4",
+    "@vitest/ui": "^1.0.4",
+    "eslint": "^9.30.1",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "jsdom": "^23.0.1",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.35.1",
+    "vite": "^7.0.4",
+    "vitest": "^1.0.4"
+  }
+}

@@ -5,7 +5,7 @@ import "../style/StoryModePage.css";
 import "../style/ThemeSelectionPage.css";
 
 import storyImage from "../assets/story.png";
-import backIcon from "../assets/back.svg";
+import backIcon from "../assets/Back.svg";
 import searchIcon from "../assets/search.svg";
 import favoriteIcon from "../assets/收藏.png";
 import favoriteTabFgActive from "../assets/red.svg";

@@ -11,6 +11,7 @@ import TopicSelectionMenu from "../view/TopicSelectionMenu";
 import type { TopicItem } from "../view/TopicSelectionMenu";
 import { api } from "../enum/api";
 import { asyncPost } from "../utils/fetch";
+import { VOICE_SERVICE_URL } from "../config/apiConfig";
 
 type ChatMsg = { type: "incoming" | "outgoing"; sender: string; content: React.ReactNode };
 const Home: React.FC = () => {
@@ -144,7 +145,7 @@ const Home: React.FC = () => {
       formData.append('chat_choose_id', topic?.id || 'default_chat_choose');
       formData.append('title', topic?.name || '台語語音對話');
       
-      const response = await fetch('http://localhost:5050/process_audio', {
+        const response = await fetch(`${VOICE_SERVICE_URL}/process_audio`, {
         method: 'POST',
         body: formData,
       });

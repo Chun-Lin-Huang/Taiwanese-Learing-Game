@@ -5,6 +5,7 @@ import ButtonClickSound from "../assets/遊戲開始介面音效.wav";
 import "../style/Game.css";
 import "../Main.css";
 import { api } from "../enum/api"; // 你的 enum/api
+import { API_BASE_URL } from "../config/apiConfig";
 
 type GameTheme = {
   title: string;
@@ -68,7 +69,7 @@ export default function GameMain() {
       };
 
       const tryByCategory = async (): Promise<GameResponse> => {
-        const r = await fetch(`http://127.0.0.1:2083/api/v1/game/by-category/${categoryId}`);
+        const r = await fetch(`${API_BASE_URL}/api/v1/game/by-category/${categoryId}`);
         const j = await r.json();
         if (!r.ok) throw new Error(j?.message || "取遊戲失敗");
         return j;
